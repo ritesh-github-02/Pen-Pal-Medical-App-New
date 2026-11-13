@@ -45,6 +45,7 @@ const BUBBLE_PATH_MOBILE =
   "Z";
 
 const mobileLayout = (scope: string) => `
+  #slide-content${scope},
   ${scope} {
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -65,10 +66,11 @@ const mobileLayout = (scope: string) => `
     box-shadow: none !important;
     border-radius: 0 !important;
   }
+  #slide-content${scope} .s4-stage,
   ${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 410px !important;
+    max-width: 440px !important;
     height: auto !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
@@ -79,7 +81,7 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 0 8px !important;
+    padding: 0 4px !important;
     margin: 0 auto !important;
     gap: 0 !important;
     box-sizing: border-box !important;
@@ -91,7 +93,7 @@ const mobileLayout = (scope: string) => `
     top: auto !important;
     transform: none !important;
     width: 100% !important;
-    max-width: clamp(335px, 88vw, 375px) !important;
+    max-width: 416px !important;
     aspect-ratio: 452 / 334 !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -113,11 +115,11 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 41.5% !important;
+    top: 41% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     width: 84% !important;
-    max-width: 315px !important;
+    max-width: 340px !important;
     padding: 0 8px !important;
     margin: 0 !important;
     display: flex !important;
@@ -128,8 +130,8 @@ const mobileLayout = (scope: string) => `
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble-text {
-    font-size: clamp(15.5px, 4.3vw, 18.5px) !important;
-    line-height: 1.3 !important;
+    font-size: clamp(18.5px, 1.7vh + 9px, 22.5px) !important;
+    line-height: 1.38 !important;
     font-weight: 700 !important;
     color: #142724 !important;
     text-align: center !important;
@@ -152,8 +154,8 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(132px, 32vw, 168px) !important;
-    height: clamp(180px, 24vh, 235px) !important;
+    width: clamp(150px, 36vw, 215px) !important;
+    height: clamp(200px, 31vh, 310px) !important;
     margin-top: -24px !important;
     margin-left: auto !important;
     margin-right: 5% !important;
@@ -177,7 +179,7 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 22px !important;
+    gap: 14px !important;
     padding-top: 4px !important;
     padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
@@ -192,8 +194,6 @@ const mobileLayout = (scope: string) => `
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
-    transform: scale(1.22) !important;
-    transform-origin: center bottom !important;
     z-index: 25 !important;
   }
   ${scope} .slide-nav,
@@ -590,3 +590,5 @@ export function Slide4AllergyBarrierScreen({
 }
 
 export default Slide4AllergyBarrierScreen;
+
+
