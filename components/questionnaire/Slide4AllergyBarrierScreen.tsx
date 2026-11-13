@@ -113,12 +113,12 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 41% !important;
+    top: 41.5% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 82% !important;
-    max-width: 300px !important;
-    padding: 0 6px !important;
+    width: 84% !important;
+    max-width: 315px !important;
+    padding: 0 8px !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -128,8 +128,8 @@ const mobileLayout = (scope: string) => `
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble-text {
-    font-size: clamp(18px, 1.8vh + 8px, 21.5px) !important;
-    line-height: 1.36 !important;
+    font-size: clamp(15.5px, 4.3vw, 18.5px) !important;
+    line-height: 1.3 !important;
     font-weight: 700 !important;
     color: #142724 !important;
     text-align: center !important;
@@ -177,7 +177,7 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 14px !important;
+    gap: 22px !important;
     padding-top: 4px !important;
     padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
@@ -192,6 +192,8 @@ const mobileLayout = (scope: string) => `
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
+    transform: scale(1.22) !important;
+    transform-origin: center bottom !important;
     z-index: 25 !important;
   }
   ${scope} .slide-nav,
@@ -588,4 +590,3 @@ export function Slide4AllergyBarrierScreen({
 }
 
 export default Slide4AllergyBarrierScreen;
-
