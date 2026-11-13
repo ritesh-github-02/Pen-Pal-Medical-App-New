@@ -19,26 +19,29 @@ export interface Slide5PrevalenceScreenProps {
 }
 
 const STAGE_W = 750;
-const STAGE_H = 530;
+const STAGE_H = 427;
 
 /**
- * Stacked mobile layout (< 768px) with Badge, Content, and Nurse Anna
- * vertically center-aligned inside the stage.
+ * Stacked mobile layout (< 768px). Declared once, reused for both
+ * the media query and explicit `variant="mobile"` mode.
+ * Optimized for full vertical & horizontal expansion across compact to tall screens.
  */
 const mobileLayout = (scope: string) => `
   #slide-content${scope},
   ${scope} {
-    overflow: hidden !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
-    min-height: clamp(610px, calc(100dvh - 185px), 730px) !important;
-    max-height: calc(100dvh - 175px) !important;
-    flex: 1 1 0% !important;
+    max-height: 100% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 10px 16px 10px 16px !important;
-    gap: 6px !important;
+    padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 8px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
     border: none !important;
@@ -49,20 +52,20 @@ const mobileLayout = (scope: string) => `
   ${scope} .s5-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 398px !important;
+    max-width: 440px !important;
     height: auto !important;
-    min-height: clamp(460px, calc(100dvh - 320px), 540px) !important;
-    flex: 1 1 0% !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: space-evenly !important;
     background-color: transparent !important;
-    padding: 8px 4px !important;
+    padding: 4px 8px !important;
     margin: 0 auto !important;
-    gap: 16px !important;
+    gap: clamp(10px, 2vh, 24px) !important;
     box-sizing: border-box !important;
   }
   ${scope} .s5-badge {
@@ -70,12 +73,12 @@ const mobileLayout = (scope: string) => `
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: 184px !important;
-    height: 46px !important;
+    min-width: clamp(190px, 52vw, 240px) !important;
+    height: clamp(50px, 6.5vh, 60px) !important;
     padding: 0 24px !important;
     background-color: #feff9f !important;
     border: 1.8px solid #236f7a !important;
-    border-radius: 14px !important;
+    border-radius: 18px !important;
     box-shadow: 0 4px 6px rgba(34, 105, 118, 0.22) !important;
     margin: 0 auto !important;
     text-align: center !important;
@@ -84,7 +87,7 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s5-badge-title {
     margin: 0 !important;
-    font-size: 16.5px !important;
+    font-size: clamp(18px, 1.8vh + 8px, 22px) !important;
     line-height: 1.2 !important;
     font-weight: 700 !important;
     letter-spacing: -0.01em !important;
@@ -94,15 +97,15 @@ const mobileLayout = (scope: string) => `
   ${scope} .s5-text-wrap {
     position: static !important;
     width: 100% !important;
-    max-width: 340px !important;
+    max-width: none !important;
     margin: 0 auto !important;
     padding: 0 4px !important;
     text-align: center !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s5-heading {
-    font-size: clamp(15px, 2.05dvh, 17px) !important;
-    line-height: 1.42 !important;
+    font-size: clamp(18.5px, 1.7vh + 9px, 22.5px) !important;
+    line-height: 1.44 !important;
     font-weight: 500 !important;
     text-align: center !important;
     text-wrap: balance !important;
@@ -110,17 +113,18 @@ const mobileLayout = (scope: string) => `
     color: #232323 !important;
   }
   ${scope} .s5-bold {
-    font-size: 1.05em !important;
+    font-size: 1.08em !important;
     font-weight: 800 !important;
     color: #111827 !important;
   }
-${scope} .s5-nurse {
+  ${scope} .s5-nurse {
     position: static !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(112px, 28vw, 142px) !important;
-    height: clamp(160px, 22vh, 202px) !important;
-    margin: 4px auto 0 auto !important;
+    width: clamp(136px, 34vw, 200px) !important;
+    height: clamp(180px, 28vh, 290px) !important;
+    max-height: none !important;
+    margin: 0 auto !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -129,79 +133,41 @@ ${scope} .s5-nurse {
   ${scope} .s5-nurse-img {
     width: 100% !important;
     height: 100% !important;
+    max-height: none !important;
     object-fit: contain !important;
     transform: none !important;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08)) !important;
   }
-  /* Two-tier bottom bar matching Slide 3 & Slide 4 (Audio on top, Nav below) */
-  ${scope} .s5-bottom-bar-mobile {
-    width: 100% !important;
-    max-width: 360px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: clamp(8px, 1.4dvh, 14px) !important;
-    padding-top: 2px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-    margin: 0 auto !important;
-    flex-shrink: 0 !important;
-    z-index: 25 !important;
-  }
-${scope} .s5-audio {
-    order: 1 !important;
+  ${scope} .s5-audio {
     position: static !important;
     right: auto !important;
     bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    margin: 0 auto !important;
+    margin: 0 auto 12px auto !important;
     z-index: 25 !important;
     flex-shrink: 0 !important;
-    color: #144e57 !important;
   }
-  ${scope} .s5-audio button {
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer !important;
-    color: #144e57 !important;
+  ${scope} .s5-nav {
+    position: static !important;
     display: flex !important;
-    align-items: center !important;
     justify-content: center !important;
-    padding: 4px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border-radius: 8px !important;
-    transition: transform 0.12s ease, opacity 0.15s ease !important;
-  }
-  ${scope} .s5-audio button:hover {
-    transform: scale(1.08) !important;
-    opacity: 0.85 !important;
-  }
-  ${scope} .s5-audio button svg {
-    height: 34px !important;
-    width: auto !important;
-    transition: transform 0.12s ease !important;
-  }
-  ${scope} .s5-audio button:hover svg,
-  ${scope} .s5-audio button:active svg {
-    transform: scale(0.96) !important;
-  }
-  ${scope} .slide-nav,
-  ${scope} .slide-nav-container {
-    order: 2 !important;
+    align-items: center !important;
     margin: 0 auto !important;
-    display: flex !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .slide-nav-container {
+    margin: 0 auto !important;
     justify-content: center !important;
-    align-items: center !important;
     width: 100% !important;
     gap: 16px !important;
   }
   ${scope} .slide-nav-btn {
     min-width: 128px !important;
+    min-height: 48px !important;
+    height: 48px !important;
     padding: 0 32px !important;
     white-space: nowrap !important;
     flex: 0 1 auto !important;
@@ -321,8 +287,7 @@ const SLIDE5_CSS = `
     color: #111827;
   }
 
-
-/* 3. Nurse Anna — right side (exact Slide 4 desktop dimensions) */
+  /* 3. Nurse Anna — right side (exact Slide 4 desktop dimensions) */
   .s5-nurse {
     position: absolute;
     left: 525px;
@@ -350,7 +315,7 @@ const SLIDE5_CSS = `
   .s5-bottom-bar-mobile {
     display: none;
   }
-.s5-audio-desktop {
+  .s5-audio-desktop {
     position: absolute;
     right: 22px;
     bottom: clamp(16px, 3vh, 22px);
@@ -393,27 +358,9 @@ const SLIDE5_CSS = `
 
   @media (max-width: 767px) {
     ${mobileLayout(".s5-root:not(.is-desktop)")}
-    .s5-audio-desktop {
-      display: none !important;
-    }
-    .s5-nav-desktop {
-      display: none !important;
-    }
-    .s5-bottom-bar-mobile {
-      display: flex !important;
-    }
   }
 
   ${mobileLayout(".s5-root.is-mobile")}
-  .s5-root.is-mobile .s5-audio-desktop {
-    display: none !important;
-  }
-  .s5-root.is-mobile .s5-nav-desktop {
-    display: none !important;
-  }
-  .s5-root.is-mobile .s5-bottom-bar-mobile {
-    display: flex !important;
-  }
 
   /* Prefers-Reduced-Motion (WCAG 2.3.3 Level AAA) */
   @media (prefers-reduced-motion: reduce) {
@@ -478,12 +425,9 @@ export function Slide5PrevalenceScreen({
     };
   }, [variant]);
 
-  const rawMed =
-    medicationName && medicationName.trim()
-      ? medicationName.trim()
-      : isEs
-        ? "la amoxicilina"
-        : "amoxicillin";
+  const rawMed = medicationName && medicationName.trim()
+    ? medicationName.trim()
+    : isEs ? "la amoxicilina" : "amoxicillin";
   const medName = resolveMedicineToken(rawMed, rawMed, isEs);
   const article = /^[aeiou]/i.test(medName) ? "an" : "a";
 
@@ -503,11 +447,9 @@ export function Slide5PrevalenceScreen({
     </>
   );
 
-  const captionText =
-    transcriptText ||
-    (isEs
-      ? `¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medName}, 95 pueden tomar ${medName} sin tener una reacción.`
-      : `Did You Know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medName} allergy, 95 can take ${medName} without having a reaction.`);
+  const captionText = transcriptText || (isEs
+    ? `¿Sabías que...? La mayoría de las personas que piensan que son alérgicas a la penicilina pueden tomarla de manera segura. De cada 100 niños con una alergia a ${medName}, 95 pueden tomar ${medName} sin tener una reacción.`
+    : `Did You Know? Most people who think they are allergic to penicillin can safely take it. Out of 100 kids with ${article} ${medName} allergy, 95 can take ${medName} without having a reaction.`);
 
   const effectiveAudioSrc =
     audioSrc ||
@@ -515,8 +457,7 @@ export function Slide5PrevalenceScreen({
       ? "/audio/exported/screen2_statistics_es.mp3"
       : "/audio/exported/screen2_statistics_en.mp3");
 
-  const variantClass =
-    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
     <div
@@ -554,10 +495,11 @@ export function Slide5PrevalenceScreen({
           </h1>
         </div>
 
-        {/* 3. Nurse Anna */}
+        {/* 3. Nurse Anna holding bottle */}
         <div className="s5-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna.png"
+            src="/images/nurse-anna-holding-bottle.png"
+            srcSet="/images/nurse-anna-holding-bottle.png 1x, /images/nurse-anna-holding-bottle-hd.png 2x"
             alt=""
             className="s5-nurse-img"
             draggable={false}
@@ -565,8 +507,8 @@ export function Slide5PrevalenceScreen({
         </div>
       </div>
 
-      {/* 4. Desktop Audio narration & CC controls */}
-      <div className="s5-audio-desktop">
+      {/* 4. Audio narration & CC controls (bottom-right on desktop, centered above nav on mobile) */}
+      <div className="s5-audio">
         <AudioPlayer
           audioSrc={effectiveAudioSrc}
           stepId={stepId}
@@ -576,28 +518,8 @@ export function Slide5PrevalenceScreen({
         />
       </div>
 
-      {/* 5. Desktop Centered Navigation */}
-      <div className="s5-nav-desktop">
-        <SlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
-        />
-      </div>
-
-      {/* 6. Mobile Centered Stacked Bottom Bar (Audio on top, Back/Next below) */}
-      <div className="s5-bottom-bar-mobile">
-        <div className="s5-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={isEs ? "es" : "en"}
-            transcriptText={captionText}
-            size="large"
-          />
-        </div>
-
+      {/* 5. Fixed Centered Bottom Navigation (Back & Next) */}
+      <div className="s5-nav">
         <SlideNavigationButtons
           onBack={onBack}
           onNext={onNext}
@@ -610,3 +532,5 @@ export function Slide5PrevalenceScreen({
 }
 
 export default Slide5PrevalenceScreen;
+
+
