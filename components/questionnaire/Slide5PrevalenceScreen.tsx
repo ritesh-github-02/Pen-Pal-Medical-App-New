@@ -527,7 +527,7 @@ export function Slide5PrevalenceScreen({
           loading={loading}
         />
       </div>
-    </div>
+    </div>  
   );
 }
 
