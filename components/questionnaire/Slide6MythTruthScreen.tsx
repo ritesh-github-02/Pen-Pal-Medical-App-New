@@ -94,27 +94,28 @@ const stripPrefix = (text: string) =>
 */
 const mobileLayout = (scope: string) => `
  ${scope} {
-   height: auto !important;
-   min-height: 100dvh !important;
-   max-height: none !important;
+   height: 100dvh !important;
+   max-height: 100dvh !important;
+   min-height: 0 !important;
    flex: 1 1 auto !important;
    overflow-y: auto !important;
    overflow-x: hidden !important;
    -webkit-overflow-scrolling: touch !important;
    display: flex !important;
    flex-direction: column !important;
-   justify-content: space-between !important;
+   justify-content: flex-start !important;
    align-items: stretch !important;
    padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.75rem, 3.5vw, 1.25rem) calc(clamp(0.75rem, 3vw, 1.25rem) + env(safe-area-inset-bottom, 0px)) clamp(0.75rem, 3.5vw, 1.25rem) !important;
    gap: clamp(0.625rem, 2vw, 1rem) !important;
    box-sizing: border-box !important;
  }
  ${scope} .s6-stage {
+   order: 1 !important;
    position: relative !important;
    width: 100% !important;
    max-width: none !important;
    height: auto !important;
-   flex: 1 1 auto !important;
+   flex: 1 0 auto !important;
    min-height: 0 !important;
    padding: 0 !important;
    margin: 0 !important;
@@ -183,6 +184,7 @@ const mobileLayout = (scope: string) => `
    justify-content: center !important;
  }
  ${scope} .s6-audio {
+   order: 2 !important;
    position: static !important;
    right: auto !important;
    bottom: auto !important;
@@ -193,7 +195,7 @@ const mobileLayout = (scope: string) => `
    margin: 0.25rem auto 0 auto !important;
    width: 100% !important;
    z-index: 25 !important;
-   flex-shrink: 0 !important;
+   flex: 0 0 auto !important;
  }
  ${scope} .s6-audio [role="toolbar"] {
    display: flex !important;
@@ -203,6 +205,7 @@ const mobileLayout = (scope: string) => `
  }
  ${scope} .slide-nav,
  ${scope} .s6-nav {
+   order: 3 !important;
    position: static !important;
    display: flex !important;
    flex-wrap: wrap !important;
@@ -210,7 +213,7 @@ const mobileLayout = (scope: string) => `
    align-items: center !important;
    margin: 0.25rem auto 0 auto !important;
    width: 100% !important;
-   flex-shrink: 0 !important;
+   flex: 0 0 auto !important;
    z-index: 25 !important;
  }
  ${scope} .slide-nav-container {
