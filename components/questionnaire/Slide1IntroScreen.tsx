@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback, memo } from "react";
+import React, { useRef, useEffect, useCallback, memo, useState } from "react";
 import { NurseAnna } from "./NurseAnna";
 import AudioPlayer from "./AudioPlayer";
 
@@ -358,6 +358,33 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
   const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
+  // On mobile the teal/blue gradient is replaced with the neutral cream background
+  // so the slide blends with the shell (which is also cream on mobile).
+  const [isMobile, setIsMobile] = useState(
+    variant === "mobile" || (variant === "auto" && typeof window !== "undefined" && window.innerWidth < 768)
+  );
+  useEffect(() => {
+    if (variant !== "auto") {
+      setIsMobile(variant === "mobile");
+      return;
+    }
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [variant]);
+
+  const slideBackground = isMobile
+    ? "#fcfdf3"
+    : `
+        radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
+        radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
+        radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
+        radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
+        linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
+      `;
+
   return (
     <section
       id="slide-content"
@@ -367,13 +394,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       lang={isSpanish ? "es" : "en"}
       className={`s1-component-root relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-16 sm:pb-6 overflow-y-auto${variantClass}`}
       style={{
-        background: `
-          radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
-          radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
-          radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
-          radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
-          linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
-        `,
+        background: slideBackground,
       }}
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE1_COMPONENT_CSS }} />

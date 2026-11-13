@@ -457,6 +457,8 @@ body::-webkit-scrollbar,
   html, body {
     height: 100% !important;
     min-height: 100% !important;
+    /* Cream base so no teal bleeds through on mobile */
+    background-color: #fcfdf3 !important;
   }
 
   #main-content {
