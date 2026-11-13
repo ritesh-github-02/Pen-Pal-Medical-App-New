@@ -82,6 +82,7 @@ h3:focus-visible,
 html, body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  /* On desktop the teal shell is still visible; mobile overrides this below */
   background-color: #6dc1c1;
 }
 
@@ -89,6 +90,7 @@ body {
   background-color: #6dc1c1;
 }
 
+/* Desktop: teal shell. Mobile (<768px) override below changes this to cream. */
 .intervention-main-shell {
   background-color: #6dc1c1 !important;
 }
@@ -472,6 +474,8 @@ body::-webkit-scrollbar,
     align-items: center !important;
     min-height: 100dvh !important;
     height: 100dvh !important;
+    /* Match the slide content background so no blue shell is visible */
+    background-color: #fcfdf3 !important;
     padding: 0.5rem 0.75rem !important;
     overflow: hidden !important;
   }
@@ -490,7 +494,8 @@ body::-webkit-scrollbar,
     overflow: hidden !important;
   }
 
-  /* Clean slide frame on mobile viewports: takes only content-size height, vertically & horizontally centered */
+  /* Clean slide frame on mobile viewports: flat, no card border/shadow/radius so content
+     sits directly on the page background (matching the reference design) */
   .tablet-mockup-frame {
     aspect-ratio: auto !important;
     height: auto !important;
@@ -501,10 +506,10 @@ body::-webkit-scrollbar,
     max-width: 100% !important;
     margin: auto 0 !important;
     padding: 0 !important;
-    background: #f4f8ec !important;
-    border: 1px solid rgba(120, 165, 155, 0.28) !important;
-    border-radius: 1.5rem !important;
-    box-shadow: 0 12px 32px -4px rgba(20, 50, 45, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     position: relative !important;
     overflow: hidden !important;
     display: flex !important;
@@ -519,7 +524,7 @@ body::-webkit-scrollbar,
   }
 
   .tablet-screen-inner {
-    border-radius: 1.5rem !important;
+    border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
     overflow-y: auto !important;
