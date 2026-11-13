@@ -28,33 +28,36 @@ const BUBBLE_PATH_LEFT =
   "C 230 278, 160 262, 125 242 Z";
 
 /* Dedicated Smooth Curved Silhouette for Mobile Portrait (Tail pointing downward toward Nurse Anna)
-   Further expanded vertically (height 248) and horizontally (width 416)
-   to maximize internal breathing padding while maintaining large font.
-   Tail tip at (300, 296), cleanly reaching toward Nurse Anna */
+   Spacious squircle speech bubble with generous shoulders to provide ample breathing room for large text.
+   Tail tip at (310, 322), cleanly reaching toward Nurse Anna */
 const BUBBLE_PATH_MOBILE =
-  "M 208 8 " +
-  "C 322 8, 416 54, 416 128 " +
-  "C 416 186, 356 226, 280 242 " +
-  "C 290 262, 297 280, 300 296 " +
-  "C 282 274, 254 256, 220 246 " +
-  "C 210 246.5, 198 247, 184 247 " +
-  "C 76 247, 8 194, 8 128 " +
-  "C 8 54, 94 8, 208 8 " +
+  "M 140 10 " +
+  "C 240 6, 330 6, 380 24 " +
+  "C 422 38, 438 78, 438 132 " +
+  "C 438 186, 418 228, 365 248 " +
+  "C 336 258, 304 261, 282 262 " +
+  "C 294 280, 306 304, 310 322 " +
+  "C 290 300, 260 278, 224 266 " +
+  "C 170 268, 110 264, 70 248 " +
+  "C 22 228, 6 186, 6 132 " +
+  "C 6 78, 22 38, 62 24 " +
+  "C 82 17, 108 12, 140 10 " +
   "Z";
 
 const mobileLayout = (scope: string) => `
-  #slide-content${scope},
   ${scope} {
-    overflow: hidden !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
-    min-height: clamp(580px, calc(100dvh - 150px), 720px) !important;
     max-height: 100% !important;
-    flex: 1 1 0% !important;
+    min-height: 100% !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 14px 16px 18px 16px !important;
+    padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
     gap: 8px !important;
     box-sizing: border-box !important;
     background-color: transparent !important;
@@ -62,14 +65,13 @@ const mobileLayout = (scope: string) => `
     box-shadow: none !important;
     border-radius: 0 !important;
   }
-  #slide-content${scope} .s4-stage,
   ${scope} .s4-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 398px !important;
+    max-width: 410px !important;
     height: auto !important;
+    flex: 1 1 auto !important;
     min-height: 0 !important;
-    flex: 1 1 0% !important;
     overflow: visible !important;
     transform: none !important;
     display: flex !important;
@@ -77,9 +79,9 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
     background-color: transparent !important;
-    padding: 4px 10px !important;
+    padding: 0 8px !important;
     margin: 0 auto !important;
-    gap: 8px !important;
+    gap: 0 !important;
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble {
@@ -89,10 +91,9 @@ const mobileLayout = (scope: string) => `
     top: auto !important;
     transform: none !important;
     width: 100% !important;
-    max-width: 345px !important;
-    aspect-ratio: 438 / 312 !important;
+    max-width: clamp(335px, 88vw, 375px) !important;
+    aspect-ratio: 452 / 334 !important;
     height: auto !important;
-    flex-shrink: 1 !important;
     margin: 0 auto !important;
     filter: drop-shadow(2px 3px 0px #1a3532) !important;
     z-index: 1 !important;
@@ -112,11 +113,11 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s4-bubble-text-wrap {
     position: absolute !important;
-    top: 42.5% !important;
+    top: 41% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: 80% !important;
-    max-width: 280px !important;
+    width: 82% !important;
+    max-width: 300px !important;
     padding: 0 6px !important;
     margin: 0 !important;
     display: flex !important;
@@ -127,12 +128,12 @@ const mobileLayout = (scope: string) => `
     box-sizing: border-box !important;
   }
   ${scope} .s4-bubble-text {
-    font-size: clamp(14px, 1.95dvh, 16px) !important;
-    line-height: 1.34 !important;
+    font-size: clamp(18px, 1.8vh + 8px, 21.5px) !important;
+    line-height: 1.36 !important;
     font-weight: 700 !important;
     color: #142724 !important;
     text-align: center !important;
-    text-wrap: pretty !important;
+    text-wrap: balance !important;
     letter-spacing: -0.015em !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
@@ -151,12 +152,11 @@ const mobileLayout = (scope: string) => `
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(105px, 26vw, 136px) !important;
-    height: clamp(140px, 19.5dvh, 188px) !important;
-    margin-top: -14px !important;
+    width: clamp(132px, 32vw, 168px) !important;
+    height: clamp(180px, 24vh, 235px) !important;
+    margin-top: -24px !important;
     margin-left: auto !important;
-    margin-right: 4% !important;
-    flex-shrink: 1 !important;
+    margin-right: 5% !important;
     z-index: 2 !important;
     pointer-events: none !important;
     display: flex !important;
@@ -169,7 +169,7 @@ const mobileLayout = (scope: string) => `
     object-fit: contain !important;
     transform: none !important;
   }
-  /* Bottom Controls Bar: Guaranteed clearance at bottom so Back/Next never clip */
+  /* Bottom Controls Bar: Two-tier stack matching Slide 2 & 3 */
   ${scope} .s4-bottom-bar-mobile {
     width: 100% !important;
     max-width: 360px !important;
@@ -177,65 +177,29 @@ const mobileLayout = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 12px !important;
+    gap: 14px !important;
     padding-top: 4px !important;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
     z-index: 25 !important;
   }
   ${scope} .s4-audio {
-    order: 1 !important;
     position: static !important;
     right: auto !important;
     bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     margin: 0 auto !important;
     z-index: 25 !important;
-    color: #144e57 !important;
-  }
-  ${scope} .s4-audio button {
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer !important;
-    color: #144e57 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 4px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border-radius: 8px !important;
-    transition: transform 0.12s ease, opacity 0.15s ease !important;
-  }
-  ${scope} .s4-audio button:hover {
-    transform: scale(1.08) !important;
-    opacity: 0.85 !important;
-  }
-  ${scope} .s4-audio button svg {
-    height: 34px !important;
-    width: auto !important;
-    transition: transform 0.12s ease !important;
-  }
-  ${scope} .s4-audio button:hover svg,
-  ${scope} .s4-audio button:active svg {
-    transform: scale(0.96) !important;
   }
   ${scope} .slide-nav,
   ${scope} .slide-nav-container {
-    order: 2 !important;
     margin: 0 auto !important;
-    display: flex !important;
     justify-content: center !important;
-    align-items: center !important;
     width: 100% !important;
     gap: 16px !important;
-    padding-bottom: 2px !important;
   }
   ${scope} .slide-nav-btn {
     min-width: 128px !important;
@@ -369,38 +333,19 @@ const SLIDE4_CSS = `
 }
 .s4-audio-desktop {
   position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
+  right: clamp(14px, 3.5vw, 22px);
+  bottom: clamp(14px, 2.5vh, 22px);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   z-index: 35;
-  color: #144e57;
-}
-.s4-audio-desktop button {
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer !important;
-  color: #144e57 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 4px !important;
-  min-width: 44px !important;
-  min-height: 44px !important;
-  border-radius: 8px !important;
-  transition: transform 0.12s ease, opacity 0.15s ease !important;
-}
-.s4-audio-desktop button svg {
-  height: 34px !important;
-  width: auto !important;
 }
 .s4-nav-desktop {
   display: flex;
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: clamp(16px, 3vh, 22px);
+  bottom: clamp(14px, 2.5vh, 22px);
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -564,7 +509,7 @@ export function Slide4AllergyBarrierScreen({
           {/* Mobile Bezier SVG (Pointing down-right toward Anna below) */}
           <svg
             className="s4-bubble-mobile-svg"
-            viewBox="-6 -6 438 312"
+            viewBox="-6 -4 452 334"
             fill="none"
             aria-hidden="true"
           >
@@ -643,5 +588,4 @@ export function Slide4AllergyBarrierScreen({
 }
 
 export default Slide4AllergyBarrierScreen;
-
 
