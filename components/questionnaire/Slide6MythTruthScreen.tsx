@@ -226,14 +226,12 @@ const mobileLayout = (scope: string) => `
    gap: clamp(0.5rem, 2.5vw, 1rem) !important;
  }
  ${scope} .slide-nav-btn {
-   flex: 1 1 auto !important;
-   min-width: 5rem !important;
-   max-width: 12rem !important;
-   min-height: 3rem !important;
-   height: 3rem !important;
-   padding: 0 clamp(0.75rem, 3vw, 1.5rem) !important;
+   min-width: 128px !important;
+   min-height: 48px !important;
+   height: 48px !important;
+   padding: 0 32px !important;
    white-space: nowrap !important;
-   box-sizing: border-box !important;
+   flex: 0 1 auto !important;
  }
  @media (max-width: 22em) {
    ${scope} {
@@ -270,11 +268,11 @@ const mobileLayout = (scope: string) => `
      gap: 0.375rem !important;
    }
    ${scope} .slide-nav-btn {
-     min-width: 4.5rem !important;
-     padding: 0 0.5rem !important;
-     font-size: 0.875rem !important;
-     height: 2.75rem !important;
-     min-height: 2.75rem !important;
+     min-width: 112px !important;
+     height: 44px !important;
+     min-height: 44px !important;
+     padding: 0 16px !important;
+     font-size: 14px !important;
    }
  }
 `;
