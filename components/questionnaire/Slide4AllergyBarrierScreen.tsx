@@ -101,9 +101,15 @@ const mobileLayout = (scope: string) => `
    transform: none !important;
    width: 100% !important;
    max-width: 416px !important;
-   aspect-ratio: 452 / 334 !important;
    height: auto !important;
+   min-height: 280px !important;
    margin: 0 auto !important;
+   padding: 30px 24px 60px 24px !important; /* Top padding for curve, bottom for tail */
+   display: flex !important;
+   flex-direction: column !important;
+   align-items: center !important;
+   justify-content: center !important;
+   box-sizing: border-box !important;
    filter: drop-shadow(2px 3px 0px #1a3532) !important;
    z-index: 1 !important;
    pointer-events: none !important;
@@ -121,13 +127,13 @@ const mobileLayout = (scope: string) => `
    overflow: visible !important;
  }
  ${scope} .s4-bubble-text-wrap {
-   position: absolute !important;
-   top: 41% !important;
-   left: 50% !important;
-   transform: translate(-50%, -50%) !important;
-   width: 84% !important;
-   max-width: 340px !important;
-   padding: 0 8px !important;
+   position: relative !important;
+   top: auto !important;
+   left: auto !important;
+   transform: none !important;
+   width: 100% !important;
+   max-width: none !important;
+   padding: 0 !important;
    margin: 0 !important;
    display: flex !important;
    flex-direction: column !important;
@@ -549,6 +555,7 @@ export function Slide4AllergyBarrierScreen({
          <svg
            className="s4-bubble-mobile-svg"
            viewBox="-6 -4 452 334"
+           preserveAspectRatio="none"
            fill="none"
            aria-hidden="true"
          >
@@ -564,6 +571,7 @@ export function Slide4AllergyBarrierScreen({
              fill="#ffffff"
              stroke="#7baea9"
              strokeWidth="3.5"
+             vectorEffect="non-scaling-stroke"
              strokeLinejoin="round"
              strokeLinecap="round"
            />
@@ -572,6 +580,7 @@ export function Slide4AllergyBarrierScreen({
            <path
              d={BUBBLE_PATH_MOBILE}
              fill="url(#s4-card-dot-pattern-m)"
+             vectorEffect="non-scaling-stroke"
            />
          </svg>
 
