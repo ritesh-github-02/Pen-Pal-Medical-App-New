@@ -36,13 +36,10 @@ const SLIDE8_COMPONENT_CSS = `
      Slide 7 (Milestone Celebration)
      ------------------------------------------------------------ */
 
-  /* Changed to relative to respect the app header, and flex: 1 to fill remaining space */
+  /* Wrapper now fits perfectly inside the parent layout below the header */
   .s8-wrapper {
     width: 100%;
     height: 100%;
-    flex: 1;
-    min-height: 0;
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -75,7 +72,7 @@ const SLIDE8_COMPONENT_CSS = `
     outline: none !important;
   }
 
-  /* Primary Slide Card Container */
+  /* Primary Slide Card Container (The background rectangle) */
   .s8-component-card {
     position: relative;
     width: ${STAGE_W}px;
@@ -104,9 +101,10 @@ const SLIDE8_COMPONENT_CSS = `
     position: relative;
   }
 
+  /* 1. Speech Bubble on Left */
   .s8-bubble-wrap {
     position: relative;
-    width: 620px; 
+    width: 620px;
     max-width: 68%;
     aspect-ratio: 510 / 315;
     flex-shrink: 0;
@@ -166,6 +164,7 @@ const SLIDE8_COMPONENT_CSS = `
     width: 100%;
   }
 
+  /* 2. Nurse Anna standing on Right */
   .s8-nurse-wrap {
     position: relative;
     width: 140px;
@@ -237,7 +236,7 @@ const SLIDE8_COMPONENT_CSS = `
         left: auto !important;
         width: 100% !important;
         height: auto !important;
-        min-height: calc(100dvh - 80px) !important;
+        min-height: 100dvh !important;
         z-index: auto !important;
         overflow: visible !important;
       }
@@ -249,7 +248,7 @@ const SLIDE8_COMPONENT_CSS = `
         overflow-x: hidden !important;
         height: auto !important;
         max-height: none !important;
-        min-height: 100% !important;
+        min-height: 100dvh !important;
         flex: 1 1 auto !important;
         display: flex !important;
         flex-direction: column !important;
@@ -439,7 +438,7 @@ export function Slide8MilestoneScreen({
     headingRef.current?.focus({ preventScroll: true });
   }, []);
 
-  // Bulletproof Scaling: Uses the wrapper's actual size
+  // Responsive scaling based on the wrapper's actual available space
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
@@ -453,7 +452,7 @@ export function Slide8MilestoneScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       
-      // Leave 32px padding around the card
+      // Subtract 32px to leave a nice margin around the card inside the wrapper
       const safeW = Math.max(0, w - 32); 
       const safeH = Math.max(0, h - 32); 
       
