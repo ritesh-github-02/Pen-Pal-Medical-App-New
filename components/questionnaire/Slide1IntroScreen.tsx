@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef, useEffect, useCallback, memo, useState } from "react";
-import { NurseAnna } from "./NurseAnna";
 import AudioPlayer from "./AudioPlayer";
 
 export interface Slide1IntroScreenProps {
@@ -21,12 +20,36 @@ export interface Slide1IntroScreenProps {
   variant?: "auto" | "desktop" | "mobile";
 }
 
+/** Fixed design canvas dimensions (standard across PenPal slides) */
+const STAGE_W = 760;
+const STAGE_H = 480;
+
 const SLIDE1_COMPONENT_CSS = `
   /* ------------------------------------------------------------
      Slide 1: WCAG 2.1/2.2 Level AAA, WAVE & Karen Accessibility Rules
+     Pixel-perfect Figma matching with scale-locked vector stage
      ------------------------------------------------------------ */
 
-  /* Screen Reader Only Utility (WCAG 1.3.1, 4.1.2) */
+  .s1-root,
+  .s1-root *,
+  .s1-root *::before,
+  .s1-root *::after {
+    box-sizing: border-box;
+  }
+
+  .s1-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+  }
+
   .s1-sr-only {
     position: absolute !important;
     width: 1px !important;
@@ -39,79 +62,110 @@ const SLIDE1_COMPONENT_CSS = `
     border: 0 !important;
   }
 
-  /* Universal High Contrast Focus Indicator (WCAG 2.4.7, 2.4.11, 2.4.13 Level AAA) */
-  .s1-component-root button:focus-visible,
-  .s1-component-root a:focus-visible,
-  .s1-component-root [tabindex="0"]:focus-visible {
+  .s1-root button:focus-visible,
+  .s1-root a:focus-visible,
+  .s1-root [tabindex="0"]:focus-visible {
     outline: 3px solid #143833 !important;
     outline-offset: 3px !important;
   }
 
-  /* Heading programmatic focus without unwanted mouse-click rings */
   .s1-title:focus,
   .s1-title:focus-visible {
     outline: none !important;
   }
 
-  /* Base container layout */
-  .s1-content-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 820px;
-    margin: auto;
-    gap: 32px;
-    padding: 8px;
-    box-sizing: border-box;
+  /* ---------------- Desktop Scaled Stage ---------------- */
+  .s1-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    pointer-events: auto;
   }
 
+  /* Left column: Text & CTA Button */
   .s1-left-col {
-    flex: 1 1 0%;
-    max-width: 500px;
+    position: absolute;
+    left: 44px;
+    top: 0;
+    bottom: 0;
+    width: 440px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    gap: 12px;
-    z-index: 10;
-  }
-
-  .s1-nurse-col {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: flex-start;
     z-index: 10;
   }
 
-  /* "Get Started!" Action Button (WCAG 2.5.5 AAA Target Size >= 44px) */
+  /* Title: Large golden-yellow text with dark teal stroke & 3D shadow (NEVER WRAPS) */
+  .s1-title {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap !important;
+    margin: 0 0 8px 0;
+    padding: 0;
+    color: #ebb016;
+    font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+    -webkit-text-stroke: 1.8px #12403d;
+    paint-order: stroke fill;
+    text-shadow: 0 2.5px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3);
+  }
+
+  /* Subtitle: Clean dark teal heading (NEVER WRAPS ON STAGE) */
+  .s1-subtitle {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #12403d;
+    white-space: nowrap;
+    margin: 0 0 26px 0;
+    letter-spacing: -0.01em;
+    font-family: inherit;
+  }
+
+  /* Body copy: 2 lines matching Figma */
+  .s1-copy {
+    font-size: 16.5px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: #12403d;
+    max-width: 420px;
+    margin: 0 0 32px 0;
+  }
+
+  /* "Get Started!" Action Button — exact Figma pill styling */
   .s1-btn-start {
-    min-height: 48px;
+    min-height: 44px;
+    height: 44px;
     min-width: 140px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background-color: #fde989;
-    color: #1b3b32;
-    border: 1.5px solid #dcc65b;
+    background-color: #fff9e6;
+    color: #12403d;
+    border: 1.8px solid #d4b84b;
     font-weight: 700;
-    font-size: 16px;
-    padding: 0 28px;
-    box-shadow: 0 2px 6px rgba(18, 64, 61, 0.15);
+    font-size: 15.5px;
+    padding: 0 26px;
+    box-shadow: 0 2px 4px rgba(18, 64, 61, 0.1);
     transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
     cursor: pointer;
     user-select: none;
+    font-family: inherit;
   }
   .s1-btn-start:hover:not(:disabled) {
-    background-color: #f6df71;
+    background-color: #faecc0;
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(18, 64, 61, 0.2);
+    box-shadow: 0 4px 8px rgba(18, 64, 61, 0.16);
   }
   .s1-btn-start:active:not(:disabled) {
     transform: translateY(1px);
-    box-shadow: 0 1px 3px rgba(18, 64, 61, 0.12);
+    box-shadow: 0 1px 2px rgba(18, 64, 61, 0.1);
   }
   .s1-btn-start:focus-visible {
     outline: 3px solid #143833 !important;
@@ -123,175 +177,271 @@ const SLIDE1_COMPONENT_CSS = `
     box-shadow: none;
   }
 
-  /* -------------------------------------------------------------
-     Mobile Layout (.is-mobile or screen width < 768px)
-     - Fills outer mobile card canvas cleanly matching Slide 3 proportions
-     - Centered illustration & bold copy with generous breathing room
-     - Two-tier mobile bottom bar: Audio (CC/Play) directly above CTA
-     ------------------------------------------------------------- */
-  ${(() => {
-    const s1MobileLayout = (scope: string) => `
-      ${scope} {
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        height: 100% !important;
-        max-height: 100% !important;
-        min-height: 100% !important;
-        flex: 1 1 auto !important;
-        padding: 16px 16px 12px 16px !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 10px !important;
-        box-sizing: border-box !important;
-        border: none !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-      }
-      ${scope} .s1-content-container {
-        flex: 1 1 auto !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        justify-content: center !important;
-        gap: 0 !important;
-        width: 100% !important;
-        max-width: 380px !important;
-        margin: auto !important;
-        padding: 0 !important;
-      }
-      ${scope} .s1-header-group {
-        order: -1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        gap: 4px !important;
-        width: 100% !important;
-        margin-bottom: clamp(14px, 2.5vh, 22px) !important;
-      }
-      ${scope} .s1-nurse-col {
-        order: 0 !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-      }
-      ${scope} .s1-nurse-col img {
-        max-height: clamp(155px, 24vh, 220px) !important;
-        width: auto !important;
-        filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12)) !important;
-      }
-      ${scope} .s1-left-col {
-        display: contents !important;
-      }
-      ${scope} .s1-title {
-        font-size: clamp(3.6rem, 13.5vw, 4.9rem) !important;
-        line-height: 0.98 !important;
-        white-space: nowrap !important;
-        letter-spacing: -0.03em !important;
-        text-align: center !important;
-        margin: 0 !important;
-      }
-      ${scope} .s1-subtitle {
-        font-size: clamp(1.2rem, 4.4vw, 1.55rem) !important;
-        line-height: 1.25 !important;
-        margin-top: 6px !important;
-        max-width: 360px !important;
-        color: #143e3b !important;
-        text-align: center !important;
-      }
-      ${scope} .s1-copy {
-        order: 1 !important;
-        font-size: clamp(1rem, 3.8vw, 1.15rem) !important;
-        line-height: 1.44 !important;
-        margin-top: clamp(14px, 2.4vh, 22px) !important;
-        margin-bottom: 0 !important;
-        max-width: 340px !important;
-        color: #143833 !important;
-        text-align: center !important;
-      }
-      ${scope} .s1-btn-start {
-        min-height: 48px !important;
-        height: 48px !important;
-        min-width: 200px !important;
-        font-size: 17px !important;
-        font-weight: 800 !important;
-        padding: 0 36px !important;
-        border-radius: 9999px !important;
-        box-shadow: 0 4px 12px rgba(18, 64, 61, 0.18) !important;
-      }
-      ${scope} .s1-desktop-start {
-        display: none !important;
-      }
-      ${scope} .s1-audio-desktop {
-        display: none !important;
-      }
-      ${scope} .s1-mobile-nav {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        max-width: 360px !important;
-        padding-top: 6px !important;
-        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-        margin: 0 auto !important;
-        gap: clamp(10px, 1.8vh, 16px) !important;
-        flex-shrink: 0 !important;
-      }
-      ${scope} .s1-mobile-nav .s1-audio-wrapper {
-        width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 auto !important;
-        color: #144e57 !important;
-      }
-      ${scope} .s1-audio-wrapper > div {
-        gap: 8px !important;
-      }
-      ${scope} .s1-audio-wrapper .audio-cc-btn,
-      ${scope} .s1-audio-wrapper .audio-play-btn {
-        color: #144e57 !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 4px !important;
-      }
-      ${scope} .s1-audio-wrapper .audio-cc-btn svg,
-      ${scope} .s1-audio-wrapper .audio-play-btn svg {
-        height: 34px !important;
-        width: auto !important;
-      }
-      ${scope} .s1-mobile-nav .s1-btn-start {
-        width: auto !important;
-        max-width: 280px !important;
-      }
-    `;
-    return `
-      @media (max-width: 767px) {
-        ${s1MobileLayout(".s1-component-root:not(.is-desktop)")}
-        .s1-component-root:not(.is-desktop) {
-          min-height: min(640px, calc(100dvh - 80px)) !important;
-          max-height: calc(100dvh - 72px) !important;
-        }
-      }
-      ${s1MobileLayout(".s1-component-root.is-mobile")}
-    `;
-  })()}
+  /* Right column: Nurse Anna full illustration (properly sized, NEVER clipped) */
+  .s1-nurse-col {
+    position: absolute;
+    right: 48px;
+    top: 26px;
+    bottom: 80px;
+    width: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+  }
 
-  @media (min-width: 768px) {
-    .s1-component-root:not(.is-mobile) .s1-desktop-start {
-      display: block !important;
+  .s1-nurse-img {
+    max-height: 330px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(18, 64, 61, 0.12));
+  }
+
+  /* Desktop audio controls — anchored in the stage bottom-right */
+  .s1-audio-desktop {
+    position: absolute;
+    right: 48px;
+    bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 30;
+    color: #144e57;
+  }
+  .s1-audio-desktop button {
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #144e57 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
+    transition: transform 0.12s ease, opacity 0.15s ease !important;
+  }
+  .s1-audio-desktop button:hover {
+    transform: scale(1.08) !important;
+    opacity: 0.85 !important;
+  }
+
+  .s1-mobile-nav {
+    display: none;
+  }
+
+  /* ---------------- Responsive Mobile Layout (< 768px) ---------------- */
+  @media (max-width: 767px) {
+    .s1-root:not(.is-desktop) {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      height: 100% !important;
+      min-height: clamp(560px, calc(100dvh - 120px), 720px) !important;
+      padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+      background-color: #fcfdf3 !important;
     }
-    .s1-component-root:not(.is-mobile) .s1-audio-desktop {
+    .s1-root:not(.is-desktop) .s1-stage {
+      position: relative !important;
+      width: 100% !important;
+      max-width: 380px !important;
+      height: auto !important;
+      min-height: 100% !important;
+      transform: none !important;
       display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 6px 0 !important;
     }
-    .s1-component-root:not(.is-mobile) .s1-mobile-nav {
+    .s1-root:not(.is-desktop) .s1-left-col {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      max-width: 360px !important;
+      order: 2 !important;
+      align-items: center !important;
+      text-align: center !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+    }
+    .s1-root:not(.is-desktop) .s1-title {
+      font-size: clamp(34px, 9.5vw, 44px) !important;
+      line-height: 1 !important;
+      margin-bottom: 6px !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+    }
+    .s1-root:not(.is-desktop) .s1-subtitle {
+      font-size: clamp(14px, 4vw, 16px) !important;
+      text-align: center !important;
+      white-space: normal !important;
+      margin-bottom: 10px !important;
+    }
+    .s1-root:not(.is-desktop) .s1-copy {
+      font-size: clamp(13.5px, 3.6vw, 15px) !important;
+      line-height: 1.4 !important;
+      text-align: center !important;
+      margin-bottom: 0 !important;
+      max-width: 330px !important;
+    }
+    .s1-root:not(.is-desktop) .s1-left-col .s1-btn-start {
       display: none !important;
+    }
+    .s1-root:not(.is-desktop) .s1-nurse-col {
+      position: relative !important;
+      right: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      order: 1 !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+    }
+    .s1-root:not(.is-desktop) .s1-nurse-img {
+      max-height: clamp(140px, 22vh, 185px) !important;
+    }
+    .s1-root:not(.is-desktop) .s1-audio-desktop {
+      display: none !important;
+    }
+    .s1-root:not(.is-desktop) .s1-mobile-nav {
+      order: 3 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 340px !important;
+      gap: 10px !important;
+      margin: 0 auto !important;
+      flex-shrink: 0 !important;
+    }
+    .s1-root:not(.is-desktop) .s1-mobile-nav .s1-audio-wrapper {
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #144e57 !important;
+    }
+    .s1-root:not(.is-desktop) .s1-mobile-nav .s1-btn-start {
+      min-width: 200px !important;
+      height: 48px !important;
+      font-size: 16px !important;
+      font-weight: 700 !important;
     }
   }
 
-  /* Prefers Reduced Motion (WCAG 2.3.3) */
+  /* ---------------- Explicit variant="mobile" ---------------- */
+  .s1-root.is-mobile {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100% !important;
+    min-height: clamp(560px, calc(100dvh - 120px), 720px) !important;
+    padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    background-color: #fcfdf3 !important;
+  }
+  .s1-root.is-mobile .s1-stage {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    height: auto !important;
+    min-height: 100% !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 6px 0 !important;
+  }
+  .s1-root.is-mobile .s1-left-col {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    order: 2 !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+  }
+  .s1-root.is-mobile .s1-title {
+    font-size: clamp(34px, 9.5vw, 44px) !important;
+    line-height: 1 !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  .s1-root.is-mobile .s1-subtitle {
+    font-size: clamp(14px, 4vw, 16px) !important;
+    text-align: center !important;
+    white-space: normal !important;
+    margin-bottom: 10px !important;
+  }
+  .s1-root.is-mobile .s1-copy {
+    font-size: clamp(13.5px, 3.6vw, 15px) !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    margin-bottom: 0 !important;
+    max-width: 330px !important;
+  }
+  .s1-root.is-mobile .s1-left-col .s1-btn-start {
+    display: none !important;
+  }
+  .s1-root.is-mobile .s1-nurse-col {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    order: 1 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+  .s1-root.is-mobile .s1-nurse-img {
+    max-height: clamp(140px, 22vh, 185px) !important;
+  }
+  .s1-root.is-mobile .s1-audio-desktop {
+    display: none !important;
+  }
+  .s1-root.is-mobile .s1-mobile-nav {
+    order: 3 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    gap: 10px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  .s1-root.is-mobile .s1-mobile-nav .s1-audio-wrapper {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #144e57 !important;
+  }
+  .s1-root.is-mobile .s1-mobile-nav .s1-btn-start {
+    min-width: 200px !important;
+    height: 48px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    .s1-root *,
+    .s1-root *::before,
+    .s1-root *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
@@ -318,13 +468,43 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
   const isSpanish = isSpanishProp ?? locale === "es";
   const internalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const headingRef = externalHeadingRef || internalHeadingRef;
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
 
-  // Programmatic focus on mount per Karen's review (WCAG 2.4.3 Focus Order)
+  // WCAG 2.4.3 Focus Order: Move reading focus to heading on mount
   useEffect(() => {
     if (autoFocusHeading) {
       headingRef.current?.focus({ preventScroll: true });
     }
   }, [headingRef, autoFocusHeading]);
+
+  // Fit the fixed vector design stage into the tablet mockup frame without distorting
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
+    const update = () => {
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
+        setScale(1);
+        return;
+      }
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      // Allow 16px safety margins
+      const safeW = Math.max(0, w - 16);
+      const safeH = Math.max(0, h - 16);
+      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H, 1));
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [variant]);
 
   const introSubtitle =
     description ||
@@ -332,11 +512,14 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       ? "Padres Involucrados en Alergias a la Penicilina"
       : "Parents Engaged in Penicillin Allergies");
 
-  const mainCopy =
+  const rawCopy =
     content ||
     (isSpanish
       ? "¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños."
       : "Hi! I'm nurse Anna. Let's talk about penicillin allergies in kids.");
+
+  // Clean trailing "Get started." / "¡Comenzar!" from the displayed text so it matches Figma
+  const mainCopy = rawCopy.replace(/\s*(Get started\.?|¡Comenzar!?)\s*$/i, "").trim();
 
   const effectiveAudioSrc =
     audioSrc ||
@@ -356,123 +539,95 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
     if (onNext) onNext("yes");
   }, [loading, onAnswer, onNext]);
 
-  const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  const variantClass =
+    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
-  // On mobile the teal/blue gradient is replaced with the neutral cream background
-  // so the slide blends with the shell (which is also cream on mobile).
-  const [isMobile, setIsMobile] = useState(
-    variant === "mobile" || (variant === "auto" && typeof window !== "undefined" && window.innerWidth < 768)
-  );
-  useEffect(() => {
-    if (variant !== "auto") {
-      setIsMobile(variant === "mobile");
-      return;
-    }
-    const mq = window.matchMedia("(max-width: 767px)");
-    setIsMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, [variant]);
+  // Figma multi-stop gradient background on desktop
+  const desktopGradient = `
+    radial-gradient(circle at 12% 16%, #a1aef2 0%, rgba(161, 174, 242, 0) 55%),
+    radial-gradient(circle at 10% 70%, #8be6eb 0%, rgba(139, 230, 235, 0) 50%),
+    radial-gradient(circle at 88% 18%, #cdf2e0 0%, rgba(205, 242, 224, 0) 50%),
+    radial-gradient(circle at 90% 85%, #e6f4dd 0%, rgba(230, 244, 221, 0) 55%),
+    linear-gradient(135deg, #a6bbf5 0%, #90e1ea 32%, #c2f2ce 68%, #e2f5db 100%)
+  `;
 
-  const slideBackground = isMobile
-    ? "#fcfdf3"
-    : `
-        radial-gradient(circle at 18% 20%, rgba(186, 203, 246, 0.95) 0%, rgba(186, 203, 246, 0) 48%),
-        radial-gradient(circle at 12% 75%, rgba(162, 230, 228, 0.9) 0%, rgba(162, 230, 228, 0) 50%),
-        radial-gradient(circle at 82% 18%, rgba(204, 246, 219, 0.9) 0%, rgba(204, 246, 219, 0) 48%),
-        radial-gradient(circle at 88% 82%, rgba(235, 248, 208, 0.95) 0%, rgba(235, 248, 208, 0) 52%),
-        linear-gradient(135deg, #c4d4f8 0%, #b2e7e3 28%, #cdf3da 62%, #ecf9d4 100%)
-      `;
+  const isMobileViewport =
+    variant === "mobile" ||
+    (variant !== "desktop" && typeof window !== "undefined" && window.innerWidth < 768);
+
+  const ctaLabel = isSpanish
+    ? "Comenzar - Iniciar la guía PEN-PAL"
+    : "Get Started - Begin the PEN-PAL guide";
+
+  const ctaText = loading ? "..." : isSpanish ? "¡Comenzar!" : "Get Started!";
 
   return (
     <section
       id="slide-content"
+      ref={rootRef}
       role="region"
       aria-roledescription="slide"
       aria-labelledby="slide1-primary-heading"
       lang={isSpanish ? "es" : "en"}
-      className={`s1-component-root relative w-full h-full flex-1 min-h-0 flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-3 sm:py-6 pb-16 sm:pb-6 overflow-y-auto${variantClass}`}
+      className={`s1-root${variantClass}`}
       style={{
-        background: slideBackground,
+        background: isMobileViewport ? "#fcfdf3" : desktopGradient,
       }}
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE1_COMPONENT_CSS }} />
 
-      <div className="s1-content-container">
-        {/* Left Column: Heading, Subtitle, Copy, and CTA Button */}
+      {/* Scaled design stage — locked aspect ratio & exact vector layout on desktop */}
+      <div className="s1-stage" style={{ transform: `scale(${scale})` }}>
+        {/* Left column: Heading, Subtitle, Copy, and CTA Button */}
         <div className="s1-left-col">
-          <div className="s1-header-group">
-            {/* Golden-Yellow Title with Dark Teal Stroke & Drop Shadow (Level AAA Contrast > 9.5:1) */}
-            <h1
-              id="slide1-primary-heading"
-              ref={headingRef}
-              tabIndex={-1}
-              className="s1-title text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black tracking-tight font-display select-none text-[#ebb016]"
-              style={{
-                WebkitTextStroke: "1.6px #12403d",
-                paintOrder: "stroke fill",
-                textShadow: "0 2px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3)",
-              }}
-            >
-              {title || "PEN–PAL"}
-            </h1>
-            <p className="s1-subtitle text-sm sm:text-base md:text-lg lg:text-xl font-bold text-[#143e3b] mt-1 sm:mt-1.5 tracking-tight">
-              {introSubtitle}
-            </p>
-          </div>
+          <h1
+            id="slide1-primary-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className="s1-title select-none"
+          >
+            {title || "PEN-PAL"}
+          </h1>
 
-          <p className="s1-copy text-sm sm:text-base md:text-lg lg:text-[1.05rem] font-medium text-[#143833] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md pt-0.5 sm:pt-2">
-            {mainCopy}
-          </p>
+          <p className="s1-subtitle">{introSubtitle}</p>
+
+          <p className="s1-copy">{mainCopy}</p>
 
           {/* Desktop "Get Started!" Action Button */}
-          <div className="s1-desktop-start pt-2 sm:pt-4">
-            <button
-              type="button"
-              onClick={handleStart}
-              disabled={loading}
-              className="s1-btn-start"
-              aria-label={
-                isSpanish
-                  ? "Comenzar - Iniciar la guía PEN-PAL"
-                  : "Get Started - Begin the PEN-PAL guide"
-              }
-            >
-              {loading ? "..." : isSpanish ? "¡Comenzar!" : "Get Started!"}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={loading}
+            className="s1-btn-start"
+            aria-label={ctaLabel}
+          >
+            {ctaText}
+          </button>
         </div>
 
-        {/* Right Column: Nurse Anna Formal Introduction (Slide 1 ONLY: isDecorative={false}) */}
+        {/* Right column: Nurse Anna (properly sized to fit comfortably with no clipping) */}
         <div className="s1-nurse-col">
-          <NurseAnna
-            size="md"
-            imgClassName="w-24 sm:w-28 md:w-32 lg:w-36 max-h-[145px] sm:max-h-[190px] md:max-h-[220px] object-contain"
-            isDecorative={false}
-            locale={isSpanish ? "es" : "en"}
+          <img
+            src="/images/nurse-anna.png"
+            alt={
+              isSpanish
+                ? "Ilustración de la enfermera Anna sonriendo"
+                : "Illustration of Nurse Anna smiling in blue scrubs"
+            }
+            className="s1-nurse-img"
           />
         </div>
-      </div>
 
-      {/* Audio (CC & Play/Pause) Controls - Desktop only */}
-      <footer
-        className="s1-audio-desktop absolute right-3 sm:right-6 md:right-8 bottom-3 sm:bottom-4 md:bottom-5 z-30 flex items-center"
-        role="toolbar"
-        aria-label={isSpanish ? "Controles de audio y subtítulos" : "Slide audio and caption controls"}
-      >
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={isSpanish ? "es" : "en"}
-          transcriptText={effectiveTranscript}
-          size="large"
-        />
-      </footer>
-
-      {/* Mobile Action & Audio Controls Toolbar: Audio on top, Get Started below */}
-      <div className="s1-mobile-nav z-30">
-        <div className="s1-audio-wrapper">
+        {/* Desktop Audio narration & CC controls — perfectly anchored at bottom-right */}
+        <footer
+          className="s1-audio-desktop"
+          role="toolbar"
+          aria-label={
+            isSpanish
+              ? "Controles de audio y subtítulos"
+              : "Slide audio and caption controls"
+          }
+        >
           <AudioPlayer
             audioSrc={effectiveAudioSrc}
             stepId={stepId}
@@ -480,25 +635,33 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
             transcriptText={effectiveTranscript}
             size="large"
           />
-        </div>
+        </footer>
 
-        <button
-          type="button"
-          onClick={handleStart}
-          disabled={loading}
-          className="s1-btn-start"
-          aria-label={
-            isSpanish
-              ? "Comenzar - Iniciar la guía PEN-PAL"
-              : "Get Started - Begin the PEN-PAL guide"
-          }
-        >
-          {loading ? "..." : isSpanish ? "¡Comenzar!" : "Get Started!"}
-        </button>
+        {/* Mobile Toolbar: Audio controls on top, Get Started button below */}
+        <div className="s1-mobile-nav z-30">
+          <div className="s1-audio-wrapper">
+            <AudioPlayer
+              audioSrc={effectiveAudioSrc}
+              stepId={stepId}
+              locale={isSpanish ? "es" : "en"}
+              transcriptText={effectiveTranscript}
+              size="large"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={loading}
+            className="s1-btn-start"
+            aria-label={ctaLabel}
+          >
+            {ctaText}
+          </button>
+        </div>
       </div>
     </section>
   );
 });
 
 export default Slide1IntroScreen;
-
