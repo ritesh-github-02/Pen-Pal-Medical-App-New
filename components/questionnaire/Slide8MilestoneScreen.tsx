@@ -33,25 +33,24 @@ const BUBBLE_PATH_RIGHT =
 
 const SLIDE8_COMPONENT_CSS = `
   /* ------------------------------------------------------------
-     WCAG 2.1 / 2.2 Level AAA & WAVE Immunity Accessibility Rules
      Slide 7 (Milestone Celebration)
      ------------------------------------------------------------ */
 
+  /* Changed to relative to respect the app header, and flex: 1 to fill remaining space */
   .s8-wrapper {
-    width: 100vw;
-    height: 100dvh;
-    position: fixed;
-    top: 0;
-    left: 0;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    z-index: 50;
-    background-color: #fafdf3;
+    background-color: transparent;
   }
 
-  /* Screen Reader Only Utility (WCAG 1.3.1, 4.1.2, 4.1.3) */
+  /* Screen Reader Only Utility */
   .s8-sr-only {
     position: absolute !important;
     width: 1px !important;
@@ -64,14 +63,13 @@ const SLIDE8_COMPONENT_CSS = `
     border: 0 !important;
   }
 
-  /* Universal High Contrast Focus Indicator (WCAG 2.4.7 Level AAA) */
+  /* Universal High Contrast Focus Indicator */
   .s8-component-card button:focus-visible,
   .s8-component-card [tabindex="0"]:focus-visible {
     outline: 3px solid #143833 !important;
     outline-offset: 3px !important;
   }
 
-  /* Heading programmatic focus without unwanted mouse-click rings */
   .s8-heading:focus,
   .s8-heading:focus-visible {
     outline: none !important;
@@ -101,21 +99,20 @@ const SLIDE8_COMPONENT_CSS = `
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 32px;
     min-height: 0;
     position: relative;
   }
 
-  /* 1. Speech Bubble on Left (Tail pointing rightward toward Nurse Anna) */
   .s8-bubble-wrap {
     position: relative;
-    width: 500px;
-    max-width: 58%;
+    width: 620px; 
+    max-width: 68%;
     aspect-ratio: 510 / 315;
     flex-shrink: 0;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
     margin-right: -31px;
-    margin-top: -233px;
+    margin-top: 0;
     z-index: 5;
   }
 
@@ -133,7 +130,7 @@ const SLIDE8_COMPONENT_CSS = `
     top: 48%;
     left: 46%;
     transform: translate(-50%, -50%);
-    width: 78%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -150,12 +147,12 @@ const SLIDE8_COMPONENT_CSS = `
     margin: 0;
     padding: 0;
     width: 100%;
-    font-size: 26px;
-    line-height: 1.4;
-    font-weight: 600;
+    font-size: 42px; 
+    line-height: 1.3;
+    font-weight: 700;
     color: #142724;
     text-align: center;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     outline: none;
     word-break: break-word;
     overflow-wrap: break-word;
@@ -169,16 +166,15 @@ const SLIDE8_COMPONENT_CSS = `
     width: 100%;
   }
 
-  /* 2. Nurse Anna standing on Right (Strictly decorative on Slide 2+) */
   .s8-nurse-wrap {
     position: relative;
-    width: 118px;
-    height: 360px;
+    width: 140px;
+    height: 400px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -10px;
+    margin-top: 0;
     z-index: 10;
     pointer-events: none;
     user-select: none;
@@ -194,14 +190,10 @@ const SLIDE8_COMPONENT_CSS = `
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
   }
 
-  /* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
   .s8-bottom-bar {
     display: contents;
   }
 
-  /* ------------------------------------------------------------
-     Bottom Audio Narration & CC Controls (Bottom-Right like Slide 5)
-     ------------------------------------------------------------ */
   .s8-audio-wrap {
     position: absolute;
     right: 22px;
@@ -213,9 +205,6 @@ const SLIDE8_COMPONENT_CSS = `
     pointer-events: auto;
   }
 
-  /* ------------------------------------------------------------
-     Centered SlideNavigationButtons (100% Centered horizontally across card)
-     ------------------------------------------------------------ */
   .s8-component-card .slide-nav {
     position: absolute !important;
     bottom: clamp(16px, 3vh, 22px) !important;
@@ -238,7 +227,7 @@ const SLIDE8_COMPONENT_CSS = `
   }
 
   /* -------------------------------------------------------------
-     EXPLICIT PREVIEW & MOBILE EMBEDDED MODES (.is-mobile & < 768px)
+     MOBILE EMBEDDED MODES (< 768px)
      ------------------------------------------------------------- */
   ${(() => {
     const mobileLayout = (scope: string) => `
@@ -248,7 +237,7 @@ const SLIDE8_COMPONENT_CSS = `
         left: auto !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 100dvh !important;
+        min-height: calc(100dvh - 80px) !important;
         z-index: auto !important;
         overflow: visible !important;
       }
@@ -260,7 +249,7 @@ const SLIDE8_COMPONENT_CSS = `
         overflow-x: hidden !important;
         height: auto !important;
         max-height: none !important;
-        min-height: 100dvh !important;
+        min-height: 100% !important;
         flex: 1 1 auto !important;
         display: flex !important;
         flex-direction: column !important;
@@ -418,7 +407,6 @@ const SLIDE8_COMPONENT_CSS = `
     `;
   })()}
 
-  /* Prefers-Reduced-Motion (WCAG 2.3.3 Level AAA) */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
@@ -441,37 +429,45 @@ export function Slide8MilestoneScreen({
   transcriptText,
 }: Slide8MilestoneScreenProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
   const activeLocale = locale || (isSpanish ? "es" : "en");
   const isEs = activeLocale.startsWith("es") || isSpanish;
 
-  // Programmatic focus on mount (WCAG 2.4.3 Focus Order)
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
   }, []);
 
-  // Bulletproof Scaling based on the actual window size
+  // Bulletproof Scaling: Uses the wrapper's actual size
   useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+
     const update = () => {
       if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
         setScale(1);
         return;
       }
       
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const w = el.clientWidth;
+      const h = el.clientHeight;
       
-      // Subtract padding to leave room for the header and margins
-      const safeW = Math.max(0, w - 64); 
-      const safeH = Math.max(0, h - 160); 
+      // Leave 32px padding around the card
+      const safeW = Math.max(0, w - 32); 
+      const safeH = Math.max(0, h - 32); 
       
       setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
     update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, [variant]);
 
   const effectiveAudioSrc =
@@ -489,7 +485,7 @@ export function Slide8MilestoneScreen({
   const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
   return (
-    <div className={`s8-wrapper${variantClass}`}>
+    <div className={`s8-wrapper${variantClass}`} ref={wrapperRef}>
       <section
         className={`s8-component-card${variantClass}`}
         style={{ transform: `scale(${scale})` }}
@@ -500,9 +496,7 @@ export function Slide8MilestoneScreen({
       >
         <style dangerouslySetInnerHTML={{ __html: SLIDE8_COMPONENT_CSS }} />
 
-        {/* Stage Body */}
         <div className="s8-stage-body">
-          {/* 1. Speech Bubble on Left */}
           <div
             className="s8-bubble-wrap"
             role="region"
@@ -555,7 +549,6 @@ export function Slide8MilestoneScreen({
             </div>
           </div>
 
-          {/* 2. Nurse Anna standing on Right (Strictly decorative on Slide 2+) */}
           <div className="s8-nurse-wrap" aria-hidden="true">
             <img
               src="/images/nurse-anna.png"
@@ -566,7 +559,6 @@ export function Slide8MilestoneScreen({
           </div>
         </div>
 
-        {/* 2. Bottom Controls (Audio above Back/Next on mobile; independent on desktop) */}
         <div className="s8-bottom-bar">
           <div className="s8-audio-wrap">
             <AudioPlayer
