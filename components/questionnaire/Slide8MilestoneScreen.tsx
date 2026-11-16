@@ -44,12 +44,16 @@ const SLIDE8_COMPONENT_CSS = `
 
 
  .s8-wrapper {
-   width: 100%;
-   height: 100%;
+   width: 100vw;
+   height: 100dvh;
+   position: fixed;
+   top: 0;
+   left: 0;
    display: flex;
    align-items: center;
    justify-content: center;
    overflow: hidden;
+   z-index: 1;
  }
 
 
@@ -158,7 +162,7 @@ const SLIDE8_COMPONENT_CSS = `
    margin: 0;
    padding: 0;
    width: 100%;
-   font-size: 14.5px;
+   font-size: 24px;
    line-height: 1.4;
    font-weight: 600;
    color: #142724;
@@ -259,8 +263,13 @@ const SLIDE8_COMPONENT_CSS = `
  ${(() => {
    const mobileLayout = (scope: string) => `
      .s8-wrapper${scope.replace('.s8-component-card', '')} {
+       position: relative !important;
+       top: auto !important;
+       left: auto !important;
+       width: 100% !important;
        height: auto !important;
        min-height: 100dvh !important;
+       z-index: auto !important;
      }
      ${scope} {
        transform: none !important;
