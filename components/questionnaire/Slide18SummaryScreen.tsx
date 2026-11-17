@@ -1,673 +1,17 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import AudioPlayer from "./AudioPlayer";
-import { Printer, Download, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { formatAssessmentData } from "@/lib/format-assessment";
 import { toPng } from "html-to-image";
 import { submitAnswer, completeQuestionnaire } from "./actions";
 
-const SLIDE18_CSS = `
-/* ==========================================================
-   Slide18SummaryScreen – Pixel-Perfect Styles Matching Target UI (p18_4.png)
-   ========================================================== */
-
-.s18-root,
-.s18-root *,
-.s18-root *::before,
-.s18-root *::after {
-  box-sizing: border-box;
-}
-
-.s18-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.8rem 2.2rem 0.55rem 2.2rem;
-  overflow: hidden;
-  gap: clamp(0.75rem, 2vh, 1.25rem);
-}
-
-/* Centered Content Container */
-.s18-content {
-  width: 100%;
-  max-width: 730px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-shrink: 0;
-}
-
-/* "Action Steps for Parents" Yellow Badge - Enlarged to match Figma */
-.s18-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fff677;
-  border: 2px solid #142724;
-  border-radius: 18px;
-  padding: 0.75rem 2.2rem;
-  box-shadow: 2.5px 3.5px 0px #1a3532;
-  margin-bottom: 0.85rem;
-}
-
-.s18-badge-title {
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: -0.015em;
-  color: #142724;
-  line-height: 1.2;
-  margin: 0;
-  outline: none;
-}
-
-.s18-badge-title:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-}
-
-/* Numbered Steps Section */
-.s18-steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.22rem;
-  width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.s18-step-line {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #142724;
-  line-height: 1.28;
-  margin: 0;
-  text-align: left;
-}
-
-.s18-quote-line {
-  font-size: 0.84rem;
-  font-weight: 500;
-  color: #142724;
-  line-height: 1.28;
-  margin: 0;
-  text-align: left;
-}
-
-.s18-quote-text {
-  font-style: italic;
-}
-
-/* Summary Table (Exact replica of Spec p18_4.png) */
-.s18-table-container {
-  width: 100%;
-  max-width: 730px;
-  border: 1px solid #90b3ab;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(20, 50, 40, 0.05);
-  flex-shrink: 0;
-}
-
-.s18-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.s18-table tr {
-  border-bottom: 1px solid #90b3ab;
-}
-
-.s18-table tr:last-child {
-  border-bottom: none;
-}
-
-.s18-table-label {
-  width: 45%;
-  background-color: #b0cdc7;
-  color: #142724;
-  font-size: 0.82rem;
-  font-weight: 500;
-  line-height: 1.25;
-  padding: 0.28rem 0.72rem;
-  border-right: 1px solid #90b3ab;
-  vertical-align: middle;
-}
-
-.s18-table-value {
-  width: 55%;
-  background-color: #ebf4f1;
-  color: #142724;
-  font-size: 0.82rem;
-  font-weight: 450;
-  line-height: 1.25;
-  padding: 0.28rem 0.72rem;
-  vertical-align: middle;
-}
-
-/* Bottom Navigation Bar */
-.s18-nav {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.s18-btn {
-  padding: 0 24px;
-  min-height: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #143833;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid #91b5ae;
-  background-color: #adcac4;
-  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.s18-btn-icon {
-  width: 1.05rem;
-  height: 1.05rem;
-  flex-shrink: 0;
-  stroke-width: 2.2;
-}
-
-.s18-btn:hover {
-  background-color: #9cbdb6;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
-}
-
-.s18-btn:active {
-  transform: scale(0.97);
-}
-
-.s18-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-
-
-
-/* Wrapper Containers (transparent to desktop layout, structural on mobile) */
-.s18-main-stage {
-  display: contents;
-}
-.s18-bottom-bar {
-  display: contents;
-}
-
-/* Print-only elements hidden on screen */
-.s18-print-header,
-.s18-print-footer {
-  display: none;
-}
-
-/* Responsive Scaling */
-@media (max-height: 640px), (max-width: 768px) {
-  .s18-root {
-    padding: 0.6rem 1.5rem 0.35rem 1.5rem;
-  }
-  .s18-badge {
-    padding: 0.55rem 1.6rem;
-    margin-bottom: 0.55rem;
-    border-radius: 16px;
-  }
-  .s18-badge-title {
-    font-size: 1.35rem;
-  }
-  .s18-steps-list {
-    gap: 0.18rem;
-    margin-bottom: 0.35rem;
-  }
-  .s18-step-line {
-    font-size: 0.82rem;
-  }
-  .s18-quote-line {
-    font-size: 0.78rem;
-  }
-  .s18-table-label,
-  .s18-table-value {
-    font-size: 0.76rem;
-    padding: 0.22rem 0.55rem;
-  }
-  .s18-btn {
-    min-height: 48px;
-    height: 48px;
-    padding: 0 18px;
-    font-size: 15px;
-    font-weight: 700;
-    gap: 0.35rem;
-  }
-  .s18-btn-icon {
-    width: 0.95rem;
-    height: 0.95rem;
-  }
-}
-
-@media (max-height: 520px) {
-  .s18-root {
-    overflow-y: auto;
-    justify-content: flex-start;
-  }
-}
-
-@media print {
-  @page {
-    size: portrait;
-    margin: 12mm 15mm;
-  }
-
-  .s18-nav,
-  .no-print {
-    display: none !important;
-  }
-
-  .s18-root {
-    position: static !important;
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    gap: 0 !important;
-  }
-
-  .s18-content {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Printable Clinical Header */
-  .s18-print-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
-    border-bottom: 2px solid #142724 !important;
-    padding-bottom: 8px !important;
-    margin-bottom: 14px !important;
-  }
-
-  .s18-print-brand {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-  }
-
-  .s18-print-logo {
-    font-size: 18pt !important;
-    font-weight: 900 !important;
-    color: #142724 !important;
-    letter-spacing: -0.02em !important;
-    line-height: 1 !important;
-  }
-
-  .s18-print-tagline {
-    font-size: 8.5pt !important;
-    font-weight: 600 !important;
-    color: #3b5a54 !important;
-  }
-
-  .s18-print-meta {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    gap: 2px !important;
-  }
-
-  .s18-print-doc-type {
-    font-size: 8.5pt !important;
-    font-weight: 700 !important;
-    color: #142724 !important;
-  }
-
-  .s18-print-date {
-    font-size: 8pt !important;
-    color: #557871 !important;
-  }
-
-  /* "Action Steps for Parents" Badge */
-  .s18-badge {
-    display: inline-block !important;
-    background-color: #fff677 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    border: 2px solid #142724 !important;
-    border-radius: 16px !important;
-    padding: 8px 24px !important;
-    box-shadow: none !important;
-    margin-bottom: 14px !important;
-  }
-
-  .s18-badge-title {
-    font-size: 16pt !important;
-    font-weight: 800 !important;
-    color: #142724 !important;
-    line-height: 1.2 !important;
-    margin: 0 !important;
-  }
-
-  /* Numbered Steps Section */
-  .s18-steps-list {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 7px !important;
-    width: 100% !important;
-    margin-bottom: 16px !important;
-  }
-
-  .s18-step-line {
-    font-size: 10pt !important;
-    font-weight: 650 !important;
-    color: #142724 !important;
-    line-height: 1.35 !important;
-    margin: 0 !important;
-  }
-
-  .s18-quote-line {
-    font-size: 9.5pt !important;
-    font-weight: 500 !important;
-    color: #1a3631 !important;
-    line-height: 1.35 !important;
-    margin: 0 0 2px 14px !important;
-  }
-
-  .s18-quote-text {
-    font-style: italic !important;
-    color: #0f172a !important;
-  }
-
-  /* Summary Table */
-  .s18-table-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1.5px solid #7da39c !important;
-    border-radius: 6px !important;
-    overflow: hidden !important;
-    box-shadow: none !important;
-    margin-bottom: 14px !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .s18-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-  }
-
-  .s18-table tr {
-    border-bottom: 1px solid #90b3ab !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .s18-table tr:last-child {
-    border-bottom: none !important;
-  }
-
-  .s18-table-label {
-    width: 42% !important;
-    background-color: #b0cdc7 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color: #0a1f1b !important;
-    font-size: 9.5pt !important;
-    font-weight: 600 !important;
-    line-height: 1.3 !important;
-    padding: 8px 12px !important;
-    border-right: 1.5px solid #90b3ab !important;
-    vertical-align: middle !important;
-  }
-
-  .s18-table-value {
-    width: 58% !important;
-    background-color: #ebf4f1 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color: #0a1f1b !important;
-    font-size: 9.5pt !important;
-    font-weight: 500 !important;
-    line-height: 1.3 !important;
-    padding: 8px 12px !important;
-    vertical-align: middle !important;
-  }
-
-  /* Printable Footer */
-  .s18-print-footer {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    border-top: 1px solid #90b3ab !important;
-    padding-top: 8px !important;
-    margin-top: 12px !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .s18-print-footer-text {
-    font-size: 8pt !important;
-    color: #3b5a54 !important;
-    font-weight: 500 !important;
-    margin: 0 !important;
-  }
-
-  .s18-print-footer-tag {
-    font-size: 8pt !important;
-    font-weight: 700 !important;
-    color: #143833 !important;
-    white-space: nowrap !important;
-    margin-left: 12px !important;
-  }
-
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    box-shadow: none !important;
-  }
-}
-
-@media (min-width: 768px) {
-  .s18-audio {
-    position: absolute;
-    right: 22px;
-    bottom: clamp(16px, 3vh, 22px);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    z-index: 30;
-  }
-}
-
-${(() => {
-  const s18MobileLayout = (scope: string) => `
-    ${scope} {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      height: 100% !important;
-      max-height: 100% !important;
-      min-height: 100% !important;
-      flex: 1 1 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      padding: 14px 16px 12px 16px !important;
-      gap: 10px !important;
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      box-sizing: border-box !important;
-    }
-    ${scope} .s18-main-stage {
-      width: 100% !important;
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-      align-items: center !important;
-      margin: auto 0 !important;
-    }
-    ${scope} .s18-content {
-      width: 100% !important;
-      max-width: 380px !important;
-      align-items: center !important;
-      gap: 8px !important;
-    }
-    ${scope} .s18-badge {
-      padding: 8px 20px !important;
-      margin-bottom: 4px !important;
-      border-radius: 14px !important;
-      max-width: 100% !important;
-    }
-    ${scope} .s18-badge-title {
-      font-size: clamp(16px, 2.3vh, 19px) !important;
-      line-height: 1.2 !important;
-      text-align: center !important;
-    }
-    ${scope} .s18-badge-title:focus:not(:focus-visible) {
-      outline: none !important;
-      box-shadow: none !important;
-    }
-    ${scope} .s18-steps-list {
-      gap: 5px !important;
-      margin-bottom: 4px !important;
-      width: 100% !important;
-    }
-    ${scope} .s18-step-line {
-      font-size: clamp(12.5px, 1.7vh, 13.5px) !important;
-      line-height: 1.32 !important;
-    }
-    ${scope} .s18-quote-line {
-      font-size: clamp(12px, 1.6vh, 13px) !important;
-      line-height: 1.32 !important;
-    }
-    ${scope} .s18-table-container {
-      width: 100% !important;
-      max-width: 380px !important;
-    }
-    ${scope} .s18-table-label,
-    ${scope} .s18-table-value {
-      font-size: clamp(11.5px, 1.55vh, 12.5px) !important;
-      line-height: 1.3 !important;
-      padding: 6px 10px !important;
-      overflow-wrap: break-word !important;
-    }
-    ${scope} .s18-bottom-bar {
-      width: 100% !important;
-      max-width: 380px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: clamp(10px, 1.8vh, 14px) !important;
-      padding-top: 6px !important;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-      margin: 0 auto !important;
-      flex-shrink: 0 !important;
-      z-index: 25 !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .s18-audio {
-      order: 1 !important;
-      position: static !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100% !important;
-      display: flex !important;
-      justify-content: center !important;
-      margin: 0 auto !important;
-      color: #144e57 !important;
-      z-index: 25 !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .s18-audio > div {
-      gap: 8px !important;
-    }
-    ${scope} .s18-audio .audio-cc-btn,
-    ${scope} .s18-audio .audio-play-btn {
-      color: #144e57 !important;
-      min-width: 44px !important;
-      min-height: 44px !important;
-      padding: 4px !important;
-    }
-    ${scope} .s18-audio .audio-cc-btn svg,
-    ${scope} .s18-audio .audio-play-btn svg {
-      height: 34px !important;
-      width: auto !important;
-    }
-    ${scope} .s18-nav {
-      order: 2 !important;
-      position: relative !important;
-      width: 100% !important;
-      margin: 0 auto !important;
-      display: flex !important;
-      flex-wrap: wrap !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 10px !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .s18-nav .slide-nav-btn {
-      min-width: 104px !important;
-      height: 44px !important;
-      padding: 0 22px !important;
-    }
-    ${scope} .s18-btn {
-      min-height: 44px !important;
-      height: 44px !important;
-      padding: 0 16px !important;
-      font-size: 14px !important;
-    }
-  `;
-  return `
-    ${s18MobileLayout(".s18-root.is-mobile")}
-    @media (max-width: 767px) {
-      ${s18MobileLayout(".s18-root:not(.is-desktop)")}
-      .s18-root:not(.is-desktop) {
-        min-height: min(640px, calc(100dvh - 80px)) !important;
-        max-height: calc(100dvh - 72px) !important;
-      }
-    }
-    @media (max-width: 767px) and (max-height: 520px) {
-      .s18-root:not(.is-desktop) {
-        justify-content: flex-start !important;
-      }
-    }
-  `;
-})()}
-`;
+// ============================================================================
+// Constants (matches reference tablet aspect 827x577 = 1.433)
+// ============================================================================
+const STAGE_W = 760;
+const STAGE_H = 530;
 
 export interface Slide18SummaryScreenProps {
   variant?: "auto" | "desktop" | "mobile";
@@ -685,31 +29,533 @@ export interface Slide18SummaryScreenProps {
   transcriptText?: string;
 }
 
+const mobileLayoutCSS = (scope: string) => `
+  ${scope} {
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
+  }
+  ${scope} .s18-stage {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+    background-color: transparent !important;
+  }
+  ${scope} .s18-capture-surface {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+  }
+  ${scope} .s18-badge {
+    position: static !important;
+    min-width: auto !important;
+    height: auto !important;
+    padding: 10px 22px !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s18-badge-title {
+    font-size: 18px !important;
+  }
+  ${scope} .s18-steps-list {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s18-step-line {
+    font-size: 13.5px !important;
+  }
+  ${scope} .s18-quote-line {
+    font-size: 13px !important;
+  }
+  ${scope} .s18-table-container {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s18-table-label,
+  ${scope} .s18-table-value {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+  ${scope} .s18-bottom-bar {
+    position: static !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 6px 0 0 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+  ${scope} .s18-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
+  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; bottom: auto !important; width: 100% !important; gap: 12px !important; justify-content: center !important; }
+  ${scope} .s18-btn-action { flex: 1 1 0% !important; height: 42px !important; min-height: 42px !important; font-size: 14px !important; padding: 0 12px !important; }
+  ${scope} .s18-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
+`;
+
+const SLIDE18_CSS = `
+  .s18-root button:focus-visible,
+  .s18-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 2px !important;
+  }
+  .s18-badge-title:focus, .s18-badge-title:focus-visible { outline: none !important; }
+
+  .s18-root, .s18-root *, .s18-root *::before, .s18-root *::after { box-sizing: border-box; }
+
+  .s18-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    color: #1d2423;
+  }
+
+  .s18-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  .s18-capture-surface {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+  }
+
+  /* Print-only elements hidden on screen */
+  .s18-print-header,
+  .s18-print-footer {
+    display: none;
+  }
+
+  /* ---- 1. Yellow Pill Badge "Action Steps for Parents" ---- */
+  .s18-badge {
+    position: absolute;
+    left: 68px;
+    top: 28px;
+    min-width: 304px;
+    height: 50px;
+    padding: 0 28px;
+    background-color: #feff9f;
+    border: 2px solid #2b7a85;
+    border-radius: 9999px;
+    box-shadow: 0 3px 6px rgba(35, 111, 122, 0.22);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+  .s18-badge-title {
+    margin: 0;
+    font-size: 20.5px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+    color: #1d2423;
+    outline: none;
+  }
+
+  /* ---- 2. Numbered Steps 1–3 ---- */
+  .s18-steps-list {
+    position: absolute;
+    left: 74px;
+    top: 94px;
+    width: 616px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 5;
+  }
+  .s18-step-line {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1d2423;
+    line-height: 1.36;
+    margin: 0;
+    text-align: left;
+  }
+  .s18-step-line--hanging {
+    padding-left: 18px;
+    text-indent: -18px;
+  }
+  .s18-quote-line {
+    font-size: 13.8px;
+    font-weight: 500;
+    color: #1d2423;
+    line-height: 1.38;
+    margin: 0 0 2px 0;
+    text-align: left;
+  }
+  .s18-quote-text {
+    font-style: italic;
+  }
+
+  /* ---- 3. 2-Column Alternating Summary Table ---- */
+  .s18-table-container {
+    position: absolute;
+    left: 74px;
+    top: 244px;
+    width: 612px;
+    max-height: 208px;
+    overflow-y: auto;
+    border: 1px solid #c3d2d0;
+    border-radius: 4px;
+    background-color: #ffffff;
+    z-index: 5;
+  }
+  .s18-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  .s18-table tr {
+    border-bottom: 1px solid #c3d2d0;
+  }
+  .s18-table tr:last-child {
+    border-bottom: none;
+  }
+  .s18-table-label {
+    width: 45%;
+    color: #2f2d2a;
+    font-size: 12.6px;
+    font-weight: 500;
+    line-height: 1.24;
+    padding: 5px 10px;
+    border-right: 1px solid #c3d2d0;
+    vertical-align: middle;
+  }
+  .s18-table-value {
+    width: 55%;
+    color: #2f2d2a;
+    font-size: 12.6px;
+    font-weight: 450;
+    line-height: 1.24;
+    padding: 5px 10px;
+    vertical-align: middle;
+  }
+  /* Alternating rows matching reference screenshot */
+  .s18-table tbody tr:nth-child(odd) .s18-table-label {
+    background-color: #c9dedd;
+  }
+  .s18-table tbody tr:nth-child(odd) .s18-table-value {
+    background-color: #edf5f4;
+  }
+  .s18-table tbody tr:nth-child(even) .s18-table-label,
+  .s18-table tbody tr:nth-child(even) .s18-table-value {
+    background-color: #ffffff;
+  }
+
+  /* ---- Captions Drawer ---- */
+  .s18-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    z-index: 25;
+    background-color: #ffffff;
+    border: 1.5px solid #2b7a85;
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(20, 56, 51, 0.14);
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #1a2322;
+    max-height: 108px;
+    overflow-y: auto;
+  }
+
+  /* ---- 4. Bottom Bar: Print + Save as Picture + CC/Play ---- */
+  .s18-bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 74px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s18-actions-center {
+    position: absolute;
+    left: 238px;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 58px;
+  }
+  .s18-btn-action {
+    height: 38px;
+    min-width: 96px;
+    padding: 0 22px;
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: #c6dce0;
+    border: 1.6px solid #3c7c87;
+    color: #182728;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+  }
+  .s18-btn-action:hover:not(:disabled) {
+    background-color: #b4d1d6;
+  }
+  .s18-btn-action:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .s18-btn-action:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+  .s18-btn-spinner {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .s18-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .s18-icon-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    margin: 0;
+    min-width: 40px;
+    min-height: 40px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #2b7a85;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+  }
+  .s18-icon-btn:hover { opacity: 0.82; transform: scale(1.04); }
+  .s18-icon-btn:active { transform: scale(0.95); }
+  .s18-icon-btn[aria-pressed="true"] { background-color: rgba(43, 122, 133, 0.12); }
+
+  ${mobileLayoutCSS(".s18-root.is-mobile")}
+  @media (max-width: 767px) {
+    ${mobileLayoutCSS(".s18-root:not(.is-desktop)")}
+  }
+
+  /* ---- Clinical Print Layout ---- */
+  @media print {
+    @page {
+      size: portrait;
+      margin: 12mm 15mm;
+    }
+    .s18-bottom-bar,
+    .s18-captions-panel,
+    .no-print {
+      display: none !important;
+    }
+    .s18-root {
+      position: static !important;
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+      background: #ffffff !important;
+      overflow: visible !important;
+    }
+    .s18-stage {
+      position: static !important;
+      width: 100% !important;
+      height: auto !important;
+      transform: none !important;
+      overflow: visible !important;
+    }
+    .s18-capture-surface {
+      position: static !important;
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+      padding: 0 !important;
+    }
+    .s18-print-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-end !important;
+      border-bottom: 2px solid #142724 !important;
+      padding-bottom: 8px !important;
+      margin-bottom: 14px !important;
+    }
+    .s18-print-brand {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+    }
+    .s18-print-logo {
+      font-size: 18pt !important;
+      font-weight: 900 !important;
+      color: #142724 !important;
+      line-height: 1 !important;
+    }
+    .s18-print-tagline {
+      font-size: 8.5pt !important;
+      font-weight: 600 !important;
+      color: #3b5a54 !important;
+    }
+    .s18-print-meta {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      gap: 2px !important;
+    }
+    .s18-print-doc-type {
+      font-size: 8.5pt !important;
+      font-weight: 700 !important;
+      color: #142724 !important;
+    }
+    .s18-print-date {
+      font-size: 8pt !important;
+      color: #557871 !important;
+    }
+    .s18-badge {
+      position: static !important;
+      display: inline-flex !important;
+      background-color: #feff9f !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      border: 2px solid #2b7a85 !important;
+      box-shadow: none !important;
+      margin-bottom: 14px !important;
+    }
+    .s18-steps-list {
+      position: static !important;
+      width: 100% !important;
+      margin-bottom: 14px !important;
+      gap: 6px !important;
+    }
+    .s18-table-container {
+      position: static !important;
+      width: 100% !important;
+      max-height: none !important;
+      overflow: visible !important;
+      margin-bottom: 14px !important;
+      page-break-inside: avoid !important;
+    }
+    .s18-table tbody tr:nth-child(odd) .s18-table-label {
+      background-color: #c9dedd !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .s18-table tbody tr:nth-child(odd) .s18-table-value {
+      background-color: #edf5f4 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .s18-print-footer {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      border-top: 1px solid #90b3ab !important;
+      padding-top: 8px !important;
+      font-size: 8.5pt !important;
+      color: #3b5a54 !important;
+    }
+    .s18-print-footer-text { margin: 0 !important; }
+    .s18-print-footer-tag { font-weight: 700 !important; color: #142724 !important; }
+  }
+`;
+
 export function Slide18SummaryScreen({
   variant = "auto",
   isSpanish = false,
   answers,
   activeToken,
   participantId,
-  onBack,
   onPrint,
-  onNavigateToSuccess,
-  onNext,
   audioSrc,
   stepId = "screen7_summary",
   locale,
   transcriptText,
 }: Slide18SummaryScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const summaryTitleRef = useRef<HTMLHeadingElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [scale, setScale] = useState(1);
   const [isSavingPicture, setIsSavingPicture] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [captionsOpen, setCaptionsOpen] = useState(false);
+
+  // Scale-locked desktop stage
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0 && h > 0) {
+        setScale(Math.min(Math.max(0, w - 8) / STAGE_W, Math.max(0, h - 8) / STAGE_H));
+      }
+    };
+    update();
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(update);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      summaryTitleRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => summaryTitleRef.current?.focus(), 50);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
   }, []);
 
   // Unified clinical data formatting across Slide 18, Report Page, and PDF
@@ -723,6 +569,51 @@ export function Slide18SummaryScreen({
   const effectiveMedName = formatted.medicationName;
   const tableRows = formatted.summaryTableRows;
 
+  const effectiveAudioSrc =
+    audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3");
+
+  const effectiveTranscript =
+    transcriptText ||
+    (isSpanish
+      ? "Pasos a seguir para los padres. Hable con el médico de su hijo sobre la alergia en su próxima visita, comparta fotos de la reacción y entregue esta tabla al médico."
+      : "Action Steps for Parents. Talk to your child's doctor about the allergy at their next visit, share pictures of your child's reaction with the doctor, and give the table below to your child's doctor.");
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+  };
+
+  const handleTogglePlay = () => {
+    if (isPlaying) {
+      stopAudio();
+      return;
+    }
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      const playPromise = audioRef.current.play();
+      if (playPromise) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            if (typeof window !== "undefined" && "speechSynthesis" in window) {
+              window.speechSynthesis.cancel();
+              const u = new SpeechSynthesisUtterance(effectiveTranscript);
+              u.lang = (locale || (isSpanish ? "es" : "en")) === "es" ? "es-US" : "en-US";
+              u.onstart = () => setIsPlaying(true);
+              u.onend = () => setIsPlaying(false);
+              u.onerror = () => setIsPlaying(false);
+              window.speechSynthesis.speak(u);
+            }
+          });
+      }
+    }
+  };
 
   const handleSaveAsPicture = async () => {
     if (isSavingPicture) return;
@@ -735,7 +626,7 @@ export function Slide18SummaryScreen({
       const dataUrl = await toPng(element, {
         quality: 0.98,
         pixelRatio: 2,
-        backgroundColor: "#f4f8ec",
+        backgroundColor: "#fcfdf3",
         filter: (node) => {
           if (node instanceof HTMLElement && node.classList.contains("no-print")) {
             return false;
@@ -763,7 +654,6 @@ export function Slide18SummaryScreen({
       completeQuestionnaire().catch(() => {});
     } catch (err) {
       console.error("Failed to capture PNG screenshot:", err);
-      // Fallback: generate PDF if canvas export fails
       generateAssessmentPDF({
         locale: isSpanish ? "es" : "en",
         answers,
@@ -797,14 +687,6 @@ export function Slide18SummaryScreen({
     }
   };
 
-  const handleClose = () => {
-    if (onNavigateToSuccess) {
-      onNavigateToSuccess();
-    } else if (onNext) {
-      onNext();
-    }
-  };
-
   const variantClass =
     variant === "mobile"
       ? " is-mobile"
@@ -813,12 +695,21 @@ export function Slide18SummaryScreen({
       : "";
 
   return (
-    <div id="slide-content" className={`s18-root${variantClass}`} ref={cardRef}>
+    <div id="slide-content" ref={rootRef} className={`s18-root${variantClass}`} data-step-id={stepId || "screen7_summary"}>
       <style>{SLIDE18_CSS}</style>
 
-      <div className="s18-main-stage">
-        {/* Main Centered Content */}
-        <div className="s18-content">
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="none"
+        onEnded={() => setIsPlaying(false)}
+      />
+
+      <div
+        className="s18-stage"
+        style={variant === "mobile" ? undefined : { transform: `scale(${scale})` }}
+      >
+        <div className="s18-capture-surface" ref={cardRef}>
           {/* Printable Clinical Header (Visible ONLY when printing) */}
           <div className="s18-print-header" aria-hidden="true">
             <div className="s18-print-brand">
@@ -843,7 +734,7 @@ export function Slide18SummaryScreen({
             </div>
           </div>
 
-          {/* 1. Yellow Badge */}
+          {/* 1. Yellow Pill Badge "Action Steps for Parents" */}
           <div className="s18-badge">
             <h1
               ref={summaryTitleRef}
@@ -855,19 +746,19 @@ export function Slide18SummaryScreen({
             </h1>
           </div>
 
-          {/* 2. Numbered Steps matching Spec p18_4.png */}
+          {/* 2. Numbered Steps 1–3 */}
           <div className="s18-steps-list">
             <p className="s18-step-line">
               {isSpanish
                 ? "1. Hable con el médico de su hijo sobre la alergia en su próxima visita."
-                : "1. Talk to your child’s doctor about the allergy at their next visit."}
+                : "1. Talk to your child's doctor about the allergy at their next visit."}
             </p>
             <p className="s18-quote-line">
               {isSpanish ? "Esto es lo que puede decir: " : "Here’s what you can say: "}
               <span className="s18-quote-text">
                 {isSpanish
                   ? "«Leí sobre las alergias a la penicilina en niños. ¿Podríamos hablar sobre verificar si mi hijo realmente tiene una alergia?»"
-                  : '“I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?”'}
+                  : "“I read about penicillin allergies in kids. Could we talk about checking to see if my child really has an allergy?”"}
               </span>
             </p>
 
@@ -877,14 +768,14 @@ export function Slide18SummaryScreen({
                 : "2. Share pictures of your child’s reaction with the doctor."}
             </p>
 
-            <p className="s18-step-line">
+            <p className="s18-step-line s18-step-line--hanging">
               {isSpanish
                 ? `3. Entregue la siguiente tabla al médico de su hijo. Esto describe lo que ocurrió cuando su hijo tomó ${effectiveMedName}.`
                 : `3. Give the table below to your child’s doctor. This says what happened when your child took ${effectiveMedName}.`}
             </p>
           </div>
 
-          {/* 3. The 2-Column Summary Table (Spec p18_4.png) */}
+          {/* 3. 2-Column Alternating Summary Table */}
           <div className="s18-table-container">
             <table className="s18-table" aria-label={isSpanish ? "Resumen de la reacción" : "Reaction Summary"}>
               <tbody>
@@ -907,71 +798,124 @@ export function Slide18SummaryScreen({
             </p>
             <span className="s18-print-footer-tag">PEN-PAL Medical Study</span>
           </div>
-        </div>
-      </div>
 
-      {/* Bottom Controls Container (audio on top of action buttons on mobile) */}
-      <div className="s18-bottom-bar">
-        {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-        <div className="s18-audio">
-          <AudioPlayer
-            audioSrc={audioSrc || (isSpanish ? "/audio/es/step-7.mp3" : "/audio/en/step-7.mp3")}
-            stepId={stepId || "screen7_summary"}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={transcriptText || (isSpanish ? "Resumen y pasos a seguir" : "Summary and Action Steps")}
-            size="large"
-          />
-        </div>
-
-        {/* 4. Bottom Centered Navigation (Back, Print & Save) + Close ✕ */}
-        <div className="s18-nav no-print">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="slide-nav-btn slide-nav-btn--back"
-              aria-label={isSpanish ? "Atrás" : "Back"}
+          {/* Captions Drawer */}
+          {captionsOpen && (
+            <div
+              className="s18-captions-panel no-print"
+              role="region"
+              aria-label={isSpanish ? "Subtítulos de audio" : "Audio captions"}
             >
-              {isSpanish ? "Atrás" : "Back"}
-            </button>
+              {effectiveTranscript}
+            </div>
           )}
-          <button
-            type="button"
-            onClick={onPrint || (() => window.print())}
-            className="s18-btn"
-            aria-label={isSpanish ? "Imprimir hoja de resumen" : "Print summary sheet"}
-            title={isSpanish ? "Imprimir" : "Print"}
-          >
-            <Printer className="s18-btn-icon" aria-hidden="true" />
-            <span>{isSpanish ? "Imprimir" : "Print"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={handleSaveAsPicture}
-            disabled={isSavingPicture}
-            className={`s18-btn${isSavingPicture ? " opacity-80 cursor-wait" : ""}`}
-            aria-label={isSpanish ? "Guardar resumen como imagen PNG" : "Save summary as picture PNG"}
-            title={isSpanish ? "Guardar como imagen" : "Save as Picture"}
-          >
-            {isSavingPicture ? (
-              <Loader2 className="s18-btn-icon animate-spin" aria-hidden="true" />
-            ) : (
-              <Download className="s18-btn-icon" aria-hidden="true" />
-            )}
-            <span>
-              {isSavingPicture
-                ? isSpanish
-                  ? "Guardando..."
-                  : "Saving..."
-                : saveSuccess
-                ? isSpanish
-                  ? "¡Guardado!"
-                  : "Saved!"
-                : isSpanish
-                ? "Guardar como imagen"
-                : "Save as Picture"}
-            </span>
-          </button>
+
+          {/* 4. Bottom Bar: Print + Save as Picture + CC / Play */}
+          <div className="s18-bottom-bar no-print">
+            <div className="s18-actions-center">
+              <button
+                type="button"
+                onClick={onPrint || (() => window.print())}
+                className="s18-btn-action"
+                aria-label={isSpanish ? "Imprimir hoja de resumen" : "Print summary sheet"}
+                title={isSpanish ? "Imprimir" : "Print"}
+              >
+                {isSpanish ? "Imprimir" : "Print"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveAsPicture}
+                disabled={isSavingPicture}
+                className="s18-btn-action"
+                aria-label={isSpanish ? "Guardar resumen como imagen PNG" : "Save summary as picture PNG"}
+                title={isSpanish ? "Guardar como imagen" : "Save as Picture"}
+              >
+                {isSavingPicture && (
+                  <Loader2 className="s18-btn-spinner animate-spin" aria-hidden="true" />
+                )}
+                <span>
+                  {isSavingPicture
+                    ? isSpanish ? "Guardando..." : "Saving..."
+                    : saveSuccess
+                    ? isSpanish ? "¡Guardado!" : "Saved!"
+                    : isSpanish ? "Guardar como imagen" : "Save as Picture"}
+                </span>
+              </button>
+            </div>
+
+            <div className="s18-audio-controls">
+              <button
+                type="button"
+                onClick={() => setCaptionsOpen((v) => !v)}
+                aria-pressed={captionsOpen}
+                aria-label={
+                  captionsOpen
+                    ? isSpanish ? "Ocultar subtítulos" : "Hide captions"
+                    : isSpanish ? "Mostrar subtítulos" : "Show captions"
+                }
+                title={isSpanish ? "Subtítulos (CC)" : "Closed Captions (CC)"}
+                className="s18-icon-btn"
+              >
+                <svg width="36" height="34" viewBox="0 0 42 40" fill="none" aria-hidden="true">
+                  <path
+                    d="M9 5H33C36.3137 5 39 7.68629 39 11V25C39 28.3137 36.3137 31 33 31H26.2L21 36.2L15.8 31H9C5.68629 31 3 28.3137 3 25V11C3 7.68629 5.68629 5 9 5Z"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinejoin="round"
+                  />
+                  <text
+                    x="21"
+                    y="23"
+                    textAnchor="middle"
+                    fill="currentColor"
+                    fontSize="14.5"
+                    fontWeight="600"
+                    fontFamily="Plus Jakarta Sans, Inter, sans-serif"
+                    letterSpacing="0.5"
+                  >
+                    CC
+                  </text>
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleTogglePlay}
+                aria-pressed={isPlaying}
+                aria-label={
+                  isPlaying
+                    ? isSpanish ? "Pausar narración" : "Pause narration"
+                    : isSpanish ? "Reproducir narración" : "Play narration"
+                }
+                title={isPlaying ? (isSpanish ? "Pausar" : "Pause") : (isSpanish ? "Reproducir" : "Play")}
+                className="s18-icon-btn"
+              >
+                <svg width="44" height="36" viewBox="0 0 54 44" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 8.2C6 5.8 8.6 4.3 10.7 5.6L33.5 19.4C35.5 20.6 35.5 23.4 33.5 24.6L10.7 38.4C8.6 39.7 6 38.2 6 35.8V8.2Z"
+                    stroke="currentColor"
+                    strokeWidth="2.3"
+                    strokeLinejoin="round"
+                  />
+                  <text
+                    x="17.5"
+                    y="25.2"
+                    textAnchor="middle"
+                    fill="currentColor"
+                    fontSize="10.5"
+                    fontWeight="600"
+                    fontFamily="Plus Jakarta Sans, Inter, sans-serif"
+                  >
+                    {isPlaying ? "stop" : "play"}
+                  </text>
+                  <path d="M38.5 13.5C41.8 16.5 41.8 27.5 38.5 30.5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+                  <path d="M43 9.5C48 14.5 48 29.5 43 34.5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+                  <path d="M47.5 6C53.5 12.8 53.5 31.2 47.5 38" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

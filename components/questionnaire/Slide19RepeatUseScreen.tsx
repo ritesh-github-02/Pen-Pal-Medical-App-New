@@ -1,630 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import AudioPlayer from "./AudioPlayer";
-import SlideNavigationButtons from "./SlideNavigationButtons";
 
-const SLIDE19_CSS = `
-/* ==========================================================
-   Slide19RepeatUseScreen – Pixel-Perfect Styles Matching Target UI
-   ========================================================== */
-
-.s19-root,
-.s19-root *,
-.s19-root *::before,
-.s19-root *::after {
-  box-sizing: border-box;
-}
-
-.s19-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 560px) auto;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
-  column-gap: 1.75rem;
-  row-gap: clamp(0.5rem, 1.8vh, 1rem);
-  background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 4.5rem 1.8rem;
-  overflow: hidden;
-}
-
-/* Heading */
-.s19-top-section {
-  width: 100%;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
-  grid-column: 1;
-  grid-row: 1;
-}
-.s19-heading {
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.35;
-  font-weight: 700;
-  color: #142724;
-  letter-spacing: -0.015em;
-  margin: 0;
-  outline: none;
-}
-.s19-heading:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-}
-
-/* Middle Section: Teal Card + Nurse Anna */
-.s19-middle {
-  display: contents;
-}
-
-/* Main Rounded Teal Card Container */
-.s19-card {
-  background-color: #8cb2a7;
-  border: 1.5px solid #759c92;
-  border-radius: 20px;
-  padding: 1.85rem 1.85rem;
-  box-shadow: 0 4px 14px rgba(20, 55, 50, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 560px;
-  width: 100%;
-  transition: all 0.2s ease;
-  grid-column: 1;
-  grid-row: 2;
-}
-
-/* Options Row */
-.s19-options-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-/* White Option Buttons inside Teal Card */
-.s19-option-btn {
-  min-height: 44px;
-  padding: 0.55rem 1.1rem;
-  border-radius: 8px;
-  background-color: #ffffff;
-  border: 1.5px solid #236f7a;
-  color: #142724;
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.25;
-  text-align: center;
-  white-space: nowrap;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.16s ease;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.s19-option-btn--compact {
-  padding: 0.55rem 1rem;
-  min-width: 60px;
-}
-
-.s19-option-btn--wide {
-  padding: 0.55rem 1.15rem;
-}
-
-.s19-option-btn:hover {
-  background-color: #f2f8f6;
-  border-color: #1c5249;
-  transform: translateY(-1.5px);
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
-}
-
-.s19-option-btn:active {
-  transform: scale(0.97);
-}
-
-.s19-option-btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
-}
-
-/* Selected Button State: Yellowish background with greenish border */
-.s19-option-btn--selected {
-  background-color: #ffd41d !important;
-  border: 1.5px solid #1c5249 !important;
-  color: #142724 !important;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
-}
-
-.s19-option-btn--selected:hover {
-  background-color: #f7ca12 !important;
-  border-color: #143e37 !important;
-  color: #142724 !important;
-}
-
-/* Detail Badge inside Card (when Yes is chosen) */
-.s19-detail-badge {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(20, 58, 52, 0.25);
-  border-radius: 8px;
-  padding: 0.4rem 0.75rem;
-  margin-top: 0.65rem;
-  font-size: 0.8rem;
-  color: #143833;
-}
-
-.s19-detail-badge-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.s19-change-btn {
-  background: none;
-  border: none;
-  color: #1f4d45;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 0.5rem;
-  font-size: 0.78rem;
-  shrink: 0;
-}
-
-
-
-/* Nurse Anna Wrapper */
-.s19-nurse-wrap {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  flex-shrink: 0;
-  user-select: none;
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.s19-nurse-img {
-  height: 270px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
-}
-
-/* Navigation Bar */
-.s19-nav {
-  position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 20;
-}
-@media (max-width: 640px) {
-  .s19-nav {
-    bottom: 14px;
-    gap: 16px;
-  }
-}
-
-.s19-btn {
-  height: 35px;
-  padding: 0 18px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s19-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s19-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-
-.s19-btn--back {
-  min-width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s19-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-
-.s19-btn--next {
-  min-width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-}
-.s19-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-.s19-btn--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.s19-btn--disabled:hover {
-  background-color: #fdee8e;
-}
-
-/* ==========================================================
-   MODAL 20: Repeat Exposure Detail (Matches Spec p17_10.png)
-   ========================================================== */
-.s19-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(2px);
-}
-
-.s19-modal-card {
-  background-color: #f7f4ec;
-  border: 1.5px solid #d8d2c2;
-  border-radius: 18px;
-  padding: 1.5rem 1.65rem 1.15rem 1.65rem;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  animation: s19FadeIn 0.18s ease-out;
-}
-
-@keyframes s19FadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.s19-modal-heading {
-  font-size: 1.12rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: #142724;
-  margin: 0;
-  text-align: center;
-  outline: none;
-}
-
-.s19-modal-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  width: 100%;
-}
-
-.s19-modal-row {
-  display: flex;
-  gap: 0.65rem;
-  width: 100%;
-}
-
-.s19-modal-btn {
-  min-height: 44px;
-  padding: 0.55rem 0.85rem;
-  border-radius: 8px;
-  background-color: #ffffff;
-  border: 1.5px solid #236f7a;
-  color: #142724;
-  font-size: 0.86rem;
-  font-weight: 700;
-  line-height: 1.25;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.s19-modal-btn--full {
-  width: 100%;
-}
-
-.s19-modal-btn--half {
-  flex: 1 1 0%;
-}
-
-.s19-modal-btn:hover {
-  background-color: #f2f8f6;
-  border-color: #1c5249;
-  transform: translateY(-1px);
-}
-
-.s19-modal-btn:active {
-  transform: scale(0.97);
-}
-
-.s19-modal-btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
-}
-
-.s19-modal-btn--selected {
-  background-color: #ffd41d !important;
-  border: 1.5px solid #1c5249 !important;
-  color: #142724 !important;
-  box-shadow: 0 3px 8px rgba(10, 40, 35, 0.22) !important;
-}
-
-.s19-modal-btn--selected:hover {
-  background-color: #f7ca12 !important;
-  border-color: #143e37 !important;
-  color: #142724 !important;
-}
-
-
-
-/* Wrapper Containers (transparent to desktop layout, structural on mobile) */
-.s19-main-stage {
-  display: contents;
-}
-.s19-bottom-bar {
-  display: contents;
-}
-
-.s19-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
-}
-.s19-root .slide-nav {
-  margin: 10px auto 0.25rem auto !important;
-}
-
-/* Responsive Scaling */
-@media (max-height: 700px), (max-width: 860px) {
-  .s19-root {
-    padding: 1rem 1.75rem 0.5rem 1.75rem;
-    column-gap: 1.5rem;
-    grid-template-columns: minmax(0, 470px) auto;
-  }
-  .s19-heading {
-    font-size: 1.25rem;
-  }
-  .s19-middle {
-    gap: 1.5rem;
-  }
-  .s19-card {
-    padding: 1.35rem 1.4rem;
-    max-width: 470px;
-  }
-  .s19-option-btn {
-    min-height: 40px;
-    font-size: 0.84rem;
-    padding: 0.45rem 0.85rem;
-  }
-  .s19-nurse-img {
-    height: 220px;
-  }
-  .s19-btn {
-    padding: 0.38rem 1.8rem;
-    font-size: 0.9rem;
-    min-height: 38px;
-  }
-}
-
-${(() => {
-  const s19MobileLayout = (scope: string) => `
-    ${scope} {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      height: 100% !important;
-      max-height: 100% !important;
-      min-height: 100% !important;
-      flex: 1 1 auto !important;
-      padding: 14px 16px 12px 16px !important;
-      gap: 10px !important;
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      box-sizing: border-box !important;
-    }
-    ${scope} .s19-main-stage {
-      width: 100% !important;
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-evenly !important;
-      align-items: center !important;
-      gap: clamp(12px, 2.2vh, 20px) !important;
-      margin: auto 0 !important;
-    }
-    ${scope} .s19-top-section {
-      grid-column: auto !important;
-      grid-row: auto !important;
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 0 8px !important;
-    }
-    ${scope} .s19-heading {
-      font-size: clamp(16px, 2.4vh, 18.5px) !important;
-      line-height: 1.32 !important;
-      text-align: center !important;
-    }
-    ${scope} .s19-heading:focus:not(:focus-visible) {
-      outline: none !important;
-      box-shadow: none !important;
-    }
-    ${scope} .s19-middle {
-      display: contents !important;
-    }
-    ${scope} .s19-card {
-      grid-column: auto !important;
-      grid-row: auto !important;
-      max-width: 340px !important;
-      width: 100% !important;
-      padding: 14px 16px !important;
-      border-radius: 16px !important;
-      flex-shrink: 0 !important;
-    }
-    ${scope} .s19-options-row {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 10px !important;
-      width: 100% !important;
-    }
-    ${scope} .s19-option-btn {
-      width: 100% !important;
-      min-height: clamp(46px, 5.8vh, 52px) !important;
-      font-size: 0.92rem !important;
-      line-height: 1.25 !important;
-      padding: 10px 14px !important;
-      white-space: normal !important;
-      overflow-wrap: break-word !important;
-    }
-    ${scope} .s19-detail-badge {
-      width: 100% !important;
-      margin-top: 10px !important;
-      padding: 8px 12px !important;
-      font-size: 0.84rem !important;
-      gap: 8px !important;
-    }
-    ${scope} .s19-change-btn {
-      flex-shrink: 0 !important;
-      font-size: 0.82rem !important;
-      min-height: 28px !important;
-    }
-    ${scope} .s19-nurse-wrap {
-      grid-column: auto !important;
-      grid-row: auto !important;
-      margin: 0 auto !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: flex-end !important;
-      flex-shrink: 0 !important;
-    }
-    ${scope} .s19-nurse-img {
-      height: clamp(120px, 19vh, 165px) !important;
-      max-height: 165px !important;
-      width: auto !important;
-      object-fit: contain !important;
-      filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-    }
-    ${scope} .s19-modal-row {
-      flex-direction: column !important;
-    }
-    ${scope} .s19-bottom-bar {
-      width: 100% !important;
-      max-width: 360px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: clamp(10px, 1.8vh, 16px) !important;
-      padding-top: 6px !important;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-      margin: 0 auto !important;
-      flex-shrink: 0 !important;
-      z-index: 25 !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .s19-audio {
-      order: 1 !important;
-      position: static !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100% !important;
-      display: flex !important;
-      justify-content: center !important;
-      margin: 0 auto !important;
-      color: #144e57 !important;
-      z-index: 25 !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .s19-audio > div {
-      gap: 8px !important;
-    }
-    ${scope} .s19-audio .audio-cc-btn,
-    ${scope} .s19-audio .audio-play-btn {
-      color: #144e57 !important;
-      min-width: 44px !important;
-      min-height: 44px !important;
-      padding: 4px !important;
-    }
-    ${scope} .s19-audio .audio-cc-btn svg,
-    ${scope} .s19-audio .audio-play-btn svg {
-      height: 34px !important;
-      width: auto !important;
-    }
-    ${scope} .slide-nav {
-      order: 2 !important;
-      position: relative !important;
-      bottom: auto !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      margin: 0 auto !important;
-      gap: 16px !important;
-      pointer-events: auto !important;
-    }
-    ${scope} .slide-nav-btn {
-      min-width: 128px !important;
-      padding: 0 32px !important;
-    }
-  `;
-  return `
-    ${s19MobileLayout(".s19-root.is-mobile")}
-    @media (max-width: 767px) {
-      ${s19MobileLayout(".s19-root:not(.is-desktop)")}
-      .s19-root:not(.is-desktop) {
-        min-height: min(640px, calc(100dvh - 80px)) !important;
-        max-height: calc(100dvh - 72px) !important;
-      }
-    }
-    @media (max-width: 767px) and (max-height: 620px) {
-      .s19-root:not(.is-desktop) .s19-nurse-img {
-        height: clamp(92px, 14.5vh, 120px) !important;
-        max-height: 120px !important;
-      }
-      .s19-root:not(.is-desktop) .s19-option-btn {
-        min-height: 42px !important;
-      }
-    }
-  `;
-})()}
-`;
+// ============================================================================
+// Constants (matches reference tablet aspect 827x577 = 1.433)
+// ============================================================================
+const STAGE_W = 760;
+const STAGE_H = 530;
 
 export interface Slide19RepeatUseScreenProps {
   variant?: "auto" | "desktop" | "mobile";
@@ -682,7 +64,11 @@ export const REPEAT_DETAIL_OPTIONS = [
 function isRepeatSelected(optValue: string, currentSelected?: string): boolean {
   if (!currentSelected) return false;
   if (currentSelected === optValue) return true;
-  if (optValue === "Unsure" && (currentSelected.toLowerCase().includes("unsure") || currentSelected.toLowerCase().includes("know"))) {
+  if (
+    optValue === "Unsure" &&
+    (currentSelected.toLowerCase().includes("unsure") ||
+      currentSelected.toLowerCase().includes("know"))
+  ) {
     return true;
   }
   return false;
@@ -691,11 +77,434 @@ function isRepeatSelected(optValue: string, currentSelected?: string): boolean {
 function isDetailSelected(optValue: string, currentSelected?: string): boolean {
   if (!currentSelected) return false;
   if (currentSelected === optValue) return true;
-  if (optValue === "Unsure" && (currentSelected.toLowerCase().includes("unsure") || currentSelected.toLowerCase().includes("know"))) {
+  if (
+    optValue === "Unsure" &&
+    (currentSelected.toLowerCase().includes("unsure") ||
+      currentSelected.toLowerCase().includes("know"))
+  ) {
     return true;
   }
   return false;
 }
+
+const mobileLayoutCSS = (scope: string) => `
+  ${scope} {
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
+  }
+  ${scope} .s19-stage {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 14px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    background-color: transparent !important;
+  }
+  ${scope} .s19-heading {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    font-size: 17.5px !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s19-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    min-height: auto !important;
+    padding: 16px 14px !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s19-options-row {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+  ${scope} .s19-nurse {
+    position: static !important;
+    width: 104px !important;
+    height: 212px !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s19-bottom-bar {
+    position: static !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+  ${scope} .s19-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
+  ${scope} .s19-nav-center { position: static !important; order: 2 !important; transform: none !important; width: 100% !important; gap: 14px !important; justify-content: space-between !important; }
+  ${scope} .s19-btn-nav { flex: 1 1 0% !important; height: 44px !important; min-height: 44px !important; font-size: 16px !important; }
+  ${scope} .s19-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
+`;
+
+const SLIDE19_CSS = `
+  .s19-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important; border: 0 !important;
+  }
+  .s19-root button:focus-visible,
+  .s19-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 2px !important;
+  }
+  .s19-heading:focus, .s19-heading:focus-visible { outline: none !important; }
+
+  .s19-root, .s19-root *, .s19-root *::before, .s19-root *::after { box-sizing: border-box; }
+
+  .s19-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    color: #1d2423;
+  }
+
+  .s19-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  /* ---- 1. Left-aligned Bold Heading ---- */
+  .s19-heading {
+    position: absolute;
+    left: 64px;
+    top: 72px;
+    width: 640px;
+    margin: 0;
+    padding: 0;
+    font-size: 21.5px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #1d2423;
+    letter-spacing: -0.015em;
+    text-align: left;
+    outline: none;
+    z-index: 5;
+  }
+
+  /* ---- 2. Sage-Teal Card ---- */
+  .s19-card {
+    position: absolute;
+    left: 64px;
+    top: 150px;
+    width: 478px;
+    min-height: 124px;
+    background-color: #8bb6b0;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  .s19-options-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .s19-option-btn {
+    min-height: 36px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 1.3px solid #2b7a85;
+    color: #1d2423;
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s19-option-btn--compact {
+    min-width: 44px;
+    padding: 7px 12px;
+  }
+  .s19-option-btn--wide {
+    padding: 7px 14px;
+  }
+  .s19-option-btn:hover {
+    background-color: #f3f9f8;
+    border-color: #1c5249;
+    transform: translateY(-1px);
+  }
+  .s19-option-btn:active { transform: scale(0.98); }
+
+  .s19-option-btn--selected {
+    background-color: #ffd41d !important;
+    border-color: #1c5249 !important;
+    color: #142724 !important;
+    font-weight: 600;
+  }
+
+  .s19-detail-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(20, 58, 52, 0.25);
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #143833;
+  }
+  .s19-detail-badge-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .s19-change-btn {
+    background: none;
+    border: none;
+    color: #1f4d45;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    font-size: 12.5px;
+    flex-shrink: 0;
+  }
+
+  /* ---- 3. Nurse Anna (Right, Pointing Left) ---- */
+  .s19-nurse {
+    position: absolute;
+    left: 548px;
+    top: 162px;
+    width: 134px;
+    height: 274px;
+    z-index: 6;
+    user-select: none;
+    pointer-events: none;
+  }
+  .s19-nurse img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* ---- Captions Drawer ---- */
+  .s19-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    z-index: 25;
+    background-color: #ffffff;
+    border: 1.5px solid #2b7a85;
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(20, 56, 51, 0.14);
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #1a2322;
+    max-height: 108px;
+    overflow-y: auto;
+  }
+
+  /* ---- 4. Unified Bottom Bar ---- */
+  .s19-bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 74px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .s19-nav-center {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 54px;
+  }
+  .s19-btn-nav {
+    height: 38px;
+    min-width: 74px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.6px solid #3c7c87;
+    transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+    color: #182728;
+  }
+  .s19-btn-nav:active:not(:disabled) { transform: scale(0.97); }
+  .s19-btn-back { background-color: #c6dce0; }
+  .s19-btn-back:hover:not(:disabled) { background-color: #b4d1d6; }
+  .s19-btn-next { background-color: #f9fa9a; }
+  .s19-btn-next:hover:not(:disabled) { background-color: #f5f77a; }
+  .s19-btn-nav:disabled { opacity: 0.48; cursor: not-allowed; }
+
+  .s19-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .s19-icon-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    margin: 0;
+    min-width: 40px;
+    min-height: 40px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #2b7a85;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+  }
+  .s19-icon-btn:hover { opacity: 0.82; transform: scale(1.04); }
+  .s19-icon-btn:active { transform: scale(0.95); }
+  .s19-icon-btn[aria-pressed="true"] { background-color: rgba(43, 122, 133, 0.12); }
+
+  /* ---- Modal 20: Repeat Exposure Detail ---- */
+  .s19-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+  }
+  .s19-modal-card {
+    background-color: #f7f4ec;
+    border: 1.5px solid #d8d2c2;
+    border-radius: 18px;
+    padding: 1.5rem 1.65rem 1.25rem 1.65rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: s19FadeIn 0.18s ease-out;
+  }
+  @keyframes s19FadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .s19-modal-heading {
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #142724;
+    margin: 0;
+    text-align: center;
+    outline: none;
+  }
+  .s19-modal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+  }
+  .s19-modal-row {
+    display: flex;
+    gap: 0.65rem;
+    width: 100%;
+  }
+  .s19-modal-btn {
+    min-height: 44px;
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1.5px solid #236f7a;
+    color: #142724;
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+  .s19-modal-btn--full { width: 100%; }
+  .s19-modal-btn--half { flex: 1 1 0%; }
+  .s19-modal-btn:hover {
+    background-color: #f2f8f6;
+    border-color: #1c5249;
+    transform: translateY(-1px);
+  }
+  .s19-modal-btn--selected {
+    background-color: #ffd41d !important;
+    border-color: #1c5249 !important;
+    color: #142724 !important;
+  }
+
+  ${mobileLayoutCSS(".s19-root.is-mobile")}
+  @media (max-width: 767px) {
+    ${mobileLayoutCSS(".s19-root:not(.is-desktop)")}
+  }
+`;
 
 export function Slide19RepeatUseScreen({
   variant = "auto",
@@ -713,35 +522,102 @@ export function Slide19RepeatUseScreen({
   locale,
   navProps,
 }: Slide19RepeatUseScreenProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const modalHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [scale, setScale] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [captionsOpen, setCaptionsOpen] = useState(false);
 
   const effectiveAudioSrc =
     audioSrc ||
-    (isSpanish
-      ? "/audio/es/step-6-5.mp3"
-      : "/audio/en/step-6-5.mp3");
+    (isSpanish ? "/audio/es/step-6-5.mp3" : "/audio/en/step-6-5.mp3");
 
   const effectiveTranscript =
     transcriptText ||
     (isSpanish
-      ? "¿Alguna vez su hijo tomó penicilina o un antibiótico similar después de su reacción?"
-      : "Did your child ever take penicillin or a similar antibiotic yet again after their reaction?");
+      ? "¿Ha recibido su hijo penicilina desde la reacción?"
+      : "Has your child received penicillin since the reaction?");
+
+  // Scale-locked desktop stage
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0 && h > 0) {
+        setScale(Math.min(Math.max(0, w - 8) / STAGE_W, Math.max(0, h - 8) / STAGE_H));
+      }
+    };
+    update();
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(update);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      headingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => headingRef.current?.focus(), 50);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
+    return () => {
+      audioRef.current?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+  };
+
+  const handleTogglePlay = () => {
+    if (isPlaying) {
+      stopAudio();
+      return;
+    }
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      const playPromise = audioRef.current.play();
+      if (playPromise) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            if (typeof window !== "undefined" && "speechSynthesis" in window) {
+              window.speechSynthesis.cancel();
+              const u = new SpeechSynthesisUtterance(effectiveTranscript);
+              u.lang = (locale || (isSpanish ? "es" : "en")) === "es" ? "es-US" : "en-US";
+              u.onstart = () => setIsPlaying(true);
+              u.onend = () => setIsPlaying(false);
+              u.onerror = () => setIsPlaying(false);
+              window.speechSynthesis.speak(u);
+            }
+          });
+      }
+    }
+  };
+
+  useEffect(() => {
     if (!modalOpen) return;
-    const timer = setTimeout(() => {
-      modalHeadingRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => modalHeadingRef.current?.focus(), 50);
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setModalOpen(false);
     };
@@ -761,25 +637,16 @@ export function Slide19RepeatUseScreen({
     }
   };
 
-  const handleClear = () => {
-    onSelect("");
-    onReactionDetailSelect("");
-  };
-
   const handleNextClick = () => {
-    if (onNext) {
-      onNext();
-    } else if (navProps?.onNext) {
-      navProps.onNext(selected);
-    }
+    stopAudio();
+    if (onNext) onNext();
+    else if (navProps?.onNext) navProps.onNext(selected);
   };
 
   const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else if (navProps?.onBack) {
-      navProps.onBack();
-    }
+    stopAudio();
+    if (onBack) onBack();
+    else if (navProps?.onBack) navProps.onBack();
   };
 
   const isLoading = loading || navProps?.loading || false;
@@ -808,7 +675,9 @@ export function Slide19RepeatUseScreen({
     }
   };
 
-  const selectedDetailObj = REPEAT_DETAIL_OPTIONS.find((d) => isDetailSelected(d.value, reactionDetailSelected));
+  const selectedDetailObj = REPEAT_DETAIL_OPTIONS.find((d) =>
+    isDetailSelected(d.value, reactionDetailSelected)
+  );
   const selectedDetailLabel = isSpanish
     ? selectedDetailObj?.labelEs || reactionDetailSelected
     : selectedDetailObj?.labelEn || reactionDetailSelected;
@@ -821,114 +690,202 @@ export function Slide19RepeatUseScreen({
       : "";
 
   return (
-    <div id="slide-content" className={`s19-root${variantClass}`}>
+    <div id="slide-content" ref={rootRef} className={`s19-root${variantClass}`} data-step-id={stepId || "screen6_5_yetagain"}>
       <style>{SLIDE19_CSS}</style>
 
-      <div className="s19-main-stage">
-        {/* 1. Main Heading */}
-        <div className="s19-top-section">
-          <h1
-            ref={headingRef}
-            tabIndex={-1}
-            id="slide19-title"
-            className="s19-heading"
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="none"
+        onEnded={() => setIsPlaying(false)}
+      />
+
+      <div
+        className="s19-stage"
+        style={variant === "mobile" ? undefined : { transform: `scale(${scale})` }}
+      >
+        {/* 1. Heading */}
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          id="slide19-title"
+          className="s19-heading"
+        >
+          {isSpanish
+            ? "¿Ha recibido su hijo penicilina desde la reacción?"
+            : "Has your child received penicillin since the reaction?"}
+        </h1>
+
+        {/* 2. Sage-Teal Card */}
+        <div className="s19-card">
+          <div
+            role="radiogroup"
+            aria-labelledby="slide19-title"
+            className="s19-options-row"
           >
-            {isSpanish
-              ? "¿Ha recibido su hijo penicilina desde la reacción?"
-              : "Has your child received penicillin since the reaction?"}
-          </h1>
-        </div>
+            {REPEAT_OPTIONS.map((opt, index) => {
+              const isChecked = isRepeatSelected(opt.value, selected);
+              const label = isSpanish ? opt.labelEs : opt.labelEn;
+              const sizeClass =
+                opt.variant === "compact"
+                  ? " s19-option-btn--compact"
+                  : " s19-option-btn--wide";
 
-        {/* 2. Middle Content Area: Rounded Teal Card + Nurse Anna */}
-        <div className="s19-middle">
-          {/* Teal Rounded Container Card */}
-          <div className="s19-card">
-            <div
-              role="radiogroup"
-              aria-labelledby="slide19-title"
-              className="s19-options-row"
-            >
-              {REPEAT_OPTIONS.map((opt, index) => {
-                const isChecked = isRepeatSelected(opt.value, selected);
-                const label = isSpanish ? opt.labelEs : opt.labelEn;
-                const sizeClass = opt.variant === "compact" ? " s19-option-btn--compact" : " s19-option-btn--wide";
-
-                return (
-                  <button
-                    key={opt.value}
-                    ref={(el) => {
-                      buttonRefs.current[index] = el;
-                    }}
-                    type="button"
-                    role="radio"
-                    aria-checked={isChecked}
-                    tabIndex={isChecked || (!selected && index === 0) ? 0 : -1}
-                    onClick={() => handleMainOption(opt.value)}
-                    onKeyDown={(e) => handleArrowKeyDown(e, index)}
-                    className={`s19-option-btn${sizeClass}${isChecked ? " s19-option-btn--selected" : ""}`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Active Detail Badge (when Yes was chosen) */}
-            {selected === "Yes" && reactionDetailSelected && (
-              <div className="s19-detail-badge">
-                <span className="s19-detail-badge-text">
-                  <strong>{isSpanish ? "Detalle: " : "Detail: "}</strong>
-                  {selectedDetailLabel}
-                </span>
+              return (
                 <button
+                  key={opt.value}
+                  ref={(el) => {
+                    buttonRefs.current[index] = el;
+                  }}
                   type="button"
-                  onClick={() => setModalOpen(true)}
-                  className="s19-change-btn"
+                  role="radio"
+                  aria-checked={isChecked}
+                  tabIndex={isChecked || (!selected && index === 0) ? 0 : -1}
+                  onClick={() => handleMainOption(opt.value)}
+                  onKeyDown={(e) => handleArrowKeyDown(e, index)}
+                  className={`s19-option-btn${sizeClass}${isChecked ? " s19-option-btn--selected" : ""}`}
                 >
-                  {isSpanish ? "Cambiar" : "Change"}
+                  {label}
                 </button>
-              </div>
-            )}
+              );
+            })}
           </div>
 
-          {/* Nurse Anna on the right */}
-          <div className="s19-nurse-wrap" aria-hidden="true">
-            <img
-              src="/images/nurse-anna.png"
-              alt=""
-              className="s19-nurse-img"
-            />
-          </div>
+          {selected === "Yes" && reactionDetailSelected && (
+            <div className="s19-detail-badge">
+              <span className="s19-detail-badge-text">
+                <strong>{isSpanish ? "Detalle: " : "Detail: "}</strong>
+                {selectedDetailLabel}
+              </span>
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="s19-change-btn"
+              >
+                {isSpanish ? "Cambiar" : "Change"}
+              </button>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Bottom Controls Container (audio on top of pill navigation on mobile) */}
-      <div className="s19-bottom-bar">
-        {/* Audio narration & CC controls (bottom-right like Slide 5) */}
-        <div className="s19-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId || "screen6_5_yetagain"}
-            locale={isSpanish ? "es" : "en"}
-            transcriptText={effectiveTranscript}
-            size="large"
+        {/* 3. Nurse Anna (Right, Pointing Left) */}
+        <div className="s19-nurse" aria-hidden="true">
+          <img
+            src="/images/nurse-anna-s16.png"
+            alt=""
+            draggable={false}
           />
         </div>
 
-        {/* 3. Bottom Centered Navigation (Back & Next) */}
-        <SlideNavigationButtons
-          onBack={handleBackClick}
-          onNext={handleNextClick}
-          isSpanish={isSpanish}
-          loading={isLoading}
-          nextDisabled={!isNextEnabled}
-          variant="flow"
-        />
+        {/* Captions Drawer */}
+        {captionsOpen && (
+          <div
+            className="s19-captions-panel"
+            role="region"
+            aria-label={isSpanish ? "Subtítulos de audio" : "Audio captions"}
+          >
+            {effectiveTranscript}
+          </div>
+        )}
+
+        {/* 4. Unified Bottom Bar */}
+        <div className="s19-bottom-bar">
+          <div className="s19-nav-center">
+            <button
+              type="button"
+              onClick={handleBackClick}
+              disabled={isLoading}
+              className="s19-btn-nav s19-btn-back"
+              aria-label={isSpanish ? "Atrás" : "Back"}
+            >
+              {isSpanish ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={handleNextClick}
+              disabled={!isNextEnabled}
+              className="s19-btn-nav s19-btn-next"
+              aria-label={isSpanish ? "Siguiente" : "Next"}
+            >
+              {isSpanish ? "Siguiente" : "Next"}
+            </button>
+          </div>
+
+          <div className="s19-audio-controls">
+            <button
+              type="button"
+              onClick={() => setCaptionsOpen((v) => !v)}
+              aria-pressed={captionsOpen}
+              aria-label={
+                captionsOpen
+                  ? isSpanish ? "Ocultar subtítulos" : "Hide captions"
+                  : isSpanish ? "Mostrar subtítulos" : "Show captions"
+              }
+              title={isSpanish ? "Subtítulos (CC)" : "Closed Captions (CC)"}
+              className="s19-icon-btn"
+            >
+              <svg width="36" height="34" viewBox="0 0 42 40" fill="none" aria-hidden="true">
+                <path
+                  d="M9 5H33C36.3137 5 39 7.68629 39 11V25C39 28.3137 36.3137 31 33 31H26.2L21 36.2L15.8 31H9C5.68629 31 3 28.3137 3 25V11C3 7.68629 5.68629 5 9 5Z"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinejoin="round"
+                />
+                <text
+                  x="21"
+                  y="23"
+                  textAnchor="middle"
+                  fill="currentColor"
+                  fontSize="14.5"
+                  fontWeight="600"
+                  fontFamily="Plus Jakarta Sans, Inter, sans-serif"
+                  letterSpacing="0.5"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTogglePlay}
+              aria-pressed={isPlaying}
+              aria-label={
+                isPlaying
+                  ? isSpanish ? "Pausar narración" : "Pause narration"
+                  : isSpanish ? "Reproducir narración" : "Play narration"
+              }
+              title={isPlaying ? (isSpanish ? "Pausar" : "Pause") : (isSpanish ? "Reproducir" : "Play")}
+              className="s19-icon-btn"
+            >
+              <svg width="44" height="36" viewBox="0 0 54 44" fill="none" aria-hidden="true">
+                <path
+                  d="M6 8.2C6 5.8 8.6 4.3 10.7 5.6L33.5 19.4C35.5 20.6 35.5 23.4 33.5 24.6L10.7 38.4C8.6 39.7 6 38.2 6 35.8V8.2Z"
+                  stroke="currentColor"
+                  strokeWidth="2.3"
+                  strokeLinejoin="round"
+                />
+                <text
+                  x="17.5"
+                  y="25.2"
+                  textAnchor="middle"
+                  fill="currentColor"
+                  fontSize="10.5"
+                  fontWeight="600"
+                  fontFamily="Plus Jakarta Sans, Inter, sans-serif"
+                >
+                  {isPlaying ? "stop" : "play"}
+                </text>
+                <path d="M38.5 13.5C41.8 16.5 41.8 27.5 38.5 30.5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+                <path d="M43 9.5C48 14.5 48 29.5 43 34.5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+                <path d="M47.5 6C53.5 12.8 53.5 31.2 47.5 38" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* ==========================================================
-          MODAL 20: Repeat Exposure Detail (Matches Spec p17_10.png)
-          ========================================================== */}
+      {/* MODAL 20: Repeat Exposure Detail */}
       {modalOpen && (
         <div
           role="dialog"
@@ -952,7 +909,6 @@ export function Slide19RepeatUseScreen({
             </h2>
 
             <div className="s19-modal-options">
-              {/* Option 1: Full width on top */}
               {(() => {
                 const opt1 = REPEAT_DETAIL_OPTIONS[0];
                 const isChecked1 = isDetailSelected(opt1.value, reactionDetailSelected);
@@ -971,7 +927,6 @@ export function Slide19RepeatUseScreen({
                 );
               })()}
 
-              {/* Options 2 & 3: Side-by-side row */}
               <div className="s19-modal-row">
                 {REPEAT_DETAIL_OPTIONS.slice(1).map((opt) => {
                   const isChecked = isDetailSelected(opt.value, reactionDetailSelected);

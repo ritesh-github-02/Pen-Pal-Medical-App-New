@@ -1,495 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import AudioPlayer from "./AudioPlayer";
+import React, { useRef, useEffect, useState } from "react";
 import { resolveMedicineToken } from "@/lib/token-engine";
-import SlideNavigationButtons from "./SlideNavigationButtons";
 
-const SLIDE12_CSS = `
-/* ==========================================================
-   Slide12AgeCohortScreen – Exact Target Design Pixel-Perfect Styles
-   ========================================================== */
-
-.s12-root,
-.s12-root *,
-.s12-root *::before,
-.s12-root *::after {
-  box-sizing: border-box;
-}
-
-.s12-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f8ec;
-  padding: 0.85rem 1.8rem 4.5rem 1.8rem;
-  overflow: hidden;
-  gap: clamp(0.5rem, 1.8vh, 1rem);
-}
-
-/* Heading */
-.s12-top-section {
-  width: 100%;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  flex-shrink: 0;
-}
-.s12-heading {
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.35;
-  font-weight: 700;
-  color: #142724;
-  letter-spacing: -0.015em;
-  margin: 0;
-  outline: none;
-}
-.s12-heading:focus-visible {
-  box-shadow: 0 0 0 2px #236f7a;
-}
-
-/* Cohorts Row (Centered) */
-.s12-middle {
-  flex-shrink: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-}
-
-.s12-cohorts-grid {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 860px;
-}
-
-.s12-cohort-col {
-  flex: 1 1 0%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  cursor: pointer;
-  user-select: none;
-}
-
-.s12-cohort-img-wrap {
-  width: 100%;
-  height: 185px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin-bottom: 0px;
-  pointer-events: none;
-}
-
-.s12-cohort-img {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  display: block;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  filter: drop-shadow(0 2px 4px rgba(20, 50, 45, 0.08));
-}
-
-.s12-cohort-col:hover .s12-cohort-img {
-  transform: translateY(-4px) scale(1.02);
-}
-
-.s12-cohort-col--selected .s12-cohort-img {
-  transform: translateY(-3px);
-}
-
-.s12-cohort-btn {
-  width: 100%;
-  min-height: 52px;
-  border-radius: 9px;
-  padding: 0.45rem 0.35rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  background-color: #ffffff;
-  border: 1.5px solid #4a867e;
-  color: #142724;
-  box-shadow: 0 3px 6px rgba(20, 50, 45, 0.12);
-  transition: all 0.18s ease;
-  outline: none;
-  white-space: normal;
-  box-sizing: border-box;
-  word-wrap: break-word;
-  overflow: hidden;
-}
-
-.s12-cohort-btn:hover {
-  background-color: #f4f9f8;
-  border-color: #3b746c;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(20, 50, 45, 0.18);
-}
-
-.s12-cohort-btn:active {
-  transform: scale(0.97);
-}
-
-.s12-cohort-btn:focus-visible {
-  box-shadow: 0 0 0 3px #1f4a43;
-}
-
-/* Checked / Selected Cohort Button (Yellowish background with greenish border matching Slide 11) */
-.s12-cohort-btn--selected {
-  background-color: #ffd41d !important;
-  border-color: #1c5249 !important;
-  color: #142724 !important;
-  box-shadow: 0 4px 10px rgba(10, 40, 35, 0.22) !important;
-}
-
-.s12-cohort-btn--selected:hover {
-  background-color: #f7ca12 !important;
-  border-color: #143e37 !important;
-}
-
-.s12-cohort-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: inherit;
-}
-
-.s12-cohort-subtitle {
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.2;
-  margin-top: 2px;
-  opacity: 0.92;
-  color: inherit;
-}
-
-/* Navigation Bar */
-.s12-nav {
-  position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 20;
-}
-@media (max-width: 640px) {
-  .s12-nav {
-    bottom: 14px;
-    gap: 16px;
-  }
-}
-
-.s12-btn {
-  height: 35px;
-  padding: 0 18px;
-  border-radius: 9999px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-.s12-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-.s12-btn:focus-visible {
-  box-shadow: 0 0 0 3px #236f7a;
-}
-
-.s12-btn--back {
-  min-width: 64px;
-  background-color: #bddfd8;
-  border-color: #8ab8b0;
-  color: #143833;
-}
-.s12-btn--back:hover:not(:disabled) {
-  background-color: #a8d5cc;
-}
-
-.s12-btn--next {
-  min-width: 62px;
-  background-color: #fdee8e;
-  border-color: #d4c65e;
-  color: #232323;
-}
-.s12-btn--next:hover:not(:disabled) {
-  background-color: #f5e478;
-}
-
-.s12-btn--disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-.s12-btn--disabled:hover {
-  background-color: #fdee8e;
-}
-
-/* Tablet & Mobile Scaling */
-@media (max-height: 700px), (max-width: 860px) {
-  .s12-root {
-    padding: 0.85rem 1.75rem 1rem 1.75rem;
-  }
-  .s12-heading {
-    font-size: 1.25rem;
-  }
-  .s12-cohorts-grid {
-    gap: 0.85rem;
-    max-width: 700px;
-  }
-  .s12-cohort-img-wrap {
-    height: 155px;
-  }
-  .s12-cohort-btn {
-    min-height: 46px;
-    padding: 0.35rem 0.25rem;
-    white-space: normal;
-    box-sizing: border-box;
-    word-wrap: break-word;
-    overflow: hidden;
-  }
-  .s12-cohort-title {
-    font-size: 0.86rem;
-  }
-  .s12-cohort-subtitle {
-    font-size: 0.72rem;
-  }
-  .s12-btn {
-    padding: 0.38rem 1.8rem;
-    font-size: 0.9rem;
-    min-height: 38px;
-  }
-}
-
-@media (max-height: 580px) {
-  .s12-cohort-img-wrap {
-    height: 125px;
-  }
-  .s12-cohort-btn {
-    min-height: 42px;
-    white-space: normal;
-    box-sizing: border-box;
-    word-wrap: break-word;
-    overflow: hidden;
-  }
-  .s12-cohort-title {
-    font-size: 0.8rem;
-  }
-  .s12-cohort-subtitle {
-    font-size: 0.68rem;
-  }
-}
-
-/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
-.s12-main-stage {
-  display: contents;
-}
-.s12-bottom-bar {
-  display: contents;
-}
-
-.s12-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
-}
-.s12-root .slide-nav {
-  margin: 10px auto 0.25rem auto !important;
-}
-
-${(() => {
-  const mobileLayout = (scope: string) => `
-    ${scope} {
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      height: 100% !important;
-      max-height: 100% !important;
-      min-height: 100% !important;
-      flex: 1 1 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      padding: 14px 16px 12px 16px !important;
-      gap: 10px !important;
-      box-sizing: border-box !important;
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-    }
-    ${scope} .s12-main-stage {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-      max-width: 380px !important;
-      flex: 1 1 auto !important;
-      min-height: 0 !important;
-      margin: 0 auto !important;
-      gap: clamp(10px, 1.8vh, 16px) !important;
-    }
-    ${scope} .s12-top-section {
-      margin: 0 auto !important;
-      padding: 0 !important;
-      max-width: 350px !important;
-    }
-    ${scope} .s12-heading {
-      font-size: clamp(15px, 2.2vh, 17.5px) !important;
-      line-height: 1.35 !important;
-      text-align: center !important;
-    }
-    ${scope} .s12-heading:focus:not(:focus-visible) {
-      outline: none !important;
-    }
-    ${scope} .s12-middle {
-      flex: 0 1 auto !important;
-      height: auto !important;
-      min-height: 0 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-    }
-    ${scope} .s12-cohorts-grid {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      gap: clamp(8px, 1.4vh, 14px) 14px !important;
-      justify-content: center !important;
-      align-items: flex-end !important;
-      max-width: 360px !important;
-      width: 100% !important;
-    }
-    ${scope} .s12-cohort-col {
-      flex: 0 0 46% !important;
-      max-width: 47% !important;
-    }
-    ${scope} .s12-cohort-img-wrap {
-      height: clamp(64px, 10vh, 88px) !important;
-      margin-bottom: 2px !important;
-    }
-    ${scope} .s12-cohort-img {
-      max-height: 100% !important;
-      height: 100% !important;
-    }
-    ${scope} .s12-cohort-btn {
-      min-height: clamp(44px, 6vh, 52px) !important;
-      padding: 6px 8px !important;
-      border-radius: 12px !important;
-    }
-    ${scope} .s12-cohort-title {
-      font-size: clamp(12.5px, 1.7vh, 14px) !important;
-      line-height: 1.2 !important;
-    }
-    ${scope} .s12-cohort-subtitle {
-      font-size: clamp(10.5px, 1.4vh, 11.5px) !important;
-      line-height: 1.2 !important;
-    }
-    @media (max-height: 620px) {
-      ${scope} .s12-cohort-img-wrap {
-        height: clamp(48px, 7.5vh, 64px) !important;
-      }
-      ${scope} .s12-cohort-btn {
-        min-height: 38px !important;
-      }
-    }
-    ${scope} .s12-bottom-bar {
-      width: 100% !important;
-      max-width: 360px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: clamp(10px, 1.8vh, 16px) !important;
-      padding-top: 6px !important;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-      margin: 0 auto !important;
-      flex-shrink: 0 !important;
-      z-index: 25 !important;
-    }
-    ${scope} .s12-audio {
-      order: 1 !important;
-      position: static !important;
-      right: auto !important;
-      bottom: auto !important;
-      width: 100% !important;
-      display: flex !important;
-      justify-content: center !important;
-      margin: 0 auto !important;
-      color: #144e57 !important;
-      z-index: 25 !important;
-    }
-    ${scope} .s12-audio > div {
-      gap: 8px !important;
-    }
-    ${scope} .s12-audio .audio-cc-btn,
-    ${scope} .s12-audio .audio-play-btn {
-      color: #144e57 !important;
-      min-width: 44px !important;
-      min-height: 44px !important;
-      padding: 4px !important;
-    }
-    ${scope} .s12-audio .audio-cc-btn svg,
-    ${scope} .s12-audio .audio-play-btn svg {
-      height: 34px !important;
-      width: auto !important;
-    }
-    ${scope} .slide-nav {
-      order: 2 !important;
-      position: relative !important;
-      bottom: auto !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      margin: 0 auto !important;
-      gap: 16px !important;
-    }
-    ${scope} .slide-nav-btn {
-      min-width: 128px !important;
-      padding: 0 32px !important;
-    }
-  `;
-  return `
-    @media (max-width: 767px) {
-      ${mobileLayout(".s12-root:not(.is-desktop)")}
-      .s12-root:not(.is-desktop) {
-        min-height: min(640px, calc(100dvh - 80px)) !important;
-        max-height: calc(100dvh - 72px) !important;
-      }
-    }
-    ${mobileLayout(".s12-root.is-mobile")}
-  `;
-})()}
-`;
+// ============================================================================
+// Constants (matches reference tablet aspect 827x577 = 1.433)
+// ============================================================================
+const STAGE_W = 760;
+const STAGE_H = 530;
 
 export interface AgeCohortOption {
   value: string;
@@ -555,6 +73,383 @@ export const AGE_COHORTS: AgeCohortOption[] = [
   },
 ];
 
+// ============================================================================
+// Shared Mobile Layout CSS
+// ============================================================================
+const mobileLayoutCSS = (scope: string) => `
+  ${scope} {
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
+  }
+  ${scope} .s12-stage {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 14px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    background-color: transparent !important;
+  }
+  ${scope} .s12-heading {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    font-size: 17.5px !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s12-cohorts-grid {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 12px 14px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s12-cohort-col {
+    flex: 0 0 46% !important;
+    max-width: 47% !important;
+  }
+  ${scope} .s12-cohort-img-wrap {
+    height: 84px !important;
+    margin-bottom: 6px !important;
+  }
+  ${scope} .s12-cohort-btn {
+    min-height: 48px !important;
+    padding: 6px 8px !important;
+  }
+  ${scope} .s12-bottom-bar {
+    position: static !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+  ${scope} .s12-audio-controls {
+    position: static !important;
+    order: 1 !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s12-nav-center {
+    position: static !important;
+    order: 2 !important;
+    transform: none !important;
+    width: 100% !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
+  }
+  ${scope} .s12-btn-nav {
+    flex: 1 1 0% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  ${scope} .s12-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
+  }
+`;
+
+// ============================================================================
+// Styles
+// ============================================================================
+const SLIDE12_CSS = `
+  .s12-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important; border: 0 !important;
+  }
+  .s12-root button:focus-visible,
+  .s12-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 2px !important;
+  }
+  .s12-heading:focus, .s12-heading:focus-visible { outline: none !important; }
+
+  .s12-root,
+  .s12-root *,
+  .s12-root *::before,
+  .s12-root *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---- Root ---- */
+  .s12-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    color: #1d2423;
+  }
+
+  /* ---- Scale-locked desktop stage ---- */
+  .s12-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  /* ---- 1. Left-aligned Bold Heading ---- */
+  .s12-heading {
+    position: absolute;
+    left: 60px;
+    top: 76px;
+    width: 610px;
+    margin: 0;
+    padding: 0;
+    font-size: 21.5px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #1d2423;
+    letter-spacing: -0.015em;
+    text-align: left;
+    outline: none;
+    z-index: 5;
+  }
+
+  /* ---- 2. Five Age Cohort Columns ---- */
+  .s12-cohorts-grid {
+    position: absolute;
+    left: 48px;
+    top: 178px;
+    width: 664px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 5;
+  }
+
+  .s12-cohort-col {
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .s12-cohort-img-wrap {
+    width: 100%;
+    height: 152px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 14px;
+    pointer-events: none;
+  }
+
+  .s12-cohort-img {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    display: block;
+    transition: transform 0.18s ease;
+  }
+  .s12-cohort-col:hover .s12-cohort-img {
+    transform: translateY(-3px);
+  }
+
+  /* Dark Teal Buttons matching Reference */
+  .s12-cohort-btn {
+    width: 100%;
+    min-height: 50px;
+    border-radius: 7px;
+    padding: 6px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    background-color: #2b7783;
+    border: 1.5px solid #2b7783;
+    color: #ffffff;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.16);
+    transition: all 0.16s ease;
+    font-family: inherit;
+  }
+  .s12-cohort-btn:hover {
+    background-color: #23646f;
+    border-color: #1c5249;
+    transform: translateY(-1px);
+  }
+  .s12-cohort-btn:active { transform: scale(0.98); }
+
+  /* Selected State: Yellow with dark text & teal border */
+  .s12-cohort-btn--selected {
+    background-color: #ffd41d !important;
+    border-color: #143833 !important;
+    color: #142724 !important;
+    box-shadow: 0 4px 8px rgba(10, 40, 35, 0.24) !important;
+  }
+  .s12-cohort-btn--selected:hover {
+    background-color: #f7ca12 !important;
+  }
+
+  .s12-cohort-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: inherit;
+  }
+  .s12-cohort-subtitle {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: inherit;
+    opacity: 0.95;
+  }
+
+  /* ---- 3. Bottom Bar ---- */
+  .s12-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 0 24px;
+  }
+  .s12-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 54px;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+  .s12-btn-nav {
+    border-radius: 9999px;
+    font-weight: 600;
+    border: 1.6px solid #3c7c87;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    min-width: 74px;
+    font-size: 15px;
+    padding: 0 20px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+    font-family: inherit;
+    user-select: none;
+  }
+  .s12-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
+  .s12-btn-nav:active:not(:disabled) { transform: translateY(1px); }
+  .s12-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  .s12-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s12-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
+  .s12-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s12-btn-next:hover:not(:disabled) { background-color: #f2f380; }
+
+  .s12-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2b7a85;
+  }
+  .s12-audio-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #2b7a85;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+    font-family: inherit;
+  }
+  .s12-audio-btn:hover { transform: scale(1.08); opacity: 0.85; }
+
+  .s12-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    background: #143833;
+    color: #fff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    z-index: 30;
+  }
+  .s12-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .s12-captions-text { font-size: 13.5px; line-height: 1.4; margin: 0; font-weight: 500; color: #fff; }
+
+  @media (max-width: 767px) {
+    ${mobileLayoutCSS(".s12-root:not(.is-desktop)")}
+  }
+  ${mobileLayoutCSS(".s12-root.is-mobile")}
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+`;
+
 export interface Slide12AgeCohortScreenProps {
   isSpanish?: boolean;
   selected?: string;
@@ -586,53 +481,143 @@ export function Slide12AgeCohortScreen({
   loading = false,
   audioSrc,
   transcriptText,
-  stepId,
+  stepId = "screen6_2_timing",
   locale,
   variant = "auto",
   navProps,
 }: Slide12AgeCohortScreenProps) {
-  const slideTitleRef = useRef<HTMLHeadingElement>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const slideTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const effectiveAudioSrc =
-    audioSrc ||
-    (isSpanish
-      ? "/audio/es/step-6-2.mp3"
-      : "/audio/en/step-6-2.mp3");
+  const [scale, setScale] = useState<number>(1);
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [showCaptions, setShowCaptions] = useState<boolean>(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
 
-  const effectiveTranscript =
-    transcriptText ||
-    (isSpanish
-      ? "¿Qué edad tenía su hijo cuando tuvo una reacción a la medicina?"
-      : "How old was your child when they had a reaction to the medicine?");
+  const isEs = (locale ?? "").startsWith("es") || isSpanish;
+  const isMobile = variant === "mobile";
+  const isDesktop = variant === "desktop";
+  const variantClass = isMobile ? " is-mobile" : isDesktop ? " is-desktop" : "";
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      slideTitleRef.current?.focus();
-    }, 50);
+    const timer = setTimeout(() => slideTitleRef.current?.focus({ preventScroll: true }), 50);
     return () => clearTimeout(timer);
   }, []);
 
-  const rawTitle = isSpanish
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const update = () => {
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
+        setScale(1);
+        return;
+      }
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      setScale(Math.min(Math.max(0, w - 8) / STAGE_W, Math.max(0, h - 8) / STAGE_H));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [variant]);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        setShowCaptions(false);
+        setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCaptions, isEs]);
+
+  const rawTitle = isEs
     ? "¿Qué edad tenía su hijo cuando tuvo una reacción a [name]?"
     : "How old was your child when they had a reaction to [name]?";
+  const titleText = resolveMedicineToken(rawTitle, medicationName, isEs);
 
-  const titleText = resolveMedicineToken(rawTitle, medicationName, isSpanish);
+  const effectiveAudioSrc =
+    audioSrc || (isEs ? "/audio/es/step-6-2.mp3" : "/audio/en/step-6-2.mp3");
+  const effectiveTranscript = transcriptText || titleText;
 
-  const handleNextClick = () => {
-    if (onNext) {
-      onNext();
-    } else if (navProps?.onNext) {
-      navProps.onNext(selected);
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
+
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setLiveAnnouncement(willPlay ? "Audio narration playing" : "Audio narration paused");
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+            utt.lang = isEs ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+        utt.lang = isEs ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
     }
   };
 
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setLiveAnnouncement(next ? "Closed captions displayed" : "Closed captions hidden");
+  };
+
+  const handleNextClick = () => {
+    if (onNext) onNext();
+    else if (navProps?.onNext) navProps.onNext(selected);
+  };
   const handleBackClick = () => {
-    if (onBack) {
-      onBack();
-    } else if (navProps?.onBack) {
-      navProps.onBack();
-    }
+    if (onBack) onBack();
+    else if (navProps?.onBack) navProps.onBack();
   };
 
   const isLoading = loading || navProps?.loading || false;
@@ -653,46 +638,50 @@ export function Slide12AgeCohortScreen({
       e.preventDefault();
       nextIndex = AGE_COHORTS.length - 1;
     }
-
     if (nextIndex !== -1) {
-      const nextCohort = AGE_COHORTS[nextIndex];
-      onSelect(nextCohort.value);
+      onSelect(AGE_COHORTS[nextIndex].value);
       buttonRefs.current[nextIndex]?.focus();
     }
   };
 
-  const variantClass =
-    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
-
   return (
-    <div id="slide-content" className={`s12-root${variantClass}`}>
-      <style>{SLIDE12_CSS}</style>
+    <div
+      id="slide-content"
+      ref={rootRef}
+      className={`s12-root${variantClass}`}
+      role="region"
+      aria-roledescription="slide"
+      aria-labelledby="slide12-title"
+      lang={isEs ? "es" : "en"}
+    >
+      <style dangerouslySetInnerHTML={{ __html: SLIDE12_CSS }} />
 
-      <div className="s12-main-stage">
-        {/* 1. Slide Heading */}
-        <div className="s12-top-section">
-          <h1
-            ref={slideTitleRef}
-            tabIndex={-1}
-            id="slide12-title"
-            className="s12-heading"
-          >
-            {titleText}
-          </h1>
-        </div>
+      <div className="s12-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
 
-        {/* 2. 5 Interactive Age Cohort Characters & Buttons */}
-        <div className="s12-middle">
-        <div
-          role="radiogroup"
-          aria-labelledby="slide12-title"
-          className="s12-cohorts-grid"
-        >
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s12-sr-only"
+        aria-hidden="true"
+      />
+
+      {/* ── Scale-locked desktop stage ── */}
+      <div
+        className="s12-stage"
+        style={!isMobile ? { transform: `scale(${scale})` } : undefined}
+      >
+        <h1 ref={slideTitleRef} tabIndex={-1} id="slide12-title" className="s12-heading">
+          {titleText}
+        </h1>
+
+        <div role="radiogroup" aria-labelledby="slide12-title" className="s12-cohorts-grid">
           {AGE_COHORTS.map((cohort, index) => {
             const isSelected = selected === cohort.value;
-            const title = isSpanish ? cohort.titleEs : cohort.titleEn;
-            const subtitle = isSpanish ? cohort.subtitleEs : cohort.subtitleEn;
-            const fullLabel = `${title} ${subtitle}`;
+            const title = isEs ? cohort.titleEs : cohort.titleEn;
+            const subtitle = isEs ? cohort.subtitleEs : cohort.subtitleEn;
 
             return (
               <div
@@ -703,17 +692,10 @@ export function Slide12AgeCohortScreen({
                   buttonRefs.current[index]?.focus();
                 }}
               >
-                {/* Character Illustration standing right above button */}
-                <div className={`s12-cohort-img-wrap s12-cohort-img-wrap--${cohort.titleEn.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>
-                  <img
-                    src={cohort.imageSrc}
-                    alt=""
-                    aria-hidden="true"
-                    className={`s12-cohort-img s12-cohort-img--${cohort.titleEn.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
-                  />
+                <div className="s12-cohort-img-wrap">
+                  <img src={cohort.imageSrc} alt="" aria-hidden="true" className="s12-cohort-img" draggable={false} />
                 </div>
 
-                {/* Selection Button */}
                 <button
                   ref={(el) => {
                     buttonRefs.current[index] = el;
@@ -722,7 +704,7 @@ export function Slide12AgeCohortScreen({
                   role="radio"
                   aria-checked={isSelected}
                   tabIndex={isSelected || (!selected && index === 0) ? 0 : -1}
-                  aria-label={fullLabel}
+                  aria-label={`${title} ${subtitle}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelect(cohort.value);
@@ -730,40 +712,76 @@ export function Slide12AgeCohortScreen({
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   className={`s12-cohort-btn${isSelected ? " s12-cohort-btn--selected" : ""}`}
                 >
-                  <span className="s12-cohort-title">
-                    {title}
-                  </span>
-                  <span className="s12-cohort-subtitle">
-                    {subtitle}
-                  </span>
+                  <span className="s12-cohort-title">{title}</span>
+                  <span className="s12-cohort-subtitle">{subtitle}</span>
                 </button>
               </div>
             );
           })}
         </div>
-      </div>
-      </div>
 
-      {/* Bottom Controls: Audio above Back/Next on mobile; independent on desktop */}
-      <div className="s12-bottom-bar">
-        <div className="s12-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId || "screen6_2_timing"}
-            locale={isSpanish ? "es" : "en"}
-            transcriptText={effectiveTranscript}
-            size="large"
-          />
-        </div>
+        {showCaptions && (
+          <div className="s12-captions-panel" role="region" aria-label={isEs ? "Subtítulos" : "Closed captions"}>
+            <span className="s12-captions-tag" aria-hidden="true">CC</span>
+            <p className="s12-captions-text">{effectiveTranscript}</p>
+          </div>
+        )}
 
-        <SlideNavigationButtons
-          onBack={handleBackClick}
-          onNext={handleNextClick}
-          isSpanish={isSpanish}
-          loading={isLoading}
-          nextDisabled={!isNextEnabled}
-          variant="flow"
-        />
+        <footer className="s12-bottom-bar" role="toolbar" aria-label="Slide navigation and media controls">
+          <nav className="s12-nav-center" aria-label="Slide pagination">
+            <button type="button" onClick={handleBackClick} disabled={isLoading} className="s12-btn-nav s12-btn-back">
+              {isEs ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={handleNextClick}
+              disabled={!isNextEnabled}
+              aria-disabled={!isNextEnabled}
+              className="s12-btn-nav s12-btn-next"
+            >
+              {isLoading ? "..." : isEs ? "Siguiente" : "Next"}
+            </button>
+          </nav>
+
+          <div className="s12-audio-controls">
+            <button type="button" className="s12-audio-btn" onClick={toggleCaptions} aria-pressed={showCaptions}
+              aria-label={showCaptions ? "Hide closed captions" : "Show closed captions"}>
+              <svg width="44" height="40" viewBox="0 0 40 36" fill="none" aria-hidden="true" focusable="false">
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text x="20" y="15.5" textAnchor="middle" dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"} fontSize="13" fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, sans-serif">CC</text>
+              </svg>
+            </button>
+
+            <button type="button" className="s12-audio-btn" onClick={toggleAudio} aria-pressed={audioPlaying}
+              aria-label={audioPlaying ? "Pause audio narration" : "Play audio narration"}>
+              {audioPlaying ? (
+                <svg width="54" height="40" viewBox="0 0 50 36" fill="none" aria-hidden="true" focusable="false">
+                  <path d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor" strokeWidth="2.1" strokeLinejoin="round" fill="none" />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width="54" height="40" viewBox="0 0 50 36" fill="none" aria-hidden="true" focusable="false">
+                  <path d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor" strokeWidth="2.1" strokeLinejoin="round" fill="none" />
+                  <text x="14.8" y="17.2" textAnchor="middle" dominantBaseline="central" fill="currentColor"
+                    fontSize="8" fontWeight="700" fontFamily="ui-sans-serif, system-ui, sans-serif">play</text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );
