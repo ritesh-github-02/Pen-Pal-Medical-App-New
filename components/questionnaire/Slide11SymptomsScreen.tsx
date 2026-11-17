@@ -1,17 +1,21 @@
 "use client";
 
+
 import React, { useState, useRef, useEffect } from "react";
 import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
 import SlideNavigationButtons from "./SlideNavigationButtons";
 
+
 const STAGE_W = 896;
 const STAGE_H = 620;
+
 
 /* ==========================================================
    Slide11SymptomsScreen – Scaled & Optimized Styles
    ========================================================== */
+
 
 const SLIDE11_CSS = `
 .s11-wrapper {
@@ -24,12 +28,14 @@ const SLIDE11_CSS = `
   background-color: transparent;
 }
 
+
 .s11-root,
 .s11-root *,
 .s11-root *::before,
 .s11-root *::after {
   box-sizing: border-box;
 }
+
 
 .s11-root {
   position: relative;
@@ -47,6 +53,7 @@ const SLIDE11_CSS = `
   overflow: hidden;
   gap: 1.5rem;
 }
+
 
 /* Top Heading */
 .s11-top-section {
@@ -69,6 +76,7 @@ const SLIDE11_CSS = `
   box-shadow: 0 0 0 2px #236f7a;
 }
 
+
 /* Middle Content: Sage Green Card (Left) + Nurse Anna (Right) */
 .s11-middle {
   flex-shrink: 0;
@@ -81,6 +89,7 @@ const SLIDE11_CSS = `
   padding: 0;
   margin: 0 auto;
 }
+
 
 /* Sage Green Container Card */
 .s11-card {
@@ -96,6 +105,7 @@ const SLIDE11_CSS = `
   gap: 1rem;
 }
 
+
 /* Rows of symptom chips */
 .s11-chip-row {
   display: flex;
@@ -103,6 +113,7 @@ const SLIDE11_CSS = `
   flex-wrap: wrap;
   gap: 0.8rem;
 }
+
 
 .s11-chip {
   display: inline-flex;
@@ -123,6 +134,7 @@ const SLIDE11_CSS = `
   outline: none;
 }
 
+
 .s11-chip:hover {
   background-color: #f3f8f6;
   border-color: #1c5249;
@@ -130,13 +142,16 @@ const SLIDE11_CSS = `
   box-shadow: 0 2.5px 5px rgba(0, 0, 0, 0.14);
 }
 
+
 .s11-chip:active {
   transform: scale(0.97);
 }
 
+
 .s11-chip:focus-visible {
   box-shadow: 0 0 0 3px rgba(31, 77, 69, 0.4);
 }
+
 
 .s11-chip--checked {
   background-color: #ffd41d !important;
@@ -145,10 +160,12 @@ const SLIDE11_CSS = `
   box-shadow: 0 2px 5px rgba(10, 40, 35, 0.2) !important;
 }
 
+
 .s11-chip--checked:hover {
   background-color: #f7ca12 !important;
   border-color: #143e37 !important;
 }
+
 
 .s11-chip-edit {
   font-size: 0.85rem;
@@ -164,6 +181,7 @@ const SLIDE11_CSS = `
   justify-content: center;
 }
 
+
 /* Row 5: Other describe underline + Unsure chip */
 .s11-row-bottom {
   display: flex;
@@ -173,6 +191,7 @@ const SLIDE11_CSS = `
   margin-top: 0.5rem;
 }
 
+
 .s11-other-wrap {
   display: flex;
   align-items: center;
@@ -180,12 +199,14 @@ const SLIDE11_CSS = `
   flex: 1;
 }
 
+
 .s11-other-label {
   font-size: 16px; /* INCREASED */
   font-weight: 600;
   color: #142724;
   white-space: nowrap;
 }
+
 
 .s11-other-input {
   flex: 1;
@@ -201,12 +222,14 @@ const SLIDE11_CSS = `
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
+
 .s11-other-input:focus {
   border-color: #ffd41d !important;
   outline: 2px solid #ffd41d !important;
   outline-offset: 1px !important;
   background-color: rgba(16, 44, 40, 0.42) !important;
 }
+
 
 /* Right Section: Nurse Anna */
 .s11-right {
@@ -216,10 +239,12 @@ const SLIDE11_CSS = `
   justify-content: center;
 }
 
+
 .s11-nurse {
   width: 150px; /* Slightly larger for the bigger canvas */
   height: auto;
 }
+
 
 .s11-nurse-img {
   width: 100%;
@@ -228,6 +253,7 @@ const SLIDE11_CSS = `
   display: block;
   filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
 }
+
 
 /* Audio and Nav */
 .s11-audio {
@@ -253,6 +279,7 @@ const SLIDE11_CSS = `
   pointer-events: auto !important;
 }
 
+
 /* ==========================================================
    Mobile-First Responsive Layout Override
    ========================================================== */
@@ -263,7 +290,7 @@ const SLIDE11_CSS = `
     min-height: 100dvh !important;
     overflow: visible !important;
   }
-  
+ 
   .s11-root {
     width: 100% !important;
     height: auto !important;
@@ -277,15 +304,18 @@ const SLIDE11_CSS = `
     gap: 1rem !important;
   }
 
+
   .s11-heading {
     font-size: 18px !important;
     text-align: left !important;
   }
 
+
   .s11-middle {
     flex-direction: column !important;
     gap: 1rem !important;
   }
+
 
   .s11-card {
     padding: 0.85rem 1rem !important;
@@ -293,14 +323,17 @@ const SLIDE11_CSS = `
     border-radius: 14px !important;
   }
 
+
   .s11-chip-row {
     gap: 0.45rem !important;
   }
+
 
   .s11-chip {
     padding: 0.45rem 0.75rem !important;
     font-size: 14px !important;
   }
+
 
   .s11-row-bottom {
     flex-direction: column !important;
@@ -308,24 +341,29 @@ const SLIDE11_CSS = `
     gap: 0.8rem !important;
   }
 
+
   .s11-other-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 0.4rem !important;
   }
 
+
   .s11-other-label {
     font-size: 14px !important;
   }
+
 
   .s11-other-input {
     font-size: 14px !important;
     padding: 8px !important;
   }
 
+
   .s11-nurse {
     width: 120px !important;
   }
+
 
   .s11-audio {
     position: static !important;
@@ -333,12 +371,14 @@ const SLIDE11_CSS = `
     justify-content: center !important;
   }
 
+
   .s11-root .slide-nav {
     position: static !important;
     margin-top: 0.5rem !important;
   }
 }
 `;
+
 
 export interface Slide11SymptomsScreenProps {
   isSpanish: boolean;
@@ -360,11 +400,13 @@ export interface Slide11SymptomsScreenProps {
   locale?: string;
 }
 
+
 interface SymptomItem {
   value: string;
   labelEn: string;
   labelEs: string;
 }
+
 
 const ROW_1: SymptomItem[] = [
   { value: "Rash", labelEn: "Rash", labelEs: "Sarpullido" },
@@ -373,10 +415,12 @@ const ROW_1: SymptomItem[] = [
   { value: "Itchiness", labelEn: "Itchiness", labelEs: "Picazón" },
 ];
 
+
 const ROW_2: SymptomItem[] = [
   { value: "Throat tightness", labelEn: "Throat tightness", labelEs: "Opresión en la garganta" },
   { value: "Shortness of breath", labelEn: "Shortness of breath or hard time breathing", labelEs: "Dificultad para respirar" },
 ];
+
 
 const ROW_3: SymptomItem[] = [
   { value: "Fever", labelEn: "Fever (new fever or worse fever)", labelEs: "Fiebre (nueva o peor)" },
@@ -384,11 +428,13 @@ const ROW_3: SymptomItem[] = [
   { value: "Diarrhea", labelEn: "Diarrhea", labelEs: "Diarrea" },
 ];
 
+
 const ROW_4: SymptomItem[] = [
   { value: "Joint pain", labelEn: "Joint pain", labelEs: "Dolor articular" },
   { value: "Vomiting", labelEn: "Wanted to throw up or threw up", labelEs: "Ganas de vomitar o vomitó" },
   { value: "Muscle aches", labelEn: "Muscle aches", labelEs: "Dolores musculares" },
 ];
+
 
 export function Slide11SymptomsScreen({
   isSpanish,
@@ -415,11 +461,13 @@ export function Slide11SymptomsScreen({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+
   const effectiveAudioSrc =
     audioSrc ||
     (isSpanish
       ? "/audio/exported/screen6_1_symptoms_es.mp3"
       : "/audio/exported/screen6_1_symptoms_en.mp3");
+
 
   const effectiveTranscript =
     transcriptText ||
@@ -427,14 +475,18 @@ export function Slide11SymptomsScreen({
       ? "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina."
       : "Select what happened when your child was said to be allergic to penicillin.");
 
+
   const swellingTriggerRef = useRef<HTMLElement | null>(null);
   const swellingFirstBtnRef = useRef<HTMLButtonElement | null>(null);
+
 
   const [symptoms, setSymptoms] = useState<string[]>(selectedSymptoms);
   const [otherText, setOtherText] = useState<string>(symptomsOther);
 
+
   const [rashModalOpen, setRashModalOpen] = useState(false);
   const [activeRashDetails, setActiveRashDetails] = useState<string[]>(rashDetails);
+
 
   const [swellingModalOpen, setSwellingModalOpen] = useState(false);
   const [activeSwellingDetails, setActiveSwellingDetails] = useState<string[]>(swellingDetails);
@@ -443,10 +495,12 @@ export function Slide11SymptomsScreen({
     return found ? found.replace(/^Other:\s*/, "") : "";
   });
 
+
   // Scaling Logic
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
+
 
     const update = () => {
       if (window.innerWidth < 768) {
@@ -460,6 +514,7 @@ export function Slide11SymptomsScreen({
       setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
+
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
@@ -470,6 +525,7 @@ export function Slide11SymptomsScreen({
     };
   }, []);
 
+
   useEffect(() => {
     const timer = setTimeout(() => {
       headingRef.current?.focus();
@@ -477,11 +533,13 @@ export function Slide11SymptomsScreen({
     return () => clearTimeout(timer);
   }, []);
 
+
   useEffect(() => {
     if (!rashModalOpen) return;
     const timer = setTimeout(() => {
       rashFirstBtnRef.current?.focus();
     }, 50);
+
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -496,11 +554,13 @@ export function Slide11SymptomsScreen({
     };
   }, [rashModalOpen]);
 
+
   useEffect(() => {
     if (!swellingModalOpen) return;
     const timer = setTimeout(() => {
       swellingFirstBtnRef.current?.focus();
     }, 50);
+
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -514,6 +574,7 @@ export function Slide11SymptomsScreen({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [swellingModalOpen]);
+
 
   const toggleSymptom = (val: string, e?: React.MouseEvent<HTMLElement>) => {
     let updated: string[];
@@ -530,10 +591,12 @@ export function Slide11SymptomsScreen({
     setSymptoms(updated);
     onSelectSymptoms(updated);
 
+
     if (val === "Rash" && !symptoms.includes("Rash")) {
       if (e) modalTriggerRef.current = e.currentTarget;
       setTimeout(() => setRashModalOpen(true), 150);
     }
+
 
     if (val === "Swelling" && !symptoms.includes("Swelling")) {
       if (e) swellingTriggerRef.current = e.currentTarget;
@@ -541,9 +604,11 @@ export function Slide11SymptomsScreen({
     }
   };
 
+
   const handleOtherChange = (text: string) => {
     setOtherText(text);
     if (onSymptomsOtherChange) onSymptomsOtherChange(text);
+
 
     let updated = [...symptoms];
     if (text.trim() && !updated.includes("Other")) {
@@ -556,6 +621,7 @@ export function Slide11SymptomsScreen({
       onSelectSymptoms(updated);
     }
   };
+
 
   const toggleRashDetail = (val: string) => {
     let updated: string[];
@@ -572,6 +638,7 @@ export function Slide11SymptomsScreen({
     setActiveRashDetails(updated);
     if (onRashDetailsChange) onRashDetailsChange(updated);
   };
+
 
   const toggleSwellingDetail = (val: string) => {
     let updated: string[];
@@ -590,6 +657,7 @@ export function Slide11SymptomsScreen({
     if (onSwellingDetailsChange) onSwellingDetailsChange(updated);
   };
 
+
   const handleSwellingOtherChange = (text: string) => {
     setSwellingOtherText(text);
     const withoutOther = activeSwellingDetails.filter(
@@ -600,16 +668,20 @@ export function Slide11SymptomsScreen({
     if (onSwellingDetailsChange) onSwellingDetailsChange(next);
   };
 
+
   const rawTitle = isSpanish
     ? "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a [name]."
     : "Select what happened when your child was said to be allergic to [name].";
 
+
   const titleText = resolveMedicineToken(rawTitle, medicationName, isSpanish);
   const isNextEnabled = symptoms.length > 0 || otherText.trim().length > 0;
+
 
   const renderChip = (item: SymptomItem) => {
     const isChecked = symptoms.includes(item.value);
     const label = isSpanish ? item.labelEs : item.labelEn;
+
 
     return (
       <button
@@ -649,10 +721,12 @@ export function Slide11SymptomsScreen({
     );
   };
 
+
   return (
     <div className="s11-wrapper" ref={wrapperRef}>
       <div id="slide-content" className="s11-root" style={{ transform: `scale(${scale})` }}>
         <style dangerouslySetInnerHTML={{ __html: SLIDE11_CSS }} />
+
 
         <div className="s11-top-section">
           <h1 ref={headingRef} tabIndex={-1} className="s11-heading">
@@ -660,12 +734,14 @@ export function Slide11SymptomsScreen({
           </h1>
         </div>
 
+
         <div className="s11-middle">
           <div className="s11-card" role="group" aria-label={titleText}>
             <div className="s11-chip-row">{ROW_1.map(renderChip)}</div>
             <div className="s11-chip-row">{ROW_2.map(renderChip)}</div>
             <div className="s11-chip-row">{ROW_3.map(renderChip)}</div>
             <div className="s11-chip-row">{ROW_4.map(renderChip)}</div>
+
 
             <div className="s11-row-bottom">
               <div className="s11-other-wrap">
@@ -681,6 +757,7 @@ export function Slide11SymptomsScreen({
                 />
               </div>
 
+
               <button
                 type="button"
                 role="checkbox"
@@ -692,6 +769,7 @@ export function Slide11SymptomsScreen({
               </button>
             </div>
           </div>
+
 
           <div className="s11-right">
             <div className="s11-nurse">
@@ -705,6 +783,7 @@ export function Slide11SymptomsScreen({
           </div>
         </div>
 
+
         <div className="s11-audio">
           <AudioPlayer
             audioSrc={effectiveAudioSrc}
@@ -713,6 +792,7 @@ export function Slide11SymptomsScreen({
             transcriptText={effectiveTranscript}
           />
         </div>
+
 
         <SlideNavigationButtons
           onBack={onBack}
@@ -723,6 +803,7 @@ export function Slide11SymptomsScreen({
           variant="flow"
         />
       </div>
+
 
       {/* MODALS moved outside the scaled canvas so they cover the whole screen perfectly */}
       {rashModalOpen && (
@@ -761,6 +842,7 @@ export function Slide11SymptomsScreen({
           </div>
         </div>
       )}
+
 
       {swellingModalOpen && (
         <div
@@ -814,7 +896,12 @@ export function Slide11SymptomsScreen({
   );
 }
 
+
 export default Slide11SymptomsScreen;
 
 
-  
+
+
+ 
+
+
