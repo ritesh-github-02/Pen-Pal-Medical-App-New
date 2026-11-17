@@ -36,7 +36,6 @@ const SLIDE8_COMPONENT_CSS = `
      Slide 7 (Milestone Celebration)
      ------------------------------------------------------------ */
 
-  /* Wrapper now fits perfectly inside the parent layout below the header */
   .s8-wrapper {
     width: 100%;
     height: 100%;
@@ -72,7 +71,7 @@ const SLIDE8_COMPONENT_CSS = `
     outline: none !important;
   }
 
-  /* Primary Slide Card Container (The background rectangle) */
+  /* Primary Slide Card Container (Background Rectangle) */
   .s8-component-card {
     position: relative;
     width: ${STAGE_W}px;
@@ -86,7 +85,6 @@ const SLIDE8_COMPONENT_CSS = `
     padding: 30px 48px 24px 48px;
     box-sizing: border-box;
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #fafdf3;
     border-radius: 24px;
   }
 
@@ -110,7 +108,7 @@ const SLIDE8_COMPONENT_CSS = `
     flex-shrink: 0;
     filter: drop-shadow(2.5px 3.5px 0px #1a3532);
     margin-right: -31px;
-    margin-top: 0;
+    margin-top: -250px;
     z-index: 5;
   }
 
@@ -128,7 +126,7 @@ const SLIDE8_COMPONENT_CSS = `
     top: 48%;
     left: 46%;
     transform: translate(-50%, -50%);
-    width: 80%;
+    width: 84%; /* Slightly wider to give text more room */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -141,12 +139,13 @@ const SLIDE8_COMPONENT_CSS = `
     z-index: 2;
   }
 
+  /* Adjusted font size to perfectly fit inside the bubble */
   .s8-heading {
     margin: 0;
     padding: 0;
     width: 100%;
-    font-size: 42px; 
-    line-height: 1.3;
+    font-size: 32px; 
+    line-height: 1.35;
     font-weight: 700;
     color: #142724;
     text-align: center;
@@ -438,7 +437,7 @@ export function Slide8MilestoneScreen({
     headingRef.current?.focus({ preventScroll: true });
   }, []);
 
-  // Responsive scaling based on the wrapper's actual available space
+  // Responsive scaling based on the wrapper's available space below the header
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
@@ -452,7 +451,7 @@ export function Slide8MilestoneScreen({
       const w = el.clientWidth;
       const h = el.clientHeight;
       
-      // Subtract 32px to leave a nice margin around the card inside the wrapper
+      // Leave 32px padding around the card
       const safeW = Math.max(0, w - 32); 
       const safeH = Math.max(0, h - 32); 
       
