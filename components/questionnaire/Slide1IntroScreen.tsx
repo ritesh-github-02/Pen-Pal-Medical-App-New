@@ -252,46 +252,29 @@ const SLIDE1_COMPONENT_CSS = `
       transform: none !important;
       display: flex !important;
       flex-direction: column !important;
-      justify-content: space-between !important;
+      justify-content: center !important;
       align-items: center !important;
-      gap: 10px !important;
+      gap: 8px !important;
       padding: 6px 0 !important;
     }
     .s1-root:not(.is-desktop) .s1-left-col {
-      position: relative !important;
-      left: auto !important;
-      top: auto !important;
-      bottom: auto !important;
-      width: 100% !important;
-      max-width: 360px !important;
-      order: 2 !important;
-      align-items: center !important;
-      text-align: center !important;
-      justify-content: center !important;
-      margin: 0 auto !important;
+      display: contents !important;
     }
     .s1-root:not(.is-desktop) .s1-title {
+      order: 1 !important;
       font-size: clamp(34px, 9.5vw, 44px) !important;
       line-height: 1 !important;
-      margin-bottom: 6px !important;
+      margin: 0 0 2px 0 !important;
       text-align: center !important;
       white-space: nowrap !important;
     }
     .s1-root:not(.is-desktop) .s1-subtitle {
+      order: 2 !important;
       font-size: clamp(14px, 4vw, 16px) !important;
       text-align: center !important;
       white-space: normal !important;
-      margin-bottom: 10px !important;
-    }
-    .s1-root:not(.is-desktop) .s1-copy {
-      font-size: clamp(13.5px, 3.6vw, 15px) !important;
-      line-height: 1.4 !important;
-      text-align: center !important;
-      margin-bottom: 0 !important;
-      max-width: 330px !important;
-    }
-    .s1-root:not(.is-desktop) .s1-left-col .s1-btn-start {
-      display: none !important;
+      margin: 0 0 6px 0 !important;
+      max-width: 360px !important;
     }
     .s1-root:not(.is-desktop) .s1-nurse-col {
       position: relative !important;
@@ -299,18 +282,29 @@ const SLIDE1_COMPONENT_CSS = `
       top: auto !important;
       bottom: auto !important;
       width: 100% !important;
-      order: 1 !important;
-      margin: 0 auto !important;
+      order: 3 !important;
+      margin: 4px auto 8px auto !important;
       padding: 0 !important;
     }
     .s1-root:not(.is-desktop) .s1-nurse-img {
       max-height: clamp(140px, 22vh, 185px) !important;
     }
+    .s1-root:not(.is-desktop) .s1-copy {
+      order: 4 !important;
+      font-size: clamp(13.5px, 3.6vw, 15px) !important;
+      line-height: 1.4 !important;
+      text-align: center !important;
+      margin: 0 0 6px 0 !important;
+      max-width: 330px !important;
+    }
+    .s1-root:not(.is-desktop) .s1-left-col .s1-btn-start {
+      display: none !important;
+    }
     .s1-root:not(.is-desktop) .s1-audio-desktop {
       display: none !important;
     }
     .s1-root:not(.is-desktop) .s1-mobile-nav {
-      order: 3 !important;
+      order: 5 !important;
       display: flex !important;
       flex-direction: column !important;
       align-items: center !important;
@@ -355,46 +349,29 @@ const SLIDE1_COMPONENT_CSS = `
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
     padding: 6px 0 !important;
   }
   .s1-root.is-mobile .s1-left-col {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    bottom: auto !important;
-    width: 100% !important;
-    max-width: 360px !important;
-    order: 2 !important;
-    align-items: center !important;
-    text-align: center !important;
-    justify-content: center !important;
-    margin: 0 auto !important;
+    display: contents !important;
   }
   .s1-root.is-mobile .s1-title {
+    order: 1 !important;
     font-size: clamp(34px, 9.5vw, 44px) !important;
     line-height: 1 !important;
-    margin-bottom: 6px !important;
+    margin: 0 0 2px 0 !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
   .s1-root.is-mobile .s1-subtitle {
+    order: 2 !important;
     font-size: clamp(14px, 4vw, 16px) !important;
     text-align: center !important;
     white-space: normal !important;
-    margin-bottom: 10px !important;
-  }
-  .s1-root.is-mobile .s1-copy {
-    font-size: clamp(13.5px, 3.6vw, 15px) !important;
-    line-height: 1.4 !important;
-    text-align: center !important;
-    margin-bottom: 0 !important;
-    max-width: 330px !important;
-  }
-  .s1-root.is-mobile .s1-left-col .s1-btn-start {
-    display: none !important;
+    margin: 0 0 6px 0 !important;
+    max-width: 360px !important;
   }
   .s1-root.is-mobile .s1-nurse-col {
     position: relative !important;
@@ -402,18 +379,29 @@ const SLIDE1_COMPONENT_CSS = `
     top: auto !important;
     bottom: auto !important;
     width: 100% !important;
-    order: 1 !important;
-    margin: 0 auto !important;
+    order: 3 !important;
+    margin: 4px auto 8px auto !important;
     padding: 0 !important;
   }
   .s1-root.is-mobile .s1-nurse-img {
     max-height: clamp(140px, 22vh, 185px) !important;
   }
+  .s1-root.is-mobile .s1-copy {
+    order: 4 !important;
+    font-size: clamp(13.5px, 3.6vw, 15px) !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    margin: 0 0 6px 0 !important;
+    max-width: 330px !important;
+  }
+  .s1-root.is-mobile .s1-left-col .s1-btn-start {
+    display: none !important;
+  }
   .s1-root.is-mobile .s1-audio-desktop {
     display: none !important;
   }
   .s1-root.is-mobile .s1-mobile-nav {
-    order: 3 !important;
+    order: 5 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -608,13 +596,14 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
         {/* Right column: Nurse Anna (properly sized to fit comfortably with no clipping) */}
         <div className="s1-nurse-col">
           <img
-            src="/images/nurse-anna.png"
+            src="/images/nurse-anna-s1.png"
             alt={
               isSpanish
                 ? "Ilustración de la enfermera Anna sonriendo"
                 : "Illustration of Nurse Anna smiling in blue scrubs"
             }
             className="s1-nurse-img"
+            draggable={false}
           />
         </div>
 
