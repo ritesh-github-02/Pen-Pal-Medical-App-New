@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-
 import { resolveMedicineToken as engineResolveMedicineToken } from "@/lib/token-engine";
 
 // ============================================================================
@@ -59,613 +58,150 @@ function resolveMedicineToken(
   return engineResolveMedicineToken(text, medicine, isSpanish)
     .replace(/\[\s*name\s*\]/gi, medicine)
     .replace(/\[name\]/gi, medicine)
-    .replace(/\[Name\]/g, medicine)
-    .replace(/name /g, medicine);
+    .replace(/\[Name\]/g, medicine);
 }
 
 // ============================================================================
-// Subcomponent 1: Self-contained AudioPlayer (Play/Pause & Closed Captions)
+// Constants & Vectors (matches reference tablet aspect 827x577 = 1.433)
 // ============================================================================
-function InternalAudioPlayer({
-  audioSrc,
-  stepId,
-  locale = "en",
-  transcriptText,
-  size = "large",
-  onAudioToggle,
-  onCaptionsToggle,
-  className = "",
-}: AudioPlayerProps) {
-  const isSpanish = locale === "es";
-
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [showCaptions, setShowCaptions] = useState<boolean>(false);
-  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Stop audio on unmount or slide change
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [stepId]);
-
-  // Dismiss captions on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showCaptions) {
-        e.preventDefault();
-        setShowCaptions(false);
-        onCaptionsToggle?.(false);
-        setLiveAnnouncement(
-          isSpanish ? "Subtítulos ocultados" : "Closed captions hidden"
-        );
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showCaptions, isSpanish, onCaptionsToggle]);
-
-  const toggleCaptions = () => {
-    const next = !showCaptions;
-    setShowCaptions(next);
-    onCaptionsToggle?.(next);
-    setLiveAnnouncement(
-      next
-        ? isSpanish
-          ? "Subtítulos mostrados"
-          : "Closed captions displayed"
-        : isSpanish
-          ? "Subtítulos ocultados"
-          : "Closed captions hidden"
-    );
-  };
-
-  const toggleAudio = () => {
-    const next = !isPlaying;
-
-    if (!next) {
-      if (audioRef.current && !audioRef.current.paused) {
-        audioRef.current.pause();
-      }
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
-      setIsPlaying(false);
-      onAudioToggle?.(false);
-      setLiveAnnouncement(
-        isSpanish ? "Narración de audio en pausa" : "Audio narration paused"
-      );
-      return;
-    }
-
-    if (audioSrc && audioRef.current) {
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          onAudioToggle?.(true);
-          setLiveAnnouncement(
-            isSpanish
-              ? "Narración de audio en reproducción"
-              : "Audio narration playing"
-          );
-        })
-        .catch(() => {
-          fallbackSpeechSynthesis();
-        });
-    } else {
-      fallbackSpeechSynthesis();
-    }
-  };
-
-  const fallbackSpeechSynthesis = () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const textToRead = transcriptText || "";
-      const utterance = new SpeechSynthesisUtterance(textToRead);
-      utterance.lang = isSpanish ? "es-ES" : "en-US";
-      utterance.rate = 0.95;
-
-      utterance.onstart = () => {
-        setIsPlaying(true);
-        onAudioToggle?.(true);
-        setLiveAnnouncement(
-          isSpanish
-            ? "Narración de audio en reproducción"
-            : "Audio narration playing"
-        );
-      };
-
-      utterance.onend = () => {
-        setIsPlaying(false);
-        onAudioToggle?.(false);
-      };
-
-      utterance.onerror = () => {
-        setIsPlaying(false);
-        onAudioToggle?.(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
-    } else {
-      setIsPlaying(false);
-    }
-  };
-
-  return (
-    <div className={`relative flex flex-col items-end ${className}`}>
-      {/* HTML5 Audio Element */}
-      {audioSrc && (
-        <audio
-          ref={audioRef}
-          src={audioSrc}
-          onEnded={() => {
-            setIsPlaying(false);
-            onAudioToggle?.(false);
-          }}
-          className="hidden"
-          preload="metadata"
-        />
-      )}
-
-      {/* Screen Reader Live Status Region */}
-      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {liveAnnouncement}
-      </div>
-
-      {/* Closed Captions Panel */}
-      {showCaptions && transcriptText && (
-        <div
-          role="region"
-          aria-label={isSpanish ? "Subtítulos de narración" : "Audio narration captions"}
-          className="mb-2 max-w-sm sm:max-w-md bg-[#143833] text-white p-3 rounded-xl shadow-xl border border-[#bddfd8] text-xs sm:text-sm font-medium leading-relaxed flex items-start gap-2.5 z-30 animate-fadeIn"
-        >
-          <span
-            aria-hidden="true"
-            className="bg-[#fdee8e] text-[#1a2624] font-extrabold text-[10px] sm:text-xs px-1.5 py-0.5 rounded flex-shrink-0 uppercase tracking-wider"
-          >
-            CC
-          </span>
-          <p className="m-0 text-slate-100 flex-1">{transcriptText}</p>
-        </div>
-      )}
-
-      {/* Audio Controls Bar */}
-      <div
-        className="flex items-center gap-2"
-        role="toolbar"
-        aria-label={isSpanish ? "Controles de audio" : "Media controls"}
-        style={{ color: "#144e57" }}
-      >
-        {/* Closed Captions Button */}
-        <button
-          type="button"
-          onClick={toggleCaptions}
-          aria-pressed={showCaptions}
-          aria-label={
-            showCaptions
-              ? isSpanish
-                ? "Ocultar subtítulos"
-                : "Hide closed captions"
-              : isSpanish
-                ? "Mostrar subtítulos"
-                : "Show closed captions"
-          }
-          title={
-            showCaptions
-              ? isSpanish
-                ? "Ocultar subtítulos"
-                : "Hide closed captions"
-              : isSpanish
-                ? "Mostrar subtítulos"
-                : "Show closed captions"
-          }
-          className="s3-audio-btn"
-        >
-          <svg
-            width="46"
-            height="42"
-            viewBox="0 0 40 36"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill={showCaptions ? "currentColor" : "none"}
-            />
-            <text
-              x="20"
-              y="15.5"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fill={showCaptions ? "#ffffff" : "currentColor"}
-              fontSize="13"
-              fontWeight="700"
-              fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-              letterSpacing="0.3px"
-            >
-              CC
-            </text>
-          </svg>
-        </button>
-
-        {/* Play/Pause Button */}
-        <button
-          type="button"
-          onClick={toggleAudio}
-          aria-pressed={isPlaying}
-          aria-label={
-            isPlaying
-              ? isSpanish
-                ? "Pausar narración de audio"
-                : "Pause audio narration"
-              : isSpanish
-                ? "Reproducir narración de audio"
-                : "Play audio narration"
-          }
-          title={
-            isPlaying
-              ? isSpanish
-                ? "Pausar narración de audio"
-                : "Pause audio narration"
-              : isSpanish
-                ? "Reproducir narración de audio"
-                : "Play audio narration"
-          }
-          className="s3-audio-btn"
-        >
-          {isPlaying ? (
-            <svg
-              width="58"
-              height="42"
-              viewBox="0 0 50 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinejoin="round"
-                fill="none"
-              />
-              <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-              <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-              <path
-                d="M 33 11 C 37 13.5 37 22.5 33 25"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
-          ) : (
-            <svg
-              width="58"
-              height="42"
-              viewBox="0 0 50 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinejoin="round"
-                fill="none"
-              />
-              <text
-                x="14.8"
-                y="17.2"
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="currentColor"
-                fontSize="8"
-                fontWeight="700"
-                fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                letterSpacing="0.1px"
-              >
-                play
-              </text>
-              <path
-                d="M 33 11 C 37 13.5 37 22.5 33 25"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-              <path
-                d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Subcomponent 2: Self-contained SlideNavigationButtons (Back & Next)
-// ============================================================================
-function InternalSlideNavigationButtons({
-  onBack,
-  onNext,
-  isSpanish,
-  loading = false,
-  nextDisabled = false,
-  className = "",
-}: SlideNavigationButtonsProps) {
-  return (
-    <nav className={`slide-nav slide-nav-container ${className}`} aria-label="Slide navigation">
-      <button
-        type="button"
-        className="slide-nav-btn slide-nav-btn--back"
-        onClick={onBack}
-        aria-label={isSpanish ? "Ir a la diapositiva anterior" : "Go to previous slide"}
-      >
-        {isSpanish ? "Atrás" : "Back"}
-      </button>
-
-      <button
-        type="button"
-        className="slide-nav-btn slide-nav-btn--next"
-        onClick={onNext}
-        disabled={loading || nextDisabled}
-        aria-label={
-          loading
-            ? isSpanish
-              ? "Cargando siguiente diapositiva"
-              : "Loading next slide"
-            : isSpanish
-              ? "Ir a la siguiente diapositiva"
-              : "Go to next slide"
-        }
-      >
-        {loading ? (
-          <span className="flex items-center gap-2">
-            <span className="inline-block w-4 h-4 border-2 border-slate-700 border-t-transparent rounded-full animate-spin" />
-            <span>{isSpanish ? "Cargando..." : "Loading..."}</span>
-          </span>
-        ) : isSpanish ? (
-          "Siguiente"
-        ) : (
-          "Next"
-        )}
-      </button>
-    </nav>
-  );
-}
-
-// ============================================================================
-// Constants & Vectors
-// ============================================================================
-const STAGE_W = 750;
+const STAGE_W = 760;
 const STAGE_H = 530;
 
-const BUBBLE_BEZIER_PATH =
-  "M 182.5 12 " +
-  "C 275 12, 350 52, 350 101 " +
-  "C 350 138, 318 168, 268 180 " +
-  "C 285 198, 305 222, 312 244 " +
-  "C 290 226, 258 206, 222 188 " +
-  "C 209 189.5, 196 190, 182.5 190 " +
-  "C 90 190, 15 150, 15 101 " +
-  "C 15 52, 90 12, 182.5 12 " +
-  "Z";
+// Wide horizontal oval speech bubble with smooth curved lower-right tail
+// pointing toward Nurse Anna's raised hand (viewBox 0 0 490 175)
+const BUBBLE_PATH =
+  "M 229 8 " +
+  "C 352 8, 452 42.5, 452 85 " +
+  "C 452 106, 434 123, 406 134 " +
+  "Q 440 156, 476 166 " +
+  "Q 412 169, 356 151 " +
+  "C 320 159, 276 162, 229 162 " +
+  "C 106 162, 6 127.5, 6 85 " +
+  "C 6 42.5, 106 8, 229 8 Z";
 
 // ============================================================================
-// Responsive Styles
+// Shared Mobile Layout CSS
 // ============================================================================
-const mobileLayout = (scope: string) => `
-  #slide-content${scope},
+const mobileLayoutCSS = (scope: string) => `
   ${scope} {
-    overflow: hidden !important;
-    height: 100% !important;
-    min-height: clamp(610px, calc(100dvh - 185px), 730px) !important;
-    max-height: calc(100dvh - 175px) !important;
-    flex: 1 1 0% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 10px 16px 10px 16px !important;
-    gap: 6px !important;
-    box-sizing: border-box !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
   }
-  #slide-content${scope} .s3-stage,
   ${scope} .s3-stage {
-    position: relative !important;
+    position: static !important;
     width: 100% !important;
-    max-width: 380px !important;
     height: auto !important;
-    min-height: clamp(460px, calc(100dvh - 320px), 540px) !important;
-    flex: 1 1 0% !important;
-    overflow: visible !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
     transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 14px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
     background-color: transparent !important;
-    padding: 4px 0 !important;
-    margin: 0 auto !important;
-    gap: clamp(14px, 2.2dvh, 22px) !important;
   }
   ${scope} .s3-left-col {
     position: static !important;
     width: 100% !important;
-    max-width: 345px !important;
+    max-width: 360px !important;
     margin: 0 auto !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    text-align: center !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s3-heading {
-    position: static !important;
-    width: 100% !important;
-    font-size: clamp(15px, 2.15dvh, 17.5px) !important;
-    line-height: 1.34 !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.015em !important;
-    text-align: center !important;
-    margin: 0 auto !important;
-    color: #142724 !important;
-    border: none !important;
-    outline: none !important;
-  }
-  ${scope} .s3-heading:focus,
-  ${scope} .s3-heading:focus-visible {
-    outline: none !important;
+    font-size: 16.5px !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
   }
   ${scope} .s3-bubble {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(245px, 74vw, 295px) !important;
-    aspect-ratio: 380 / 250 !important;
+    width: 100% !important;
+    max-width: 350px !important;
+    aspect-ratio: 490 / 175 !important;
     height: auto !important;
-    flex-shrink: 0 !important;
     margin: 0 auto !important;
-    filter: drop-shadow(2px 3px 0px #1a3532) !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s3-bubble-text-wrap {
-    top: 42% !important;
-    left: 48% !important;
-    width: 82% !important;
-    max-width: 245px !important;
-    padding: 0 4px !important;
-    box-sizing: border-box !important;
+    top: 48% !important;
+    left: 46.5% !important;
+    width: 78% !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(12.5px, 1.75dvh, 14px) !important;
-    line-height: 1.34 !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-    text-align: center !important;
+    font-size: clamp(12.5px, 3.4vw, 14.5px) !important;
+    line-height: 1.38 !important;
   }
   ${scope} .s3-nurse {
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: clamp(78px, 19vw, 100px) !important;
-    height: clamp(115px, 16dvh, 150px) !important;
-    margin-top: -18px !important;
-    margin-left: auto !important;
-    margin-right: 10% !important;
+    width: 100px !important;
+    height: 192px !important;
+    margin: -10px 10% 0 auto !important;
     flex-shrink: 0 !important;
   }
-  ${scope} .s3-nurse-img {
-    height: 100% !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-  }
-  /* Two-tier bottom bar */
-  ${scope} .s3-bottom-bar-mobile {
-    width: 100% !important;
-    max-width: 360px !important;
-    display: flex !important;
+  ${scope} .s3-bottom-bar {
+    position: static !important;
+    height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: clamp(8px, 1.4dvh, 14px) !important;
-    padding-top: 2px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-    margin: 0 auto !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
     flex-shrink: 0 !important;
-    z-index: 25 !important;
+    width: 100% !important;
+    max-width: 360px !important;
   }
-  ${scope} .s3-audio {
-    order: 1 !important;
+  ${scope} .s3-audio-controls {
     position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    order: 1 !important;
     margin: 0 auto !important;
-    z-index: 25 !important;
-    color: #144e57 !important;
   }
-  ${scope} .s3-audio-btn {
-    background: transparent !important;
-    border: none !important;
-    cursor: pointer !important;
-    color: #144e57 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 4px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    border-radius: 8px !important;
-    transition: transform 0.12s ease, opacity 0.15s ease !important;
-  }
-  ${scope} .s3-audio-btn:hover {
-    transform: scale(1.08) !important;
-    opacity: 0.85 !important;
-  }
-  ${scope} .s3-audio-btn svg {
-    height: 34px !important;
-    width: auto !important;
-    transition: transform 0.12s ease !important;
-  }
-  ${scope} .s3-audio-btn:hover svg,
-  ${scope} .s3-audio-btn:active svg {
-    transform: scale(0.96) !important;
-  }
-  ${scope} .slide-nav,
-  ${scope} .slide-nav-container {
+  ${scope} .s3-nav-center {
+    position: static !important;
     order: 2 !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    transform: none !important;
     width: 100% !important;
-    gap: 16px !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
   }
-  ${scope} .slide-nav-btn {
-    min-width: 128px !important;
-    padding: 0 32px !important;
-    white-space: nowrap !important;
-    flex: 0 1 auto !important;
+  ${scope} .s3-btn-nav {
+    flex: 1 1 0% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  ${scope} .s3-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
   }
 `;
 
+// ============================================================================
+// Styles
+// ============================================================================
 const SLIDE3_CSS = `
+  .s3-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important; border: 0 !important;
+  }
+  .s3-root button:focus-visible,
+  .s3-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 3px !important;
+  }
+  .s3-heading:focus, .s3-heading:focus-visible { outline: none !important; }
+
   .s3-root,
   .s3-root *,
   .s3-root *::before,
@@ -673,21 +209,23 @@ const SLIDE3_CSS = `
     box-sizing: border-box;
   }
 
+  /* ---- Root ---- */
   .s3-root {
     position: relative;
-    width: 100%;
-    height: 100%;
-    flex: 1 1 0%;
-    min-height: 0;
-    overflow: hidden;
-    background-color: #fafdf3;
     display: flex;
+    flex: 1 1 0%;
     align-items: center;
     justify-content: center;
-    font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color: #142724;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    color: #1d2423;
   }
 
+  /* ---- Scale-locked desktop stage ---- */
   .s3-stage {
     position: relative;
     width: ${STAGE_W}px;
@@ -695,49 +233,41 @@ const SLIDE3_CSS = `
     flex: none;
     transform-origin: center center;
     background-color: transparent;
+    overflow: hidden;
   }
 
+  /* ---- 1. Top Statement Text ---- */
   .s3-left-col {
     position: absolute;
-    left: 40px;
-    top: 42px;
-    width: 440px;
+    left: 93px;
+    top: 68px;
+    width: 576px;
     margin: 0;
     padding: 0;
     z-index: 5;
   }
-
   .s3-heading {
     margin: 0;
     padding: 0;
-    font-size: 20px;
-    line-height: 1.38;
-    font-weight: 700;
-    letter-spacing: -0.012em;
-    color: #142724;
+    font-size: 21px;
+    line-height: 1.36;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1d2423;
     outline: none;
   }
 
-  .s3-heading:focus-visible {
-    outline: 2px dashed #143833;
-    outline-offset: 4px;
-    border-radius: 4px;
-  }
-
-  /* Speech Bubble */
+  /* ---- 2. Wide Mint-Teal Speech Bubble ---- */
   .s3-bubble {
     position: absolute;
-    left: 371px;
-    top: 119px;
-    width: 290px;
-    aspect-ratio: 380 / 250;
-    height: auto;
-    filter: drop-shadow(2.5px 3.5px 0px #1a3532);
-    z-index: 6;
+    left: 90px;
+    top: 184px;
+    width: 486px;
+    height: 174px;
     margin: 0;
     padding: 0;
+    z-index: 6;
   }
-
   .s3-bubble-svg {
     position: absolute;
     inset: 0;
@@ -745,14 +275,12 @@ const SLIDE3_CSS = `
     height: 100%;
     overflow: visible;
   }
-
   .s3-bubble-text-wrap {
     position: absolute;
-    top: 40%;
-    left: 48%;
+    top: 48.5%;
+    left: 46.7%;
     transform: translate(-50%, -50%);
-    width: 78%;
-    max-width: 235px;
+    width: 76%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -760,181 +288,154 @@ const SLIDE3_CSS = `
     text-align: center;
     pointer-events: none;
   }
-
   .s3-bubble-text {
     margin: 0;
     padding: 0;
-    font-size: 14.5px;
-    line-height: 1.45;
-    font-weight: 600;
-    color: #142724;
+    font-size: 18.5px;
+    line-height: 1.48;
+    font-weight: 500;
+    color: #1d2423;
     text-align: center;
     letter-spacing: -0.01em;
   }
 
-  /* Nurse Anna */
+  /* ---- 3. Nurse Anna (right side, matching reference size & height) ---- */
   .s3-nurse {
     position: absolute;
-    left: 620px;
-    top: 240px;
-    width: 100px;
-    height: 200px;
-    z-index: 20;
+    left: 564px;
+    top: 177px;
+    width: 142px;
+    height: 274px;
+    z-index: 10;
     pointer-events: none;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     user-select: none;
     -webkit-user-drag: none;
   }
-
   .s3-nurse-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.08));
+    user-select: none;
   }
 
-  /* Navigation Buttons */
-  .slide-nav-container {
+  /* ---- 4. Bottom Bar (matches Slide 2 pixel-for-pixel) ---- */
+  .s3-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    z-index: 30;
+    z-index: 20;
+    padding: 0 24px;
   }
 
-  .slide-nav-btn {
-    min-height: 48px;
-    height: 48px;
-    min-width: 124px;
-    padding: 0 32px;
+  .s3-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 54px;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+  .s3-btn-nav {
     border-radius: 9999px;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
+    border: 1.6px solid #3c7c87;
     cursor: pointer;
-    border: 1.5px solid transparent;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    height: 38px;
+    min-width: 74px;
+    font-size: 15px;
+    padding: 0 20px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+    font-family: inherit;
     user-select: none;
     touch-action: manipulation;
   }
+  .s3-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
+  .s3-btn-nav:active:not(:disabled) { transform: translateY(1px); }
+  .s3-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  .s3-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s3-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
+  .s3-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s3-btn-next:hover:not(:disabled) { background-color: #f2f380; }
 
-  .slide-nav-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14);
-  }
-
-  .slide-nav-btn:active:not(:disabled) {
-    transform: translateY(1px);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  .slide-nav-btn:focus-visible {
-    outline: 3px solid #143833 !important;
-    outline-offset: 3px !important;
-  }
-
-  .slide-nav-btn--back {
-    background-color: #bddfd8;
-    border-color: #78a59b;
-    color: #11332e;
-  }
-  .slide-nav-btn--back:hover:not(:disabled) {
-    background-color: #a8d5cc;
-  }
-
-  .slide-nav-btn--next {
-    background-color: #fdee8e;
-    border-color: #c8b746;
-    color: #1a2624;
-  }
-  .slide-nav-btn--next:hover:not(:disabled) {
-    background-color: #f5e478;
-  }
-
-  .slide-nav-btn:disabled,
-  .slide-nav-btn--disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    pointer-events: none;
-    box-shadow: none;
-  }
-
-  /* Desktop Layout: Bottom controls */
-  .s3-bottom-bar-mobile {
-    display: none;
-  }
-  .s3-audio-desktop {
+  /* Audio controls — bottom-right */
+  .s3-audio-controls {
     position: absolute;
-    right: 22px;
-    bottom: clamp(16px, 3vh, 22px);
+    right: 52px;
+    bottom: 18px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    z-index: 30;
-    color: #144e57;
+    gap: 8px;
+    color: #2b7a85;
   }
-  .s3-audio-desktop .s3-audio-btn {
+  .s3-audio-btn {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #144e57;
+    color: #2b7a85;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 4px;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 40px;
+    min-height: 40px;
     border-radius: 8px;
     transition: transform 0.12s ease, opacity 0.15s ease;
+    font-family: inherit;
   }
-  .s3-audio-desktop .s3-audio-btn svg {
-    height: 34px !important;
-    width: auto !important;
-  }
-  .s3-nav-desktop {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .s3-audio-btn:hover { transform: scale(1.08); opacity: 0.85; }
+
+  /* Closed Captions Panel */
+  .s3-captions-panel {
     position: absolute;
-    bottom: clamp(16px, 3vh, 22px);
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    z-index: 25;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    background: #143833;
+    color: #fff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    z-index: 30;
   }
+  .s3-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .s3-captions-text { font-size: 13.5px; line-height: 1.4; margin: 0; font-weight: 500; color: #fff; }
 
+  /* ================================================================
+     MOBILE LAYOUT  (is-mobile class  OR  ≤767px viewport)
+     ================================================================ */
   @media (max-width: 767px) {
-    ${mobileLayout(".s3-root")}
-    .s3-audio-desktop {
-      display: none !important;
-    }
-    .s3-nav-desktop {
-      display: none !important;
-    }
-    .s3-bottom-bar-mobile {
-      display: flex !important;
-    }
+    ${mobileLayoutCSS(".s3-root:not(.is-desktop)")}
   }
+  ${mobileLayoutCSS(".s3-root.is-mobile")}
 
-  ${mobileLayout(".s3-root.is-mobile")}
-  .s3-root.is-mobile .s3-audio-desktop {
-    display: none !important;
-  }
-  .s3-root.is-mobile .s3-nav-desktop {
-    display: none !important;
-  }
-  .s3-root.is-mobile .s3-bottom-bar-mobile {
-    display: flex !important;
-  }
-
-  /* Accessibility: Prefers-Reduced-Motion */
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
@@ -961,33 +462,39 @@ export function Slide3EfficacyScreen({
 }: Slide3EfficacyScreenProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const [scale, setScale] = useState(1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [scale, setScale] = useState<number>(1);
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [showCaptions, setShowCaptions] = useState<boolean>(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
 
   const isEs = (locale ?? "").startsWith("es") || isSpanish;
+  const isMobile = variant === "mobile";
+  const isDesktop = variant === "desktop";
+  const variantClass = isMobile ? " is-mobile" : isDesktop ? " is-desktop" : "";
 
   // Programmatic focus on mount (WCAG 2.4.3 Focus Order)
   useEffect(() => {
-    const timer = setTimeout(() => headingRef.current?.focus(), 50);
+    const timer = setTimeout(() => headingRef.current?.focus({ preventScroll: true }), 50);
     return () => clearTimeout(timer);
   }, []);
 
-  // Standardized dynamic responsive stage scaling across all viewports
+  // Scale-locked stage — proportionally fills desktop tablet frame
   useEffect(() => {
     const el = rootRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
 
     const update = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w && h) {
-        if (variant === "mobile" || window.innerWidth < 768) {
-          setScale(1);
-        } else {
-          const safeW = Math.max(0, w - 24);
-          const safeH = Math.max(0, h - 24);
-          setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
-        }
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
+        setScale(1);
+        return;
       }
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      const safeW = Math.max(0, w - 8);
+      const safeH = Math.max(0, h - 8);
+      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
     update();
@@ -1000,6 +507,18 @@ export function Slide3EfficacyScreen({
     };
   }, [variant]);
 
+  // Escape dismisses captions (WCAG 1.4.13)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        setShowCaptions(false);
+        setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCaptions, isEs]);
+
   const rawMed =
     medicationName && medicationName.trim()
       ? medicationName.trim()
@@ -1007,25 +526,96 @@ export function Slide3EfficacyScreen({
         ? "la amoxicilina"
         : "amoxicillin";
 
-  const rawHeadingEn = `Many kids have had [name] because it's the best for treating common ear, sinus and throat infections. It is also one of the best antibiotics in adults, too.`;
-  const rawHeadingEs = `Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes de oído, senos paranasales y garganta. También es uno de los mejores antibióticos para adultos.`;
+  const capMed = rawMed.charAt(0).toUpperCase() + rawMed.slice(1);
+
+  const rawHeadingEn =
+    "Many kids have had [name] because it's the best for treating common ear, sinus and throat infections. It is also one of the best antibiotics in adults, too.";
+  const rawHeadingEs =
+    "Muchos niños han tomado [name] porque es el mejor para tratar infecciones comunes de oído, senos paranasales y garganta. También es uno de los mejores antibióticos para adultos.";
 
   const headingText = resolveMedicineToken(isEs ? rawHeadingEs : rawHeadingEn, rawMed, isEs);
 
   const bubbleText = isEs
-    ? `${rawMed} es un medicamento maravilloso, pero como todos los antibióticos no funciona bien para los resfriados comunes o la gripe.`
-    : `${rawMed} is a wonder drug, but like all antibiotics it doesn't work well for common colds or the flu.`;
+    ? `${capMed} es un medicamento maravilloso, pero como todos los antibióticos no funciona bien para los resfriados comunes o la gripe.`
+    : `${capMed} is a wonder drug, but like all antibiotics it doesn't work well for common colds or the flu.`;
 
-  const captionText = transcriptText || `${headingText} ${bubbleText}`;
+  const effectiveTranscript = transcriptText || `${headingText} ${bubbleText}`;
 
   const effectiveAudioSrc =
     audioSrc ||
-    (isEs
-      ? "/audio/exported/slide3_efficacy_es.mp3"
-      : "/audio/exported/slide3_efficacy_en.mp3");
+    (isEs ? "/audio/exported/slide3_efficacy_es.mp3" : "/audio/exported/slide3_efficacy_en.mp3");
 
-  const variantClass =
-    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  // Sync audio element events & clean up on unmount / step change
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
+
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setLiveAnnouncement(
+      willPlay
+        ? isEs ? "Reproduciendo narración de audio" : "Audio narration playing"
+        : isEs ? "Narración de audio pausada" : "Audio narration paused"
+    );
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+            utt.lang = isEs ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+        utt.lang = isEs ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+    }
+  };
+
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setLiveAnnouncement(
+      next
+        ? isEs ? "Subtítulos mostrados" : "Closed captions displayed"
+        : isEs ? "Subtítulos ocultados" : "Closed captions hidden"
+    );
+  };
 
   return (
     <div
@@ -1039,8 +629,25 @@ export function Slide3EfficacyScreen({
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE3_CSS }} />
 
-      {/* Scaled stage container */}
-      <div className="s3-stage" style={{ transform: `scale(${scale})` }}>
+      {/* Screen Reader Live Region */}
+      <div className="s3-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
+
+      {/* Hidden HTML5 Audio */}
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s3-sr-only"
+        aria-hidden="true"
+      />
+
+      {/* ── Scale-locked desktop stage ── */}
+      <div
+        className="s3-stage"
+        style={!isMobile ? { transform: `scale(${scale})` } : undefined}
+      >
         {/* 1. Statement Heading */}
         <div className="s3-left-col">
           <h1
@@ -1053,7 +660,7 @@ export function Slide3EfficacyScreen({
           </h1>
         </div>
 
-        {/* 2. Speech Bubble */}
+        {/* 2. Wide Mint-Teal Speech Bubble */}
         <figure
           className="s3-bubble"
           role="group"
@@ -1061,26 +668,30 @@ export function Slide3EfficacyScreen({
         >
           <svg
             className="s3-bubble-svg"
-            viewBox="0 0 380 250"
+            viewBox="0 0 490 175"
             fill="none"
             aria-hidden="true"
             focusable="false"
           >
-            <defs>
-              <pattern id="s3-cmp-dot-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-                <circle cx="8" cy="8" r="0.75" fill="#cadada" opacity="0.6" />
-              </pattern>
-            </defs>
-
+            {/* Subtle dark bottom rim shadow matching reference */}
             <path
-              d={BUBBLE_BEZIER_PATH}
-              fill="#ffffff"
-              stroke="#7baea9"
-              strokeWidth="3.5"
+              d={BUBBLE_PATH}
+              transform="translate(0, 2.5)"
+              fill="#193432"
+              stroke="#193432"
+              strokeWidth="2.5"
               strokeLinejoin="round"
               strokeLinecap="round"
             />
-            <path d={BUBBLE_BEZIER_PATH} fill="url(#s3-cmp-dot-grid)" />
+            {/* Light mint-teal bubble fill & teal border */}
+            <path
+              d={BUBBLE_PATH}
+              fill="#ddf3f1"
+              stroke="#76aca5"
+              strokeWidth="3.2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
           </svg>
 
           <div className="s3-bubble-text-wrap">
@@ -1092,57 +703,179 @@ export function Slide3EfficacyScreen({
         <div className="s3-nurse" aria-hidden="true">
           <img
             src="/images/nurse-anna.png"
-            alt={isEs ? "Ilustración de la enfermera Anna" : "Nurse Anna"}
+            alt=""
             className="s3-nurse-img"
             draggable={false}
           />
         </div>
-      </div>
 
-      {/* 4. Desktop Audio narration & CC controls */}
-      <div className="s3-audio-desktop">
-        <InternalAudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={isEs ? "es" : "en"}
-          transcriptText={captionText}
-          size="large"
-        />
-      </div>
+        {/* Closed Captions Panel */}
+        {showCaptions && (
+          <div
+            className="s3-captions-panel"
+            role="region"
+            aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
+          >
+            <span className="s3-captions-tag" aria-hidden="true">CC</span>
+            <p className="s3-captions-text">{effectiveTranscript}</p>
+          </div>
+        )}
 
-      {/* 5. Desktop Centered Navigation */}
-      <div className="s3-nav-desktop">
-        <InternalSlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
-        />
-      </div>
+        {/* 4. Bottom Navigation & Audio Controls */}
+        <footer
+          className="s3-bottom-bar"
+          role="toolbar"
+          aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
+        >
+          <nav className="s3-nav-center" aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}>
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={loading}
+              className="s3-btn-nav s3-btn-back"
+              aria-label={isEs ? "Ir a la diapositiva anterior" : "Go to previous slide"}
+            >
+              {isEs ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={loading}
+              className="s3-btn-nav s3-btn-next"
+              aria-label={isEs ? "Ir a la siguiente diapositiva" : "Go to next slide"}
+            >
+              {loading ? "..." : isEs ? "Siguiente" : "Next"}
+            </button>
+          </nav>
 
-      {/* 6. Mobile Centered Stacked Bottom Bar */}
-      <div className="s3-bottom-bar-mobile">
-        <div className="s3-audio">
-          <InternalAudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={isEs ? "es" : "en"}
-            transcriptText={captionText}
-            size="large"
-          />
-        </div>
+          <div className="s3-audio-controls">
+            <button
+              type="button"
+              className="s3-audio-btn"
+              onClick={toggleCaptions}
+              aria-pressed={showCaptions}
+              aria-label={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+              title={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+            >
+              <svg
+                width="44"
+                height="40"
+                viewBox="0 0 40 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text
+                  x="20"
+                  y="15.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"}
+                  fontSize="13"
+                  fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                  letterSpacing="0.3px"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
 
-        <InternalSlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
-        />
+            <button
+              type="button"
+              className="s3-audio-btn"
+              onClick={toggleAudio}
+              aria-pressed={audioPlaying}
+              aria-label={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+              title={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+            >
+              {audioPlaying ? (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <text
+                    x="14.8"
+                    y="17.2"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="currentColor"
+                    fontSize="8"
+                    fontWeight="700"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    letterSpacing="0.1px"
+                  >
+                    play
+                  </text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );
 }
 
 export default Slide3EfficacyScreen;
-
-

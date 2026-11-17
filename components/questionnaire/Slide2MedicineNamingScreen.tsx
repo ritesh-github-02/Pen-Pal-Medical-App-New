@@ -1,1403 +1,899 @@
 "use client";
 
-
 import React, { useState, useRef, useEffect } from "react";
+
 export interface Slide2MedicineNamingScreenProps {
- isSpanish?: boolean;
- selected?: string;
- onSelect: (value: string) => void;
- onNext: () => void;
- onBack: () => void;
- loading?: boolean;
- audioSrc?: string;
- stepId?: string;
- locale?: string;
- transcriptText?: string;
- variant?: "auto" | "desktop" | "mobile";
+  isSpanish?: boolean;
+  selected?: string;
+  onSelect: (value: string) => void;
+  onNext: () => void;
+  onBack: () => void;
+  loading?: boolean;
+  audioSrc?: string;
+  stepId?: string;
+  locale?: string;
+  transcriptText?: string;
+  variant?: "auto" | "desktop" | "mobile";
 }
 
-
+// Option order matches the reference image exactly:
+// Penicillin → "Pink medicine" → Amoxicillin → Amoxicillin Clavulanate → Augmentin
 export const MEDICINE_OPTIONS_DISPLAY = [
- { value: "Penicillin", labelEn: "Penicillin", labelEs: "Penicilina" },
- { value: "Amoxicillin", labelEn: "Amoxicillin", labelEs: "Amoxicilina" },
- { value: "Pink medicine", labelEn: "“Pink medicine”", labelEs: "“Medicina rosa”" },
- { value: "Amoxicillin Clavulanate", labelEn: "Amoxicillin Clavulanate", labelEs: "Amoxicilina Clavulanato" },
- { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
+  { value: "Penicillin", labelEn: "Penicillin", labelEs: "Penicilina" },
+  { value: "Pink medicine", labelEn: "\u201cPink medicine\u201d", labelEs: "\u201cMedicina rosa\u201d" },
+  { value: "Amoxicillin", labelEn: "Amoxicillin", labelEs: "Amoxicilina" },
+  { value: "Amoxicillin Clavulanate", labelEn: "Amoxicillin Clavulanate", labelEs: "Amoxicilina Clavulanato" },
+  { value: "Augmentin", labelEn: "Augmentin", labelEs: "Augmentin" },
 ];
 
+// ─── Desktop stage dimensions (matches reference tablet aspect 827x577 = 1.433) ──
+const STAGE_W = 760;
+const STAGE_H = 530;
 
-/* Hand-drawn style bubble body + sharp tail matching Slide 2 reference */
-const BUBBLE_PATH =
- "M 397.9,283.4 " +
- "C 395.8,284.6 391.2,287.9 385.1,290.7 " +
- "C 379.0,293.4 369.2,297.5 361.3,299.9 " +
- "C 353.4,302.3 345.2,303.8 337.6,305.3 " +
- "C 330.0,306.8 322.6,307.8 315.6,309.0 " +
- "C 308.6,310.2 302.5,312.1 295.5,312.7 " +
- "C 288.5,313.3 280.6,312.4 273.6,312.7 " +
- "C 266.6,313.0 260.2,314.5 253.5,314.5 " +
- "C 246.8,314.5 240.1,313.3 233.4,312.7 " +
- "C 226.7,312.1 220.6,311.4 213.3,310.8 " +
- "C 206.0,310.2 197.2,310.2 189.6,309.0 " +
- "C 182.0,307.8 175.5,305.3 167.6,303.5 " +
- "C 159.7,301.7 150.3,300.8 142.1,298.0 " +
- "C 133.9,295.3 126.8,291.3 118.3,287.0 " +
- "C 109.8,282.7 99.7,277.9 90.9,272.4 " +
- "C 82.1,266.9 73.8,261.1 65.3,254.1 " +
- "C 56.8,247.1 46.8,239.2 39.8,230.3 " +
- "C 32.8,221.5 27.0,211.4 23.3,201.0 " +
- "C 19.6,190.6 18.1,179.0 17.8,168.0 " +
- "C 17.5,157.0 19.1,146.0 21.5,135.0 " +
- "C 23.9,124.0 27.2,111.9 32.4,102.1 " +
- "C 37.6,92.3 44.6,84.0 52.5,76.4 " +
- "C 60.4,68.8 70.5,62.1 79.9,56.3 " +
- "C 89.4,50.5 99.8,45.6 109.2,41.6 " +
- "C 118.7,37.6 127.5,35.2 136.6,32.5 " +
- "C 145.7,29.8 155.5,27.0 164.0,25.2 " +
- "C 172.5,23.4 179.8,22.4 187.7,21.5 " +
- "C 195.6,20.6 203.9,20.3 211.5,19.7 " +
- "C 219.1,19.1 226.4,18.1 233.4,17.8 " +
- "C 240.4,17.5 245.9,17.5 253.5,17.8 " +
- "C 261.1,18.1 271.2,19.1 279.1,19.7 " +
- "C 287.0,20.3 293.7,20.6 301.0,21.5 " +
- "C 308.3,22.4 315.6,24.0 322.9,25.2 " +
- "C 330.2,26.4 337.0,27.0 344.9,28.8 " +
- "C 352.8,30.6 362.0,33.4 370.5,36.1 " +
- "C 379.0,38.9 387.2,41.6 396.0,45.3 " +
- "C 404.8,49.0 414.9,52.9 423.4,58.1 " +
- "C 431.9,63.3 438.7,69.7 447.2,76.4 " +
- "C 455.7,83.1 466.7,90.2 474.6,98.4 " +
- "C 482.5,106.7 490.4,115.8 494.7,125.9 " +
- "C 499.0,136.0 501.1,147.8 500.2,158.8 " +
- "C 499.3,169.8 493.8,181.4 489.2,191.8 " +
- "C 484.6,202.2 480.4,211.0 472.8,221.1 " +
- "C 465.2,231.2 448.4,247.0 443.5,252.2 " +
- "L 485.6,314.5 " +
- "L 397.9,283.4 " +
- "Z";
-
- 
-const s2MobileLayout = (scope: string) => `
-  .tablet-mockup-frame ${scope},
-  .tablet-screen-inner ${scope},
-  .tablet-slide-content ${scope},
-  .intervention-frame-outer ${scope},
-  #slide-content${scope},
+// ─── Shared Mobile CSS Helper ────────────────────────────────────────────────
+const mobileLayoutCSS = (scope: string) => `
   ${scope} {
-    aspect-ratio: auto !important;
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
+  }
+  ${scope} .s2-stage {
+    position: static !important;
     width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: 100% !important;
-    flex: 1 1 0% !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    height: auto !important;
+    min-height: 100% !important;
     border-radius: 0 !important;
-    padding: 10px 14px 10px 14px !important;
+    transform: none !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
     align-items: center !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    gap: 8px !important;
+    justify-content: space-between !important;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)) 14px !important;
+    gap: 10px !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
+    background-color: transparent !important;
   }
-  /* 1. Top Yellow Banner */
-  ${scope} .s2-banner-wrap {
-    position: relative !important;
+  ${scope} .s2-banner {
+    position: static !important;
     width: 100% !important;
     max-width: 360px !important;
-    border-radius: 18px !important;
-    padding: 8px 14px !important;
+    min-height: auto !important;
+    border-radius: 16px !important;
+    padding: 10px 14px !important;
     margin: 0 auto !important;
-    box-shadow: 0 2px 6px rgba(35, 111, 122, 0.2) !important;
     flex-shrink: 0 !important;
-    z-index: 5 !important;
   }
   ${scope} .s2-heading {
-    font-size: 14.5px !important;
-    line-height: 1.3 !important;
-    text-align: center !important;
-    margin: 0 !important;
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
   }
-  /* 2. Middle Stage: Scrollable independently so options never overlap bottom buttons */
-  ${scope} .s2-stage-middle {
-    position: relative !important;
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-width: 360px !important;
-    padding: 2px 2px 6px 2px !important;
-    margin: 0 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    z-index: 1 !important;
-  }
-  /* 2A. Character Area: Speech Bubble + Nurse Anna side-by-side */
-  ${scope} .s2-character-col {
-    order: 1 !important;
-    position: relative !important;
-    width: 100% !important;
-    max-width: 350px !important;
-    height: auto !important;
+  ${scope} .s2-middle-row {
     display: flex !important;
     flex-direction: row !important;
-    align-items: center !important;
+    align-items: flex-end !important;
     justify-content: center !important;
-    gap: 8px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
+    gap: 18px !important;
+    width: 100% !important;
+    max-width: 360px !important;
     flex-shrink: 0 !important;
-  }
-  ${scope} .s2-bubble-wrap {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    flex: 1 1 0% !important;
-    min-width: 0 !important;
-    width: auto !important;
-    max-width: 260px !important;
-    min-height: auto !important;
-    aspect-ratio: 520 / 340 !important;
-    height: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 0 !important;
-    filter: drop-shadow(0 3px 6px rgba(20, 56, 51, 0.12)) !important;
-  }
-  ${scope} .s2-bubble-text-wrap {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    z-index: 1 !important;
-    width: 100% !important;
-    max-width: none !important;
-    padding: 24px 30px 28px 28px !important;
-    box-sizing: border-box !important;
-  }
-  ${scope} .s2-bubble-text {
-    width: 100% !important;
-    font-size: clamp(11px, 3vw, 12.5px) !important;
-    line-height: 1.35 !important;
-    font-weight: 600 !important;
-    color: #143833 !important;
-    text-align: center !important;
-    overflow-wrap: break-word !important;
-    word-break: normal !important;
   }
   ${scope} .s2-nurse-wrap {
-    position: relative !important;
-    right: auto !important;
-    bottom: auto !important;
-    width: clamp(50px, 15vw, 64px) !important;
-    height: clamp(96px, 28vw, 124px) !important;
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  ${scope} .s2-nurse-img {
-    max-height: 100% !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)) !important;
-  }
-  /* 2B. Options Area */
-  ${scope} .s2-options-col {
-    order: 2 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    max-width: 340px !important;
-    margin: 0 auto !important;
+    position: static !important;
+    width: 96px !important;
+    height: 184px !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s2-bottle-wrap {
-    display: none !important;
+    position: static !important;
+    width: 78px !important;
+    height: 126px !important;
+    margin-bottom: 12px !important;
+    flex-shrink: 0 !important;
   }
-  ${scope} .s2-radiogroup {
+  ${scope} .s2-checklist {
+    position: static !important;
     width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
+    max-width: 360px !important;
+    flex-shrink: 0 !important;
     gap: 6px !important;
   }
   ${scope} .s2-option-row {
     width: 100% !important;
-    min-height: 38px !important;
-    gap: 12px !important;
-    padding: 6px 14px !important;
-    border-radius: 12px !important;
+    height: auto !important;
+    min-height: 40px !important;
+    padding: 6px 12px !important;
+    border-radius: 10px !important;
     border: 1.5px solid rgba(35, 111, 122, 0.2) !important;
     background-color: rgba(255, 255, 255, 0.85) !important;
-    box-shadow: 0 1px 3px rgba(20, 56, 51, 0.06) !important;
-    transition: all 0.15s ease !important;
-    justify-content: flex-start !important;
-  }
-  ${scope} .s2-option-row:hover,
-  ${scope} .s2-option-row:active {
-    background-color: rgba(189, 223, 216, 0.4) !important;
-    border-color: #236f7a !important;
-    transform: translateY(-1px) !important;
+    box-sizing: border-box !important;
   }
   ${scope} .s2-checkbox-box {
     width: 22px !important;
     height: 22px !important;
-    border-radius: 5px !important;
-    border: 2px solid #236f7a !important;
-    flex-shrink: 0 !important;
-  }
-  ${scope} .s2-checkbox-box.checked {
-    background-color: #144e57 !important;
-    border-color: #143833 !important;
   }
   ${scope} .s2-option-text {
-    font-size: 14px !important;
-    line-height: 1.3 !important;
-    font-weight: 600 !important;
-    color: #143833 !important;
+    font-size: 15px !important;
+    white-space: normal !important;
   }
-  /* 3. Bottom Bar: Solid cream background & static flex position so it never overlaps options */
   ${scope} .s2-bottom-bar {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    width: 100% !important;
-    max-width: 340px !important;
-    background-color: #fafdf3 !important;
-    display: flex !important;
+    position: static !important;
+    height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
     gap: 8px !important;
-    padding-top: 6px !important;
-    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-    margin: 0 auto !important;
+    padding: 4px 0 0 0 !important;
     flex-shrink: 0 !important;
-    z-index: 25 !important;
-  }
-  ${scope} .s2-spacer-side {
-    display: none !important;
+    width: 100% !important;
+    max-width: 360px !important;
   }
   ${scope} .s2-audio-controls {
-    order: 1 !important;
     position: static !important;
-    right: auto !important;
-    bottom: auto !important;
-    width: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
+    order: 1 !important;
     margin: 0 auto !important;
-    background-color: transparent !important;
-    padding: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-  ${scope} .s2-audio-btn {
-    min-width: 44px !important;
-    min-height: 40px !important;
-    padding: 2px 4px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  ${scope} .s2-audio-btn svg {
-    height: 32px !important;
-    width: auto !important;
-    transition: transform 0.12s ease !important;
-  }
-  ${scope} .s2-audio-btn:hover svg,
-  ${scope} .s2-audio-btn:active svg {
-    transform: scale(0.96) !important;
   }
   ${scope} .s2-nav-center {
-    order: 2 !important;
     position: static !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 14px !important;
+    order: 2 !important;
+    transform: none !important;
     width: 100% !important;
-    margin: 0 !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
   }
   ${scope} .s2-btn-nav {
     flex: 1 1 0% !important;
-    min-height: 44px !important;
     height: 44px !important;
+    min-height: 44px !important;
     font-size: 16px !important;
-    font-weight: 700 !important;
-    padding: 0 16px !important;
-    border-radius: 9999px !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
-    text-align: center !important;
+  }
+  ${scope} .s2-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
   }
 `;
-const SLIDE2_COMPONENT_CSS = `
- /* ------------------------------------------------------------
-    Slide 2: WCAG 2.1 / 2.2 Level AAA, WAVE & Karen Accessibility Rules
-    ------------------------------------------------------------ */
 
+// ─── CSS ─────────────────────────────────────────────────────────────────────
+const CSS = `
+  /* ---- Accessibility ---- */
+  .s2-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important; border: 0 !important;
+  }
+  .s2-root button:focus-visible,
+  .s2-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 3px !important;
+  }
+  .s2-heading:focus, .s2-heading:focus-visible { outline: none !important; }
 
- .s2-sr-only {
-   position: absolute !important;
-   width: 1px !important;
-   height: 1px !important;
-   padding: 0 !important;
-   margin: -1px !important;
-   overflow: hidden !important;
-   clip: rect(0, 0, 0, 0) !important;
-   white-space: nowrap !important;
-   border: 0 !important;
- }
+  /* ---- Root ---- */
+  .s2-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
 
+  /* ---- Scale-locked desktop stage (transparent so outer cream shell shows seamlessly) ---- */
+  .s2-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    overflow: hidden;
+  }
 
- .s2-component-card button:focus-visible,
- .s2-component-card [tabindex="0"]:focus-visible {
-   outline: 3px solid #143833 !important;
-   outline-offset: 3px !important;
- }
+  /* ---- Yellow banner (top-left, rounded rectangle) ---- */
+  .s2-banner {
+    position: absolute;
+    top: 26px;
+    left: 52px;
+    width: 496px;
+    background-color: #feff9f;
+    border: 2px solid #2b7a85;
+    border-radius: 22px;
+    box-shadow: 0 3px 6px rgba(35, 111, 122, 0.2);
+    padding: 14px 24px;
+    box-sizing: border-box;
+    z-index: 10;
+  }
+  .s2-heading {
+    margin: 0;
+    font-size: 21px;
+    line-height: 1.42;
+    font-weight: 700;
+    color: #1a1f1e;
+    letter-spacing: -0.01em;
+  }
 
+  /* On desktop, middle-row is transparent to layout so Nurse & Bottle position directly on .s2-stage */
+  .s2-middle-row {
+    display: contents;
+  }
 
- .s2-heading:focus,
- .s2-heading:focus-visible {
-   outline: none !important;
- }
+  /* ---- Nurse Anna (left, using uploaded nurse-anna-s2.png) ---- */
+  .s2-nurse-wrap {
+    position: absolute;
+    left: 88px;
+    top: 144px;
+    width: 125px;
+    height: 274px;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 5;
+  }
+  .s2-nurse-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+  }
 
+  /* ---- Pink Amoxicillin Bottle (center, aligned with checklist top & bottom) ---- */
+  .s2-bottle-wrap {
+    position: absolute;
+    left: 237px;
+    top: 184px;
+    width: 99px;
+    height: 176px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+  .s2-bottle-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+  }
 
- .s2-component-card {
-   position: relative;
-   width: 100%;
-   max-width: 1000px;
-   height: 100%;
-   max-height: 100%;
-   background-color: #fafdf3;
-   border-radius: 28px;
-   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-   border: 1px solid rgba(120, 165, 155, 0.28);
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   overflow: hidden;
-   padding: 24px 38px 20px 38px;
-   box-sizing: border-box;
-   font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
- }
+  /* ---- Checklist (right, top & bottom aligned flush with bottle) ---- */
+  .s2-checklist {
+    position: absolute;
+    left: 348px;
+    top: 180px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    z-index: 5;
+  }
+  .s2-option-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 36px;
+    min-height: 36px;
+    cursor: pointer;
+    user-select: none;
+    padding: 0 4px;
+    border-radius: 6px;
+    transition: background-color 0.12s ease;
+  }
+  .s2-option-row:hover {
+    background-color: rgba(189, 223, 216, 0.28);
+  }
+  .s2-option-row:focus-within {
+    outline: 3px solid #143833 !important;
+    outline-offset: 2px !important;
+  }
+  .s2-checkbox-box {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    border: 1.8px solid #3c7c87;
+    background-color: #dbe0e3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+  }
+  .s2-checkbox-box.checked {
+    background-color: #144e57;
+    border-color: #143833;
+    color: #fff;
+  }
+  .s2-option-text {
+    font-size: 21px;
+    line-height: 1.2;
+    font-weight: 500;
+    color: #1d2423;
+    white-space: nowrap;
+  }
+  .s2-option-text.checked {
+    font-weight: 700;
+    color: #0a1c1a;
+  }
 
+  /* ---- Bottom bar ---- */
+  .s2-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 0 24px;
+  }
 
- /* Seamless fill when placed inside an outer app frame (prevents double rectangle / empty bottom canvas) */
- .tablet-mockup-frame .s2-component-card,
- .tablet-screen-inner .s2-component-card,
- .tablet-slide-content .s2-component-card,
- .intervention-frame-outer .s2-component-card {
-   border: none !important;
-   box-shadow: none !important;
-   background-color: transparent !important;
-   border-radius: 0 !important;
-   max-width: 100% !important;
-   width: 100% !important;
-   height: 100% !important;
-   padding: 24px 38px 20px 38px !important;
- }
+  /* Back + Next centered with wide spacing like reference */
+  .s2-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 54px;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+  .s2-btn-nav {
+    border-radius: 9999px;
+    font-weight: 600;
+    border: 1.6px solid #3c7c87;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    min-width: 74px;
+    font-size: 15px;
+    padding: 0 20px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+    font-family: inherit;
+  }
+  .s2-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.12); }
+  .s2-btn-nav:active:not(:disabled) { transform: translateY(1px); }
+  .s2-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  .s2-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s2-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
+  .s2-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s2-btn-next:hover:not(:disabled) { background-color: #f2f380; }
 
+  /* ---- Audio controls — bottom-right ---- */
+  .s2-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2b7a85;
+  }
+  .s2-audio-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #2b7a85;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+    font-family: inherit;
+  }
+  .s2-audio-btn:hover { transform: scale(1.08); opacity: 0.85; }
 
- /* 1. Yellow Banner & Heading (WCAG AAA Contrast: #142724 on #feff9f = 14.2:1) */
- .s2-banner-wrap {
-   width: 100%;
-   max-width: 760px;
-   margin: 0 auto 10px auto;
-   background-color: #feff9f;
-   border: 2px solid #236f7a;
-   border-radius: 9999px;
-   box-shadow: 0 4px 6px rgba(34, 105, 118, 0.25);
-   padding: 10px 24px;
-   text-align: center;
-   flex-shrink: 0;
- }
- .s2-heading {
-   margin: 0;
-   font-size: 20px;
-   line-height: 1.3;
-   font-weight: 700;
-   letter-spacing: -0.01em;
-   color: #142724;
-   outline: none;
- }
+  /* Captions panel */
+  .s2-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    background: #143833;
+    color: #fff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    z-index: 30;
+  }
+  .s2-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .s2-captions-text { font-size: 13.5px; line-height: 1.4; margin: 0; font-weight: 500; color: #fff; }
 
+  /* ================================================================
+     MOBILE LAYOUT  (is-mobile class  OR  ≤767px viewport)
+     ================================================================ */
+  @media (max-width: 767px) {
+    ${mobileLayoutCSS(".s2-root:not(.is-desktop)")}
+  }
+  ${mobileLayoutCSS(".s2-root.is-mobile")}
 
- /* 2. Middle Content Area (Keeps checklist & Nurse Anna centered and cohesive at all screen resolutions) */
- .s2-stage-middle {
-   flex: 1;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   width: 100%;
-   max-width: 820px;
-   margin: 0 auto;
-   min-height: 0;
-   padding: 0 4px;
-   gap: 48px;
- }
-
-
- .s2-options-col {
-   display: flex;
-   align-items: center;
-   gap: 22px;
-   flex: 0 0 auto;
-   width: auto;
-   max-width: 440px;
- }
-
-
- .s2-bottle-wrap {
-   flex-shrink: 0;
-   width: 90px;
-   height: 175px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
- }
- .s2-bottle-img {
-   width: 100%;
-   height: 100%;
-   object-fit: contain;
-   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
-   user-select: none;
- }
-
-
- /* Radio Group */
- .s2-radiogroup {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-   flex: 1;
- }
-
-
- .s2-option-row {
-   display: flex;
-   align-items: center;
-   gap: 12px;
-   min-height: 44px;
-   cursor: pointer;
-   user-select: none;
-   padding: 4px 8px;
-   border-radius: 10px;
-   transition: background-color 0.12s ease;
- }
- .s2-option-row:hover {
-   background-color: rgba(189, 223, 216, 0.3);
- }
- .s2-option-row:focus-within {
-   outline: 3px solid #143833 !important;
-   outline-offset: 2px !important;
- }
-
-
- .s2-checkbox-box {
-   width: 28px;
-   height: 28px;
-   flex-shrink: 0;
-   border-radius: 6px;
-   border: 2px solid #236f7a;
-   background-color: #e8ece9;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   transition: all 0.15s ease;
- }
- .s2-checkbox-box.checked {
-   background-color: #144e57;
-   border-color: #143833;
-   color: #ffffff;
- }
-
-
- .s2-option-text {
-   font-size: 17.5px;
-   line-height: 1.3;
-   font-weight: 500;
-   color: #142724;
-   transition: color 0.12s ease, font-weight 0.12s ease;
-   word-break: break-word;
- }
- .s2-option-text.checked {
-   font-weight: 700;
-   color: #0a1c1a;
- }
-
-
- /* Character & Bubble Area */
- .s2-character-col {
-   position: relative;
-   width: 320px;
-   height: 265px;
-   flex-shrink: 0;
- }
- .s2-bubble-wrap {
-   position: absolute;
-   left: 0;
-   top: 0;
-   width: 245px;
-   min-height: 160px;
-   aspect-ratio: 520 / 340;
-   height: auto;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   z-index: 5;
-   pointer-events: none;
-   filter: drop-shadow(2px 3px 0px #1a3532);
- }
- .s2-bubble-svg {
-   position: absolute;
-   inset: 0;
-   width: 100%;
-   height: 100%;
-   overflow: visible;
- }
- .s2-bubble-text-wrap {
-   position: relative;
-   z-index: 1;
-   width: 100%;
-   padding: 30px 38px 34px 36px;
-   box-sizing: border-box;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   text-align: center;
-   pointer-events: none;
- }
- .s2-bubble-text {
-   margin: 0;
-   padding: 0;
-   width: 100%;
-   font-size: 13px;
-   line-height: 1.38;
-   font-weight: 600;
-   color: #142724;
-   text-align: center;
-   overflow-wrap: break-word;
-   word-break: normal;
- }
-
-
- /* Nurse Anna (Post-Slide 1 Decorative Character) */
- .s2-nurse-wrap {
-   position: absolute;
-   right: 8px;
-   bottom: 2px;
-   width: 105px;
-   height: 195px;
-   z-index: 6;
-   pointer-events: none;
-   display: flex;
-   align-items: flex-end;
-   justify-content: center;
- }
- .s2-nurse-img {
-   width: 100%;
-   height: 100%;
-   object-fit: contain;
-   user-select: none;
-   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
- }
-
-
- /* ------------------------------------------------------------
-    Bottom Bar: Centered Navigation & Bottom-Right Audio Controls
-    ------------------------------------------------------------ */
- .s2-bottom-bar {
-   width: 100%;
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   flex-shrink: 0;
-   padding-top: 8px;
-   position: relative;
-   z-index: 20;
- }
-
-
- .s2-spacer-side {
-   width: 110px;
-   flex-shrink: 0;
- }
-
-
- .s2-nav-center {
-   display: flex;
-   align-items: center;
-   gap: 14px;
-   margin: 0 auto;
-   flex-shrink: 0;
- }
-
-
- .s2-btn-nav {
-   border-radius: 9999px;
-   font-weight: 700;
-   border: 1.5px solid transparent;
-   cursor: pointer;
-   display: inline-flex;
-   align-items: center;
-   justify-content: center;
-   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-   min-height: 48px;
-   min-width: 98px;
-   font-size: 16px;
-   padding: 0 24px;
-   transition: transform 0.1s ease, background-color 0.15s ease;
- }
- .s2-btn-nav:hover:not(:disabled) {
-   transform: translateY(-1px);
-   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14);
- }
- .s2-btn-nav:active:not(:disabled) {
-   transform: translateY(1px);
-   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
- }
- .s2-btn-nav:disabled {
-   opacity: 0.55;
-   cursor: not-allowed;
-   box-shadow: none;
- }
-
-
- .s2-btn-back {
-   background-color: #bddfd8;
-   color: #11332e;
-   border-color: #78a59b;
- }
- .s2-btn-back:hover:not(:disabled) {
-   background-color: #a8d5cc;
- }
-
-
- .s2-btn-next {
-   background-color: #fdee8e;
-   color: #1a2624;
-   border-color: #c8b746;
- }
- .s2-btn-next:hover:not(:disabled) {
-   background-color: #f5e478;
- }
-
-
- /* Audio Narration & CC Controls */
- .s2-audio-controls {
-   display: flex;
-   align-items: center;
-   gap: 6px;
-   color: #144e57;
-   justify-content: flex-end;
- }
- .s2-audio-btn {
-   background: transparent;
-   border: none;
-   cursor: pointer;
-   color: #144e57;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   padding: 6px;
-   min-width: 44px;
-   min-height: 44px;
-   border-radius: 8px;
-   transition: transform 0.12s ease, opacity 0.15s ease;
- }
- .s2-audio-btn:hover {
-   transform: scale(1.08);
-   opacity: 0.85;
- }
-
-
- /* Closed Captions Panel (WCAG 1.2.2 Captions) */
- .s2-captions-panel {
-   background: #143833;
-   color: #ffffff;
-   border: 1.5px solid #bddfd8;
-   border-radius: 12px;
-   padding: 8px 14px;
-   margin-top: 6px;
-   margin-bottom: 6px;
-   display: flex;
-   align-items: flex-start;
-   gap: 10px;
-   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-   z-index: 15;
- }
- .s2-captions-tag {
-   background: #fdee8e;
-   color: #1a2624;
-   font-size: 11px;
-   font-weight: 800;
-   text-transform: uppercase;
-   padding: 2px 6px;
-   border-radius: 4px;
-   flex-shrink: 0;
-   letter-spacing: 0.05em;
- }
- .s2-captions-text {
-   font-size: 13.5px;
-   line-height: 1.4;
-   margin: 0;
-   font-weight: 500;
-   color: #ffffff;
- }
-
-
- /* -------------------------------------------------------------
-    Mobile Layout (.is-mobile or screen width < 768px)
-    ------------------------------------------------------------- */
- ${s2MobileLayout(".s2-component-card.is-mobile")}
-
- @media (max-width: 767px) {
-   ${s2MobileLayout(".s2-component-card:not(.is-desktop)")}
- }
-
- /* Prefers Reduced Motion (WCAG 2.3.3) */
- @media (prefers-reduced-motion: reduce) {
-   *, *::before, *::after {
-     animation-duration: 0.001ms !important;
-     animation-iteration-count: 1 !important;
-     transition-duration: 0.001ms !important;
-     scroll-behavior: auto !important;
-   }
- }
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 `;
 
-
 export function Slide2MedicineNamingScreen({
- isSpanish = false,
- selected,
- onSelect,
- onNext,
- onBack,
- loading = false,
- audioSrc,
- stepId = "slide2_naming",
- locale,
- transcriptText,
- variant = "auto",
+  isSpanish = false,
+  selected,
+  onSelect,
+  onNext,
+  onBack,
+  loading = false,
+  audioSrc,
+  stepId = "slide2_naming",
+  locale,
+  transcriptText,
+  variant = "auto",
 }: Slide2MedicineNamingScreenProps) {
- const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
- const [showCaptions, setShowCaptions] = useState<boolean>(false);
- const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [showCaptions, setShowCaptions] = useState<boolean>(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
+  const [scale, setScale] = useState<number>(1);
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
- const headingRef = useRef<HTMLHeadingElement | null>(null);
- const audioRef = useRef<HTMLAudioElement | null>(null);
+  const activeLocale = locale || (isSpanish ? "es" : "en");
+  const isEs = activeLocale.startsWith("es") || isSpanish;
 
+  const isMobile = variant === "mobile";
+  const isDesktop = variant === "desktop";
+  const variantClass = isMobile ? " is-mobile" : isDesktop ? " is-desktop" : "";
 
- const activeLocale = locale || (isSpanish ? "es" : "en");
- const isEs = activeLocale.startsWith("es") || isSpanish;
+  // Scale-locked stage — proportionally fills the tablet container on desktop
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof ResizeObserver === "undefined") return;
 
+    const update = () => {
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
+        setScale(1);
+        return;
+      }
+      const { clientWidth: w, clientHeight: h } = root;
+      if (!w || !h) return;
+      const safeW = Math.max(0, w - 8);
+      const safeH = Math.max(0, h - 8);
+      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
+    };
 
- // Programmatic focus on mount per Karen's review (WCAG 2.4.3 Focus Order)
- useEffect(() => {
-   headingRef.current?.focus({ preventScroll: true });
- }, []);
+    update();
+    const obs = new ResizeObserver(update);
+    obs.observe(root);
+    window.addEventListener("resize", update);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [variant]);
 
+  // Focus heading on mount (WCAG 2.4.3)
+  useEffect(() => {
+    headingRef.current?.focus({ preventScroll: true });
+  }, []);
 
- // Keyboard Escape listener for Closed Captions dismissal (WCAG 1.4.13)
- useEffect(() => {
-   const handleKeyDown = (e: KeyboardEvent) => {
-     if (e.key === "Escape" && showCaptions) {
-       setShowCaptions(false);
-       setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
-     }
-   };
-   window.addEventListener("keydown", handleKeyDown);
-   return () => window.removeEventListener("keydown", handleKeyDown);
- }, [showCaptions, isEs]);
+  // Escape dismisses captions (WCAG 1.4.13)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        setShowCaptions(false);
+        setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCaptions, isEs]);
 
+  const nextEnabled = !!selected && !loading;
 
- const nextEnabled = !!selected && !loading;
+  const handleOptionSelect = (val: string, label: string) => {
+    onSelect(val);
+    setLiveAnnouncement(isEs ? `Seleccionado: ${label}` : `Selected: ${label}`);
+  };
 
+  const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const ni = (currentIndex + 1) % MEDICINE_OPTIONS_DISPLAY.length;
+      const opt = MEDICINE_OPTIONS_DISPLAY[ni];
+      handleOptionSelect(opt.value, isEs ? opt.labelEs : opt.labelEn);
+    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      const pi = (currentIndex - 1 + MEDICINE_OPTIONS_DISPLAY.length) % MEDICINE_OPTIONS_DISPLAY.length;
+      const opt = MEDICINE_OPTIONS_DISPLAY[pi];
+      handleOptionSelect(opt.value, isEs ? opt.labelEs : opt.labelEn);
+    }
+  };
 
- const handleOptionSelect = (val: string, label: string) => {
-   onSelect(val);
-   setLiveAnnouncement(
-     isEs
-       ? `Seleccionado: ${label}`
-       : `Selected: ${label}`
-   );
- };
+  const effectiveTranscript =
+    transcriptText ||
+    (isEs
+      ? "Seleccione cómo llama a la penicilina. Tiene muchos nombres diferentes."
+      : "Select what you call penicillin. It has lots of different names!");
 
+  const effectiveAudioSrc =
+    audioSrc || (isEs ? "/audio/exported/slide2_naming_es.mp3" : "/audio/exported/slide2_naming_en.mp3");
 
- const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
-   if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-     e.preventDefault();
-     const nextIndex = (currentIndex + 1) % MEDICINE_OPTIONS_DISPLAY.length;
-     const nextOpt = MEDICINE_OPTIONS_DISPLAY[nextIndex];
-     handleOptionSelect(nextOpt.value, isEs ? nextOpt.labelEs : nextOpt.labelEn);
-   } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-     e.preventDefault();
-     const prevIndex = (currentIndex - 1 + MEDICINE_OPTIONS_DISPLAY.length) % MEDICINE_OPTIONS_DISPLAY.length;
-     const prevOpt = MEDICINE_OPTIONS_DISPLAY[prevIndex];
-     handleOptionSelect(prevOpt.value, isEs ? prevOpt.labelEs : prevOpt.labelEn);
-   }
- };
+  // Sync audio element events
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
 
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setLiveAnnouncement(
+      willPlay
+        ? isEs ? "Reproduciendo narración de audio" : "Audio narration playing"
+        : isEs ? "Narración de audio pausada" : "Audio narration paused"
+    );
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+            utt.lang = isEs ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+        utt.lang = isEs ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+    }
+  };
 
- const effectiveTranscript =
-   transcriptText ||
-   (isEs
-     ? "¡Primero hablemos de la penicilina. ¡Tiene muchos nombres! ¡Seleccione cómo lo llama! Usaremos el nombre que elija durante nuestro tiempo juntos."
-     : "Let's first talk about penicillin. It has lots of names! Select what you call it! We'll use the name you choose during our time together.");
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setLiveAnnouncement(
+      next
+        ? isEs ? "Subtítulos mostrados" : "Closed captions displayed"
+        : isEs ? "Subtítulos ocultados" : "Closed captions hidden"
+    );
+  };
 
+  return (
+    <div
+      ref={rootRef}
+      id="slide-content"
+      role="region"
+      aria-roledescription="slide"
+      aria-labelledby="slide2-heading"
+      lang={isEs ? "es" : "en"}
+      className={`s2-root${variantClass}`}
+    >
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
- const effectiveAudioSrc =
-   audioSrc ||
-   (isEs
-     ? "/audio/exported/slide2_naming_es.mp3"
-     : "/audio/exported/slide2_naming_en.mp3");
+      {/* SR live region */}
+      <div className="s2-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
 
+      {/* Hidden audio */}
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s2-sr-only"
+        aria-hidden="true"
+      />
 
- // Synchronize audio playback state with audio element events and SpeechSynthesis
- useEffect(() => {
-   const audioEl = audioRef.current;
-   if (!audioEl) return;
+      {/* ── Scale-locked stage ── */}
+      <div
+        className="s2-stage"
+        style={!isMobile ? { transform: `scale(${scale})` } : undefined}
+      >
+        {/* 1. Yellow banner — top-left rounded rectangle */}
+        <div className="s2-banner">
+          <h1 id="slide2-heading" ref={headingRef} tabIndex={-1} className="s2-heading">
+            {isEs
+              ? "Seleccione cómo llama a la penicilina. ¡Tiene muchos nombres diferentes!"
+              : "Select what you call penicillin. It has lots of different names!"}
+          </h1>
+        </div>
 
+        {/* 2. Nurse Anna (left) + Amoxicillin Bottle (center) */}
+        <div className="s2-middle-row">
+          <div className="s2-nurse-wrap" aria-hidden="true">
+            <img
+              src="/images/nurse-anna-s2.png"
+              alt=""
+              className="s2-nurse-img"
+              draggable={false}
+            />
+          </div>
 
-   const handlePlay = () => setAudioPlaying(true);
-   const handlePause = () => setAudioPlaying(false);
-   const handleEnded = () => setAudioPlaying(false);
+          <div className="s2-bottle-wrap">
+            <img
+              src="/images/amoxicillin-bottle.png"
+              alt={isEs ? "Frasco de medicina rosa" : "Pink medicine bottle"}
+              className="s2-bottle-img"
+              draggable={false}
+            />
+          </div>
+        </div>
 
+        {/* 3. Checklist — right, flush with bottle top & bottom */}
+        <div
+          className="s2-checklist"
+          role="radiogroup"
+          aria-label={isEs ? "Seleccione el nombre que usa para el medicamento" : "Select what you call the medicine"}
+        >
+          {MEDICINE_OPTIONS_DISPLAY.map((opt, idx) => {
+            const isChecked = selected === opt.value;
+            const label = isEs ? opt.labelEs : opt.labelEn;
+            return (
+              <label key={opt.value} className="s2-option-row" onKeyDown={(e) => handleKeyDown(e, idx)}>
+                <input
+                  type="radio"
+                  name="medicine_selection"
+                  value={opt.value}
+                  checked={isChecked}
+                  onChange={() => handleOptionSelect(opt.value, label)}
+                  className="s2-sr-only"
+                />
+                <span className={`s2-checkbox-box ${isChecked ? "checked" : ""}`} aria-hidden="true">
+                  {isChecked && (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </span>
+                <span className={`s2-option-text ${isChecked ? "checked" : ""}`}>{label}</span>
+              </label>
+            );
+          })}
+        </div>
 
-   audioEl.addEventListener("play", handlePlay);
-   audioEl.addEventListener("pause", handlePause);
-   audioEl.addEventListener("ended", handleEnded);
+        {/* Captions panel */}
+        {showCaptions && (
+          <div
+            className="s2-captions-panel"
+            role="region"
+            aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
+          >
+            <span className="s2-captions-tag" aria-hidden="true">CC</span>
+            <p className="s2-captions-text">{effectiveTranscript}</p>
+          </div>
+        )}
 
+        {/* 4. Bottom bar */}
+        <footer
+          className="s2-bottom-bar"
+          role="toolbar"
+          aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
+        >
+          <nav className="s2-nav-center" aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}>
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={loading}
+              className="s2-btn-nav s2-btn-back"
+              aria-label={isEs ? "Volver a la diapositiva anterior" : "Back to previous slide"}
+            >
+              {isEs ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={!nextEnabled}
+              aria-disabled={!nextEnabled}
+              className="s2-btn-nav s2-btn-next"
+              aria-label={isEs ? "Continuar a la siguiente diapositiva" : "Next slide"}
+            >
+              {loading ? "..." : isEs ? "Siguiente" : "Next"}
+            </button>
+          </nav>
 
-   return () => {
-     audioEl.removeEventListener("play", handlePlay);
-     audioEl.removeEventListener("pause", handlePause);
-     audioEl.removeEventListener("ended", handleEnded);
-     audioEl.pause();
-     if (typeof window !== "undefined" && "speechSynthesis" in window) {
-       window.speechSynthesis.cancel();
-     }
-   };
- }, [effectiveAudioSrc, stepId]);
+          <div className="s2-audio-controls">
+            <button
+              type="button"
+              className="s2-audio-btn"
+              onClick={toggleCaptions}
+              aria-pressed={showCaptions}
+              aria-label={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+              title={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+            >
+              <svg
+                width="44"
+                height="40"
+                viewBox="0 0 40 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text
+                  x="20"
+                  y="15.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"}
+                  fontSize="13"
+                  fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                  letterSpacing="0.3px"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
 
-
- const toggleAudio = () => {
-   const audioEl = audioRef.current;
-   const willPlay = !audioPlaying;
-
-
-   setLiveAnnouncement(
-     willPlay
-       ? isEs
-         ? "Reproduciendo narración de audio"
-         : "Audio narration playing"
-       : isEs
-       ? "Narración de audio pausada"
-       : "Audio narration paused"
-   );
-
-
-   if (willPlay) {
-     if (audioEl && audioEl.src && !audioEl.src.endsWith(".undefined")) {
-       audioEl.play().catch(() => {
-         if (typeof window !== "undefined" && "speechSynthesis" in window) {
-           window.speechSynthesis.cancel();
-           const utterance = new SpeechSynthesisUtterance(effectiveTranscript);
-           utterance.lang = isEs ? "es-US" : "en-US";
-           utterance.rate = 0.95;
-           utterance.onstart = () => setAudioPlaying(true);
-           utterance.onend = () => setAudioPlaying(false);
-           utterance.onerror = () => setAudioPlaying(false);
-           window.speechSynthesis.speak(utterance);
-         }
-       });
-     } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
-       window.speechSynthesis.cancel();
-       const utterance = new SpeechSynthesisUtterance(effectiveTranscript);
-       utterance.lang = isEs ? "es-US" : "en-US";
-       utterance.rate = 0.95;
-       utterance.onstart = () => setAudioPlaying(true);
-       utterance.onend = () => setAudioPlaying(false);
-       utterance.onerror = () => setAudioPlaying(false);
-       window.speechSynthesis.speak(utterance);
-     }
-   } else {
-     if (audioEl) {
-       audioEl.pause();
-     }
-     if (typeof window !== "undefined" && "speechSynthesis" in window) {
-       window.speechSynthesis.cancel();
-     }
-     setAudioPlaying(false);
-   }
- };
-
-
- const toggleCaptions = () => {
-   const next = !showCaptions;
-   setShowCaptions(next);
-   setLiveAnnouncement(
-     next
-       ? isEs
-         ? "Subtítulos mostrados"
-         : "Closed captions displayed"
-       : isEs
-       ? "Subtítulos ocultados"
-       : "Closed captions hidden"
-   );
- };
-
-
- const variantClass = variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
-
-
- return (
-   <section
-     id="slide-content"
-     role="region"
-     aria-roledescription="slide"
-     aria-labelledby="slide2-heading"
-     lang={isEs ? "es" : "en"}
-     className={`s2-component-card${variantClass}`}
-   >
-     <style dangerouslySetInnerHTML={{ __html: SLIDE2_COMPONENT_CSS }} />
-
-
-     {/* Screen Reader Live Region for WCAG 4.1.3 */}
-     <div className="s2-sr-only" role="status" aria-live="polite" aria-atomic="true">
-       {liveAnnouncement}
-     </div>
-
-
-     {/* Hidden audio element for narration */}
-     <audio
-       ref={audioRef}
-       src={effectiveAudioSrc}
-       preload="metadata"
-       className="s2-sr-only"
-       aria-hidden="true"
-     />
-
-
-     {/* 1. Accessible Banner & Title (Level AAA Contrast 14.2:1) */}
-     <div className="s2-banner-wrap">
-       <h1
-         id="slide2-heading"
-         ref={headingRef}
-         tabIndex={-1}
-         className="s2-heading"
-       >
-         {isEs
-           ? "¡Primero hablemos de la penicilina. ¡Tiene muchos nombres!"
-           : "Let's first talk about penicillin. It has lots of names!"}
-       </h1>
-     </div>
-
-
-     {/* 2. Middle Interactive Content Area */}
-     <div className="s2-stage-middle">
-       {/* Left Column: Pink Bottle + Accessible Radio Options */}
-       <div className="s2-options-col">
-         {/* Pink Bottle (WCAG 1.1.1 Non-text Content) */}
-         <div className="s2-bottle-wrap">
-           <img
-             src="/images/amoxicillin-bottle.png"
-             alt={isEs ? "Frasco de medicina rosa" : "Pink medicine bottle"}
-             className="s2-bottle-img"
-             draggable={false}
-           />
-         </div>
-
-
-         {/* Accessible Radio Group (WCAG 1.3.1 & 2.1.1) */}
-         <div
-           className="s2-radiogroup"
-           role="radiogroup"
-           aria-label={
-             isEs
-               ? "Seleccione el nombre que usa para el medicamento"
-               : "Select what you call the medicine"
-           }
-         >
-           {MEDICINE_OPTIONS_DISPLAY.map((opt, idx) => {
-             const isChecked = selected === opt.value;
-             const label = isEs ? opt.labelEs : opt.labelEn;
-
-
-             return (
-               <label
-                 key={opt.value}
-                 className="s2-option-row"
-                 onKeyDown={(e) => handleKeyDown(e, idx)}
-               >
-                 <input
-                   type="radio"
-                   name="medicine_selection"
-                   value={opt.value}
-                   checked={isChecked}
-                   onChange={() => handleOptionSelect(opt.value, label)}
-                   className="s2-sr-only"
-                 />
-                 <span
-                   className={`s2-checkbox-box ${isChecked ? "checked" : ""}`}
-                   aria-hidden="true"
-                 >
-                   {isChecked && (
-                     <svg
-                       width="18"
-                       height="18"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       strokeWidth="3.5"
-                       strokeLinecap="round"
-                       strokeLinejoin="round"
-                       aria-hidden="true"
-                       focusable="false"
-                     >
-                       <polyline points="20 6 9 17 4 12" />
-                     </svg>
-                   )}
-                 </span>
-                 <span className={`s2-option-text ${isChecked ? "checked" : ""}`}>
-                   {label}
-                 </span>
-               </label>
-             );
-           })}
-         </div>
-       </div>
-
-
-       {/* Right Column: Speech Bubble + Nurse Anna */}
-       <div className="s2-character-col">
-         {/* Hand-drawn SVG Speech Bubble */}
-         <div
-           className="s2-bubble-wrap"
-           role="group"
-           aria-label={isEs ? "Instrucción de selección" : "Selection instruction"}
-         >
-           <svg
-             className="s2-bubble-svg"
-             viewBox="0 0 520 340"
-             preserveAspectRatio="none"
-             fill="none"
-             aria-hidden="true"
-             focusable="false"
-           >
-             <defs>
-               <pattern id="s2-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                 <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-               </pattern>
-             </defs>
-
-
-             {/* 3D shadow underneath */}
-             <path
-               d={BUBBLE_PATH}
-               transform="translate(4, 5)"
-               fill="#1a3532"
-               stroke="#1a3532"
-               strokeWidth="2"
-               vectorEffect="non-scaling-stroke"
-               strokeLinecap="round"
-               strokeLinejoin="round"
-             />
-
-
-             {/* White bubble body */}
-             <path d={BUBBLE_PATH} fill="#ffffff" />
-
-
-             {/* Subtle paper dot grid texture */}
-             <path d={BUBBLE_PATH} fill="url(#s2-bubble-dots)" />
-
-
-             {/* Soft teal outline */}
-             <path
-               d={BUBBLE_PATH}
-               fill="none"
-               stroke="#8ebfbb"
-               strokeWidth="2.4"
-               vectorEffect="non-scaling-stroke"
-               strokeLinecap="round"
-               strokeLinejoin="round"
-             />
-           </svg>
-
-
-           <div className="s2-bubble-text-wrap">
-             <p className="s2-bubble-text">
-              {isEs ? (
-                <>
-                  ¡Seleccione cómo lo llama!<br />
-                  Usaremos el nombre que elija durante nuestro tiempo juntos.
-                </>
+            <button
+              type="button"
+              className="s2-audio-btn"
+              onClick={toggleAudio}
+              aria-pressed={audioPlaying}
+              aria-label={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+              title={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+            >
+              {audioPlaying ? (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
               ) : (
-                <>
-                  Select what you call it!<br />
-                  We&apos;ll use the name you choose during our time together.
-                </>
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <text
+                    x="14.8"
+                    y="17.2"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="currentColor"
+                    fontSize="8"
+                    fontWeight="700"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    letterSpacing="0.1px"
+                  >
+                    play
+                  </text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
               )}
-            </p>
-           </div>
-         </div>
-
-
-         {/* Nurse Anna (Decorative after Slide 1 per Karen & Eileen's Rule) */}
-         <div className="s2-nurse-wrap" aria-hidden="true">
-           <img
-             src="/images/nurse-anna.png"
-             alt=""
-             className="s2-nurse-img"
-             draggable={false}
-           />
-         </div>
-       </div>
-     </div>
-
-
-     {/* Closed Caption Drawer (WCAG 1.2.2 Captions) */}
-     {showCaptions && (
-       <div
-         className="s2-captions-panel"
-         role="region"
-         aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
-       >
-         <span className="s2-captions-tag" aria-hidden="true">
-           CC
-         </span>
-         <p className="s2-captions-text">
-           {effectiveTranscript}
-         </p>
-       </div>
-     )}
-
-
-     {/* 3. Bottom Navigation & Audio Controls (WCAG 2.4.1 Toolbar) */}
-     <footer
-       className="s2-bottom-bar"
-       role="toolbar"
-       aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
-     >
-       <div className="s2-spacer-side" aria-hidden="true" />
-
-
-       {/* Centered Back & Next Navigation with 44px+ touch targets */}
-       <nav
-         className="s2-nav-center"
-         aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}
-       >
-         <button
-           type="button"
-           onClick={onBack}
-           disabled={loading}
-           className="s2-btn-nav s2-btn-back"
-           aria-label={isEs ? "Volver a la diapositiva anterior" : "Back to previous slide"}
-         >
-           {isEs ? "Atrás" : "Back"}
-         </button>
-         <button
-           type="button"
-           onClick={onNext}
-           disabled={!nextEnabled}
-           aria-disabled={!nextEnabled}
-           className="s2-btn-nav s2-btn-next"
-           aria-label={isEs ? "Continuar a la siguiente diapositiva" : "Next slide"}
-         >
-           {loading ? "..." : isEs ? "Siguiente" : "Next"}
-         </button>
-       </nav>
-
-
-       {/* Audio narration & CC controls */}
-       <div className="s2-audio-controls s2-spacer-side">
-         <button
-           type="button"
-           className="s2-audio-btn"
-           onClick={toggleCaptions}
-           aria-pressed={showCaptions}
-           aria-label={
-             showCaptions
-               ? isEs
-                 ? "Ocultar subtítulos"
-                 : "Hide closed captions"
-               : isEs
-               ? "Mostrar subtítulos"
-               : "Show closed captions"
-           }
-           title={
-             showCaptions
-               ? isEs
-                 ? "Ocultar subtítulos"
-                 : "Hide closed captions"
-               : isEs
-               ? "Mostrar subtítulos"
-               : "Show closed captions"
-           }
-         >
-           <svg
-             width="46"
-             height="42"
-             viewBox="0 0 40 36"
-             fill="none"
-             xmlns="http://www.w3.org/2000/svg"
-             aria-hidden="true"
-             focusable="false"
-           >
-             <path
-               d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
-               stroke="currentColor"
-               strokeWidth="2.2"
-               strokeLinecap="round"
-               strokeLinejoin="round"
-               fill={showCaptions ? "currentColor" : "none"}
-             />
-             <text
-               x="20"
-               y="15.5"
-               textAnchor="middle"
-               dominantBaseline="central"
-               fill={showCaptions ? "#ffffff" : "currentColor"}
-               fontSize="13"
-               fontWeight="700"
-               fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-               letterSpacing="0.3px"
-             >
-               CC
-             </text>
-           </svg>
-         </button>
-
-
-         <button
-           type="button"
-           className="s2-audio-btn"
-           onClick={toggleAudio}
-           aria-pressed={audioPlaying}
-           aria-label={
-             audioPlaying
-               ? isEs
-                 ? "Pausar narración de audio"
-                 : "Pause audio narration"
-               : isEs
-               ? "Reproducir narración de audio"
-               : "Play audio narration"
-           }
-           title={
-             audioPlaying
-               ? isEs
-                 ? "Pausar narración de audio"
-                 : "Pause audio narration"
-               : isEs
-               ? "Reproducir narración de audio"
-               : "Play audio narration"
-           }
-         >
-           {audioPlaying ? (
-             <svg
-               width="58"
-               height="42"
-               viewBox="0 0 50 36"
-               fill="none"
-               xmlns="http://www.w3.org/2000/svg"
-               aria-hidden="true"
-               focusable="false"
-             >
-               <path
-                 d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinejoin="round"
-                 fill="none"
-               />
-               <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-               <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-               <path
-                 d="M 33 11 C 37 13.5 37 22.5 33 25"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinecap="round"
-               />
-               <path
-                 d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinecap="round"
-               />
-             </svg>
-           ) : (
-             <svg
-               width="58"
-               height="42"
-               viewBox="0 0 50 36"
-               fill="none"
-               xmlns="http://www.w3.org/2000/svg"
-               aria-hidden="true"
-               focusable="false"
-             >
-               <path
-                 d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinejoin="round"
-                 fill="none"
-               />
-               <text
-                 x="14.8"
-                 y="17.2"
-                 textAnchor="middle"
-                 dominantBaseline="central"
-                 fill="currentColor"
-                 fontSize="8"
-                 fontWeight="700"
-                 fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-                 letterSpacing="0.1px"
-               >
-                 play
-               </text>
-               <path
-                 d="M 33 11 C 37 13.5 37 22.5 33 25"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinecap="round"
-               />
-               <path
-                 d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5"
-                 stroke="currentColor"
-                 strokeWidth="2.2"
-                 strokeLinecap="round"
-               />
-             </svg>
-           )}
-         </button>
-       </div>
-     </footer>
-   </section>
- );
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
 }
-
 
 export default Slide2MedicineNamingScreen;

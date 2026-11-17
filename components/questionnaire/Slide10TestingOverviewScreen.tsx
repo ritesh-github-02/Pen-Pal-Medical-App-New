@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import AudioPlayer from "./AudioPlayer";
-import SlideNavigationButtons from "./SlideNavigationButtons";
+import React, { useEffect, useRef, useState } from "react";
 import { resolveMedicineToken } from "@/lib/token-engine";
 
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
 export interface Slide10TestingOverviewScreenProps {
   isSpanish?: boolean;
   medicationName?: string;
@@ -18,63 +19,33 @@ export interface Slide10TestingOverviewScreenProps {
   transcriptText?: string;
 }
 
-/** Fixed design stage, scaled to fit the tablet frame (same convention as the other slides). */
-const STAGE_W = 750;
+// ============================================================================
+// Constants (matches reference tablet aspect 827x577 = 1.433)
+// ============================================================================
+const STAGE_W = 760;
 const STAGE_H = 530;
 
-/** Speech-bubble artwork (viewBox 0 0 520 330, tail pointing down-right at Nurse Anna). */
-const BUBBLE_PATH =
-  "M 397.9,283.4 C 395.8,284.6 391.2,287.9 385.1,290.7 " +
-  "C 379.0,293.4 369.2,297.5 361.3,299.9 C 353.4,302.3 345.2,303.8 337.6,305.3 " +
-  "C 330.0,306.8 322.6,307.8 315.6,309.0 C 308.6,310.2 302.5,312.1 295.5,312.7 " +
-  "C 288.5,313.3 280.6,312.4 273.6,312.7 C 266.6,313.0 260.2,314.5 253.5,314.5 " +
-  "C 246.8,314.5 240.1,313.3 233.4,312.7 C 226.7,312.1 220.6,311.4 213.3,310.8 " +
-  "C 206.0,310.2 197.2,310.2 189.6,309.0 C 182.0,307.8 175.5,305.3 167.6,303.5 " +
-  "C 159.7,301.7 150.3,300.8 142.1,298.0 C 133.9,295.3 126.8,291.3 118.3,287.0 " +
-  "C 109.8,282.7 99.7,277.9 90.9,272.4 C 82.1,266.9 73.8,261.1 65.3,254.1 " +
-  "C 56.8,247.1 46.8,239.2 39.8,230.3 C 32.8,221.5 27.0,211.4 23.3,201.0 " +
-  "C 19.6,190.6 18.1,179.0 17.8,168.0 C 17.5,157.0 19.1,146.0 21.5,135.0 " +
-  "C 23.9,124.0 27.2,111.9 32.4,102.1 C 37.6,92.3 44.6,84.0 52.5,76.4 " +
-  "C 60.4,68.8 70.5,62.1 79.9,56.3 C 89.4,50.5 99.8,45.6 109.2,41.6 " +
-  "C 118.7,37.6 127.5,35.2 136.6,32.5 C 145.7,29.8 155.5,27.0 164.0,25.2 " +
-  "C 172.5,23.4 179.8,22.4 187.7,21.5 C 195.6,20.6 203.9,20.3 211.5,19.7 " +
-  "C 219.1,19.1 226.4,18.1 233.4,17.8 C 240.4,17.5 245.9,17.5 253.5,17.8 " +
-  "C 261.1,18.1 271.2,19.1 279.1,19.7 C 287.0,20.3 293.7,20.6 301.0,21.5 " +
-  "C 308.3,22.4 315.6,24.0 322.9,25.2 C 330.2,26.4 337.0,27.0 344.9,28.8 " +
-  "C 352.8,30.6 362.0,33.4 370.5,36.1 C 379.0,38.9 387.2,41.6 396.0,45.3 " +
-  "C 404.8,49.0 414.9,52.9 423.4,58.1 C 431.9,63.3 438.7,69.7 447.2,76.4 " +
-  "C 455.7,83.1 466.7,90.2 474.6,98.4 C 482.5,106.7 490.4,115.8 494.7,125.9 " +
-  "C 499.0,136.0 501.1,147.8 500.2,158.8 C 499.3,169.8 493.8,181.4 489.2,191.8 " +
-  "C 484.6,202.2 480.4,211.0 472.8,221.1 C 465.2,231.2 448.4,247.0 443.5,252.2 " +
-  "L 485.6,314.5 L 397.9,283.4 Z";
-
-/** Slide copy, defined once instead of being rebuilt on every render. */
 const COPY = {
+  banner: {
+    en: "Talk to your child\u2019s doctor about testing!",
+    es: "¡Hable con el médico de su hijo sobre las pruebas!",
+  },
   intro: {
-    en: "There's a test that your child's doctor can perform. This test can determine if your child can safely take [name].",
-    es: "Hay una prueba que el médico de su hijo puede realizar. Esta prueba puede determinar si su hijo puede tomar [name] de manera segura.",
+    en: "There is a test that can determine if your child can safely take penicillin.",
+    es: "Existe una prueba que puede determinar si su hijo puede tomar penicilina de manera segura.",
   },
   subtitle: {
     en: "Testing is safe and done in the office",
     es: "Las pruebas son seguras y se realizan en el consultorio",
   },
-  /** Rendered inside the speech bubble, line breaks are intentional. */
-  bubble: {
-    en: ["Talk to your", "child's doctor", "about testing!"],
-    es: ["¡Hable con el", "médico de su hijo", "sobre las pruebas!"],
-  },
-  bubbleLead: {
-    en: "Talk to your child's doctor about testing!",
-    es: "¡Hable con el médico de su hijo sobre las pruebas!",
-  },
   bullets: [
     {
-      en: "For the test, kids take [name] by mouth and are monitored in a doctor's office for about an hour.",
+      en: "For the test, kids take [name] by mouth and are monitored in a doctor\u2019s office for about an hour.",
       es: "Para la prueba, los niños toman [name] por vía oral y se les monitorea en el consultorio médico durante aproximadamente una hora.",
     },
     {
-      en: "Kids can help decide whether they want to take [name] as a liquid or chewable tablet.",
-      es: "Los niños pueden ayudar a decidir si quieren tomar [name] en forma líquida o en tabletas masticables.",
+      en: "Your child can help decide whether they want to take [name] as a liquid or chewable tablet.",
+      es: "Su hijo puede ayudar a decidir si quiere tomar [name] en forma líquida o en tabletas masticables.",
     },
     {
       en: "Fortunately, kids tend to like the way [name] tastes!",
@@ -83,427 +54,405 @@ const COPY = {
   ],
 } as const;
 
-/**
- * Stacked phone layout. Declared once and reused for both the media query and
- * the explicit `variant="mobile"` mode instead of duplicating the rules.
- */
-const mobileLayout = (scope: string) => `
+// ============================================================================
+// Shared Mobile Layout CSS
+// ============================================================================
+const mobileLayoutCSS = (scope: string) => `
   ${scope} {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    min-height: 100% !important;
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 14px 16px 12px 16px !important;
-    gap: 8px !important;
-    box-sizing: border-box !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
+    align-items: flex-start;
+    overflow-y: auto;
+    background-color: #fcfdf3;
   }
   ${scope} .s10-stage {
-    width: 100% !important;
-    max-width: 380px !important;
-    height: auto !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transform: none !important;
-    gap: 10px !important;
-  }
-  ${scope} .s10-body {
     position: static !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    flex: 0 1 auto !important;
-    min-height: 0 !important;
     width: 100% !important;
-    justify-content: center !important;
-    gap: clamp(10px, 1.8vh, 16px) !important;
-  }
-  ${scope} .s10-left {
-    width: 100% !important;
-    max-width: 350px !important;
-    padding: 0 2px !important;
-    justify-content: flex-start !important;
-    gap: clamp(6px, 1vh, 9px) !important;
-  }
-  ${scope} .s10-heading {
-    margin-bottom: 0 !important;
-    font-size: clamp(13px, 1.85vh, 14.5px) !important;
-    line-height: 1.36 !important;
-    font-weight: 500 !important;
-  }
-  ${scope} .s10-heading:focus:not(:focus-visible) {
-    outline: none !important;
-  }
-  ${scope} .s10-subheading {
-    margin-bottom: 0 !important;
-    font-size: clamp(13.5px, 1.95vh, 15.5px) !important;
-    line-height: 1.3 !important;
-    font-weight: 700 !important;
-    color: #1c5249 !important;
-  }
-  ${scope} .s10-bullets {
-    gap: clamp(5px, 0.9vh, 8px) !important;
-    margin: 0 !important;
-  }
-  ${scope} .s10-bullet-item {
-    font-size: clamp(12px, 1.68vh, 13.2px) !important;
-    line-height: 1.33 !important;
-    gap: 8px !important;
-  }
-  ${scope} .s10-bullet-dot {
-    width: 5.5px !important;
-    height: 5.5px !important;
-    margin-top: 6px !important;
-  }
-  ${scope} .s10-right {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    margin: 0 auto !important;
-    gap: 0 !important;
-  }
-  ${scope} .s10-bubble {
-    width: clamp(175px, 50vw, 215px) !important;
-    max-width: 215px !important;
     height: auto !important;
-    aspect-ratio: 520 / 330 !important;
-    margin: 0 auto !important;
-    position: relative !important;
-    left: -10px !important;
-    top: auto !important;
-    filter: drop-shadow(2px 3px 0 #1a3532) !important;
-  }
-  ${scope} .s10-bubble-text {
-    font-size: clamp(11.5px, 1.55vh, 13px) !important;
-    line-height: 1.26 !important;
-  }
-  ${scope} .s10-nurse {
-    width: clamp(68px, 18vw, 88px) !important;
-    height: clamp(92px, 14vh, 128px) !important;
-    max-height: 128px !important;
-    margin-top: -14px !important;
-    margin-left: auto !important;
-    margin-right: 16% !important;
-    z-index: 20 !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    transform: none !important;
     display: flex !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    background-color: transparent !important;
   }
-  ${scope} .s10-nurse-img {
-    height: 100% !important;
-    max-height: 100% !important;
-    width: auto !important;
-    object-fit: contain !important;
-    filter: drop-shadow(0 4px 10px rgba(20, 50, 45, 0.12)) !important;
-  }
-  @media (max-height: 580px) {
-    ${scope} .s10-nurse {
-      height: 76px !important;
-      max-height: 76px !important;
-    }
-    ${scope} .s10-bubble {
-      width: 155px !important;
-      max-width: 155px !important;
-    }
-  }
-  ${scope} .s10-bottom-bar {
+  ${scope} .s10-badge {
+    position: static !important;
     width: 100% !important;
     max-width: 360px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: clamp(8px, 1.5vh, 14px) !important;
-    padding-top: 4px !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 10px 18px !important;
+    border-radius: 9999px !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
-    z-index: 25 !important;
   }
-  ${scope} .s10-audio {
-    order: 1 !important;
+  ${scope} .s10-heading {
+    font-size: 16px !important;
+    white-space: normal !important;
+    text-align: center !important;
+  }
+  ${scope} .s10-left {
     position: static !important;
-    right: auto !important;
-    bottom: auto !important;
     width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
+    max-width: 360px !important;
     margin: 0 auto !important;
-    color: #144e57 !important;
-    z-index: 25 !important;
+    flex-shrink: 0 !important;
   }
-  ${scope} .s10-audio > div {
+  ${scope} .s10-intro {
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 12px !important;
+  }
+  ${scope} .s10-subheading {
+    font-size: 15px !important;
+    line-height: 1.38 !important;
+    margin-bottom: 6px !important;
+  }
+  ${scope} .s10-bullets {
+    padding-left: 8px !important;
+    gap: 6px !important;
+  }
+  ${scope} .s10-bullet-item {
+    font-size: 14.5px !important;
+    line-height: 1.38 !important;
+  }
+  ${scope} .s10-nurse {
+    position: static !important;
+    width: 104px !important;
+    height: 204px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+  ${scope} .s10-bottom-bar {
+    position: static !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
     gap: 8px !important;
+    padding: 4px 0 0 0 !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
   }
-  ${scope} .s10-audio .audio-cc-btn,
-  ${scope} .s10-audio .audio-play-btn {
-    color: #144e57 !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    padding: 4px !important;
-  }
-  ${scope} .s10-audio .audio-cc-btn svg,
-  ${scope} .s10-audio .audio-play-btn svg {
-    height: 34px !important;
-    width: auto !important;
-  }
-  ${scope} .slide-nav {
-    order: 2 !important;
-    position: relative !important;
-    bottom: auto !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
+  ${scope} .s10-audio-controls {
+    position: static !important;
+    order: 1 !important;
     margin: 0 auto !important;
-    gap: 16px !important;
   }
-  ${scope} .slide-nav-btn {
-    min-width: 128px !important;
-    padding: 0 32px !important;
+  ${scope} .s10-nav-center {
+    position: static !important;
+    order: 2 !important;
+    transform: none !important;
+    width: 100% !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
+  }
+  ${scope} .s10-btn-nav {
+    flex: 1 1 0% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  ${scope} .s10-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
   }
 `;
 
+// ============================================================================
+// Styles
+// ============================================================================
 const SLIDE10_CSS = `
-.s10-root,
-.s10-root *,
-.s10-root *::before,
-.s10-root *::after {
-  box-sizing: border-box;
-}
-
-.s10-root {
-  position: relative;
-  display: flex;
-  flex: 1 1 0%;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-  color: #232323;
-  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
-
-/* Bottom padding keeps the content clear of the shared navigation row. */
-.s10-stage {
-  position: relative;
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  width: ${STAGE_W}px;
-  height: ${STAGE_H}px;
-  padding: 28px 30px 60px;
-  transform-origin: center center;
-  overflow: hidden;
-}
-
-.s10-body {
-  position: relative;
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: 22px;
-  min-height: 0;
-}
-
-/* 1. Left information column */
-.s10-left {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-
-.s10-heading {
-  margin: 0 0 14px;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.38;
-  letter-spacing: -0.01em;
-  color: #232323;
-  text-align: left;
-  outline: none;
-}
-
-.s10-heading:focus-visible {
-  outline: 2px dashed #143833;
-  outline-offset: 4px;
-  border-radius: 4px;
-}
-
-.s10-subheading {
-  margin: 0 0 16px;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.32;
-  letter-spacing: -0.01em;
-  color: #232323;
-  text-align: left;
-}
-
-.s10-bullets {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.s10-bullet-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin: 0;
-  color: #232323;
-  font-size: 18.5px;
-  font-weight: 500;
-  line-height: 1.38;
-  letter-spacing: -0.01em;
-  text-align: left;
-}
-
-.s10-bullet-dot {
-  flex-shrink: 0;
-  width: 6.5px;
-  height: 6.5px;
-  margin-top: 9px;
-  border-radius: 50%;
-  background-color: #236f7a;
-}
-
-/* 2. Right column: speech bubble with Nurse Anna below it */
-.s10-right {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  align-items: center;
-  width: 236px;
-}
-
-.s10-bubble {
-  position: relative;
-  width: 236px;
-  height: 160px;
-  flex-shrink: 0;
-  filter: drop-shadow(3px 4px 0 #1a3532);
-  pointer-events: none;
-}
-
-.s10-bubble-svg {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.s10-bubble-text-wrap {
-  position: absolute;
-  top: 44%;
-  left: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 84%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.s10-bubble-text {
-  margin: 0;
-  color: #232323;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  text-align: center;
-}
-
-/* Nurse Anna fills whatever height is left after the bubble */
-.s10-nurse {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: flex-end;
-  justify-content: center;
-  width: 118px;
-  min-height: 0;
-  margin-top: -6px;
-  pointer-events: none;
-}
-
-.s10-nurse-img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  user-select: none;
-  -webkit-user-drag: none;
-  filter: drop-shadow(0 4px 12px rgba(20, 50, 45, 0.12));
-}
-
-/* Wrapper collapses on desktop so audio + nav keep independent absolute positioning */
-.s10-bottom-bar {
-  display: contents;
-}
-
-/* 3. Audio controls — bottom-right on desktop, centered above nav on mobile */
-.s10-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
-}
-
-@media (max-width: 767px) {
-${mobileLayout(".s10-root:not(.is-desktop)")}
-  .s10-root:not(.is-desktop) {
-    min-height: min(640px, calc(100dvh - 80px)) !important;
-    max-height: calc(100dvh - 72px) !important;
+  .s10-sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important; border: 0 !important;
   }
-}
+  .s10-root button:focus-visible,
+  .s10-root [tabindex="0"]:focus-visible {
+    outline: 3px solid #143833 !important;
+    outline-offset: 3px !important;
+  }
+  .s10-heading:focus, .s10-heading:focus-visible { outline: none !important; }
 
-${mobileLayout(".s10-root.is-mobile")}
-
-@media (prefers-reduced-motion: reduce) {
+  .s10-root,
   .s10-root *,
   .s10-root *::before,
   .s10-root *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
+    box-sizing: border-box;
   }
-}
+
+  /* ---- Root ---- */
+  .s10-root {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: transparent;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    color: #1d2423;
+  }
+
+  /* ---- Scale-locked desktop stage ---- */
+  .s10-stage {
+    position: relative;
+    width: ${STAGE_W}px;
+    height: ${STAGE_H}px;
+    flex: none;
+    transform-origin: center center;
+    background-color: transparent;
+    overflow: hidden;
+  }
+
+  /* ---- 1. Yellow Pill Banner — top-left ---- */
+  .s10-badge {
+    position: absolute;
+    left: 60px;
+    top: 48px;
+    min-width: 495px;
+    height: 58px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 28px;
+    background-color: #feff9f;
+    border: 2px solid #2b7a85;
+    border-radius: 9999px;
+    box-shadow: 0 3px 6px rgba(35, 111, 122, 0.22);
+    z-index: 6;
+  }
+  .s10-heading {
+    margin: 0;
+    padding: 0;
+    font-size: 21.5px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #1a1f1e;
+    white-space: nowrap;
+    outline: none;
+  }
+
+  /* ---- 2. Left Information Column ---- */
+  .s10-left {
+    position: absolute;
+    left: 60px;
+    top: 136px;
+    width: 494px;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+  }
+  .s10-intro {
+    margin: 0 0 20px 0;
+    font-size: 19.5px;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1d2423;
+    text-align: left;
+  }
+  .s10-subheading {
+    margin: 0 0 6px 0;
+    font-size: 19.5px;
+    line-height: 1.38;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #1d2423;
+    text-align: left;
+  }
+  .s10-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+    padding: 0 0 0 14px;
+    list-style: none;
+  }
+  .s10-bullet-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0;
+    color: #1d2423;
+    font-size: 18.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    text-align: left;
+  }
+  .s10-bullet-dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    margin-top: 10px;
+    border-radius: 50%;
+    background-color: #1d2423;
+  }
+
+  /* ---- 3. Nurse Anna — right side gesturing toward bullets ---- */
+  .s10-nurse {
+    position: absolute;
+    left: 568px;
+    top: 162px;
+    width: 142px;
+    height: 278px;
+    pointer-events: none;
+    z-index: 5;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .s10-nurse-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+  }
+
+  /* ---- 4. Bottom Bar (matches Slides 2–8 pixel-for-pixel) ---- */
+  .s10-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 0 24px;
+  }
+
+  .s10-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 54px;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+  .s10-btn-nav {
+    border-radius: 9999px;
+    font-weight: 600;
+    border: 1.6px solid #3c7c87;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    min-width: 74px;
+    font-size: 15px;
+    padding: 0 20px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+    font-family: inherit;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .s10-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
+  .s10-btn-nav:active:not(:disabled) { transform: translateY(1px); }
+  .s10-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  .s10-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s10-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
+  .s10-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s10-btn-next:hover:not(:disabled) { background-color: #f2f380; }
+
+  /* Audio controls — bottom-right */
+  .s10-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2b7a85;
+  }
+  .s10-audio-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #2b7a85;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+    font-family: inherit;
+  }
+  .s10-audio-btn:hover { transform: scale(1.08); opacity: 0.85; }
+
+  /* Closed Captions Panel */
+  .s10-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    background: #143833;
+    color: #fff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    z-index: 30;
+  }
+  .s10-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .s10-captions-text { font-size: 13.5px; line-height: 1.4; margin: 0; font-weight: 500; color: #fff; }
+
+  /* ================================================================
+     MOBILE LAYOUT  (is-mobile class  OR  ≤767px viewport)
+     ================================================================ */
+  @media (max-width: 767px) {
+    ${mobileLayoutCSS(".s10-root:not(.is-desktop)")}
+  }
+  ${mobileLayoutCSS(".s10-root.is-mobile")}
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 `;
 
+// ============================================================================
+// Main Component: Slide10TestingOverviewScreen (Slide 9 in flow)
+// ============================================================================
 export function Slide10TestingOverviewScreen({
   isSpanish = false,
   medicationName,
@@ -518,57 +467,152 @@ export function Slide10TestingOverviewScreen({
 }: Slide10TestingOverviewScreenProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const [scale, setScale] = useState(1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [scale, setScale] = useState<number>(1);
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [showCaptions, setShowCaptions] = useState<boolean>(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState<string>("");
 
   const isEs = (locale ?? "").startsWith("es") || isSpanish;
   const activeLocale = isEs ? "es" : "en";
   const medName = medicationName?.trim();
   const resolve = (value: string) => resolveMedicineToken(value, medName, isEs);
 
-  // WCAG 2.4.3 — move reading order to the new heading.
+  const isMobile = variant === "mobile";
+  const isDesktop = variant === "desktop";
+  const variantClass = isMobile ? " is-mobile" : isDesktop ? " is-desktop" : "";
+
+  // Focus heading on mount (WCAG 2.4.3)
   useEffect(() => {
-    const frame = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
+    const frame = requestAnimationFrame(() =>
+      headingRef.current?.focus({ preventScroll: true })
+    );
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Fit the fixed stage into the available frame without distorting it.
+  // Scale-locked stage — proportionally fills desktop tablet frame
   useEffect(() => {
     const el = rootRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
 
     const update = () => {
-      if (variant === "mobile" || window.innerWidth < 768) {
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
         setScale(1);
         return;
       }
       const { clientWidth: w, clientHeight: h } = el;
       if (!w || !h) return;
-      setScale(Math.min((w - 24) / STAGE_W, (h - 24) / STAGE_H, 1));
+      const safeW = Math.max(0, w - 8);
+      const safeH = Math.max(0, h - 8);
+      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
     update();
     const observer = new ResizeObserver(update);
     observer.observe(el);
-    return () => observer.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, [variant]);
 
+  // Escape dismisses captions (WCAG 1.4.13)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        setShowCaptions(false);
+        setLiveAnnouncement(isEs ? "Subtítulos ocultados" : "Closed captions dismissed");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCaptions, isEs]);
+
+  const bannerText = COPY.banner[activeLocale];
   const introText = resolve(COPY.intro[activeLocale]);
   const subtitleText = resolve(COPY.subtitle[activeLocale]);
   const bullets = COPY.bullets.map((bullet) => resolve(bullet[activeLocale]));
 
-  const spokenText =
-    transcriptText ||
-    `${COPY.bubbleLead[activeLocale]} ${introText} ${subtitleText}. ${bullets.join(" ")}`;
+  const effectiveTranscript =
+    transcriptText || `${bannerText} ${introText} ${subtitleText}. ${bullets.join(" ")}`;
 
-  // `screen4_testing_*` exists for both locales; `slide10_testing_es.mp3` does not.
   const effectiveAudioSrc =
     audioSrc ||
-    (isEs
-      ? "/audio/exported/screen4_testing_es.mp3"
-      : "/audio/exported/screen4_testing_en.mp3");
+    (isEs ? "/audio/exported/screen4_testing_es.mp3" : "/audio/exported/screen4_testing_en.mp3");
 
-  const variantClass =
-    variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
+  // Sync audio element events & clean up on unmount / step change
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
+
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setLiveAnnouncement(
+      willPlay
+        ? isEs ? "Reproduciendo narración de audio" : "Audio narration playing"
+        : isEs ? "Narración de audio pausada" : "Audio narration paused"
+    );
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+            utt.lang = isEs ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+        utt.lang = isEs ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+    }
+  };
+
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setLiveAnnouncement(
+      next
+        ? isEs ? "Subtítulos mostrados" : "Closed captions displayed"
+        : isEs ? "Subtítulos ocultados" : "Closed captions hidden"
+    );
+  };
 
   return (
     <div
@@ -582,92 +626,221 @@ export function Slide10TestingOverviewScreen({
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE10_CSS }} />
 
-      <div className="s10-stage" style={{ transform: `scale(${scale})` }}>
-        <div className="s10-body">
-          {/* 1. Left information column */}
-          <div className="s10-left">
-            <h1 id="s10-heading" ref={headingRef} tabIndex={-1} className="s10-heading">
-              {introText}
-            </h1>
-
-            <h2 className="s10-subheading">{subtitleText}</h2>
-
-            <ul className="s10-bullets" role="list">
-              {bullets.map((text, idx) => (
-                <li key={idx} className="s10-bullet-item">
-                  <span className="s10-bullet-dot" aria-hidden="true" />
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* 2. Speech bubble with Nurse Anna below */}
-          <div className="s10-right">
-            <div
-              className="s10-bubble"
-              role="note"
-              aria-label={isEs ? "Consejo de la enfermera Anna" : "Nurse Anna's advice"}
-            >
-              <svg className="s10-bubble-svg" viewBox="0 0 520 330" fill="none" aria-hidden="true" focusable="false">
-                <defs>
-                  <pattern id="s10-bubble-dots" width="18" height="18" patternUnits="userSpaceOnUse">
-                    <circle cx="9" cy="9" r="0.8" fill="#cadada" opacity="0.65" />
-                  </pattern>
-                </defs>
-                <path d={BUBBLE_PATH} fill="#ffffff" />
-                <path d={BUBBLE_PATH} fill="url(#s10-bubble-dots)" />
-                <path
-                  d={BUBBLE_PATH}
-                  fill="none"
-                  stroke="#94bbb9"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-
-              <div className="s10-bubble-text-wrap">
-                <p className="s10-bubble-text">
-                  {COPY.bubble[activeLocale].map((line, idx) => (
-                    <span key={idx}>
-                      {idx > 0 && <br />}
-                      {line}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            </div>
-
-            <div className="s10-nurse" aria-hidden="true">
-              <img
-                src="/images/nurse-anna.png"
-                alt=""
-                className="s10-nurse-img"
-                draggable={false}
-              />
-            </div>
-          </div>
-        </div>
+      {/* Screen Reader Live Region */}
+      <div className="s10-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
       </div>
 
-      <div className="s10-bottom-bar">
-        <div className="s10-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId}
-            locale={activeLocale}
-            transcriptText={spokenText}
-            size="large"
+      {/* Hidden HTML5 Audio */}
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s10-sr-only"
+        aria-hidden="true"
+      />
+
+      {/* ── Scale-locked desktop stage ── */}
+      <div
+        className="s10-stage"
+        style={!isMobile ? { transform: `scale(${scale})` } : undefined}
+      >
+        {/* 1. Yellow Pill Banner — top-left */}
+        <div className="s10-badge">
+          <h1 id="s10-heading" ref={headingRef} tabIndex={-1} className="s10-heading">
+            {bannerText}
+          </h1>
+        </div>
+
+        {/* 2. Left Information Column */}
+        <div className="s10-left">
+          <p className="s10-intro">{introText}</p>
+          <h2 className="s10-subheading">{subtitleText}</h2>
+
+          <ul className="s10-bullets" role="list">
+            {bullets.map((text, idx) => (
+              <li key={idx} className="s10-bullet-item">
+                <span className="s10-bullet-dot" aria-hidden="true" />
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 3. Nurse Anna — right side */}
+        <div className="s10-nurse" aria-hidden="true">
+          <img
+            src="/images/nurse-anna-s9.png"
+            alt=""
+            className="s10-nurse-img"
+            draggable={false}
           />
         </div>
 
-        <SlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
-        />
+        {/* Closed Captions Panel */}
+        {showCaptions && (
+          <div
+            className="s10-captions-panel"
+            role="region"
+            aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
+          >
+            <span className="s10-captions-tag" aria-hidden="true">CC</span>
+            <p className="s10-captions-text">{effectiveTranscript}</p>
+          </div>
+        )}
+
+        {/* 4. Bottom Navigation & Audio Controls */}
+        <footer
+          className="s10-bottom-bar"
+          role="toolbar"
+          aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
+        >
+          <nav className="s10-nav-center" aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}>
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={loading}
+              className="s10-btn-nav s10-btn-back"
+              aria-label={isEs ? "Ir a la diapositiva anterior" : "Go to previous slide"}
+            >
+              {isEs ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={loading}
+              className="s10-btn-nav s10-btn-next"
+              aria-label={isEs ? "Ir a la siguiente diapositiva" : "Go to next slide"}
+            >
+              {loading ? "..." : isEs ? "Siguiente" : "Next"}
+            </button>
+          </nav>
+
+          <div className="s10-audio-controls">
+            <button
+              type="button"
+              className="s10-audio-btn"
+              onClick={toggleCaptions}
+              aria-pressed={showCaptions}
+              aria-label={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+              title={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+            >
+              <svg
+                width="44"
+                height="40"
+                viewBox="0 0 40 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text
+                  x="20"
+                  y="15.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"}
+                  fontSize="13"
+                  fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                  letterSpacing="0.3px"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="s10-audio-btn"
+              onClick={toggleAudio}
+              aria-pressed={audioPlaying}
+              aria-label={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+              title={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+            >
+              {audioPlaying ? (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <text
+                    x="14.8"
+                    y="17.2"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="currentColor"
+                    fontSize="8"
+                    fontWeight="700"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    letterSpacing="0.1px"
+                  >
+                    play
+                  </text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );
