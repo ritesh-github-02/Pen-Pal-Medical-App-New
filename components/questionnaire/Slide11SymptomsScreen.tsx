@@ -876,8 +876,7 @@ export function Slide11SymptomsScreen({
                <button onClick={() => toggleSwellingDetail("Unsure")} className={`px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeSwellingDetails.includes("Unsure") ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
                   {isSpanish ? "No estoy seguro/No lo sé" : "Unsure/I don't know"}
                </button>
-             </div>
-             
+             </div>           
              <div className="flex items-center gap-3 mt-2">
                <label className="text-sm font-semibold text-[#142724] whitespace-nowrap">
                  {isSpanish ? "Otro: Describa" : "Other: Please describe"}
