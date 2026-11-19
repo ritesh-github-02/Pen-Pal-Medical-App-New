@@ -20,16 +20,11 @@ export interface Slide1IntroScreenProps {
   variant?: "auto" | "desktop" | "mobile";
 }
 
-/** Fixed design canvas dimensions (standard across PenPal slides) */
+/** Fixed design canvas dimensions */
 const STAGE_W = 760;
 const STAGE_H = 480;
 
 const SLIDE1_COMPONENT_CSS = `
-  /* ------------------------------------------------------------
-     Slide 1: WCAG 2.1/2.2 Level AAA, WAVE & Karen Accessibility Rules
-     Pixel-perfect Figma matching with scale-locked vector stage
-     ------------------------------------------------------------ */
-
   .s1-root,
   .s1-root *,
   .s1-root *::before,
@@ -91,7 +86,7 @@ const SLIDE1_COMPONENT_CSS = `
     left: 44px;
     top: 0;
     bottom: 0;
-    width: 440px;
+    width: 460px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -99,59 +94,55 @@ const SLIDE1_COMPONENT_CSS = `
     z-index: 10;
   }
 
-  /* Title: Large golden-yellow text with dark teal stroke & 3D shadow (NEVER WRAPS) */
   .s1-title {
-    font-size: 52px;
+    font-size: 76px; /* Massive, bold Figma title */
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.02em;
     white-space: nowrap !important;
-    margin: 0 0 8px 0;
+    margin: 0 0 12px 0;
     padding: 0;
-    color: #ebb016;
+    color: #facc15; /* Exact Figma Yellow */
     font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
-    -webkit-text-stroke: 1.8px #12403d;
+    -webkit-text-stroke: 2px #12403d; /* Thicker stroke */
     paint-order: stroke fill;
-    text-shadow: 0 2.5px 0 #12403d, 0 3px 2px rgba(18, 64, 61, 0.3);
+    text-shadow: 0 4px 0 #12403d, 0 5px 4px rgba(18, 64, 61, 0.3); /* Harder drop shadow */
   }
 
-  /* Subtitle: Clean dark teal heading (NEVER WRAPS ON STAGE) */
   .s1-subtitle {
-    font-size: 19px;
-    font-weight: 700;
+    font-size: 26px; /* Increased from 19px */
+    font-weight: 600;
     line-height: 1.3;
     color: #12403d;
     white-space: nowrap;
-    margin: 0 0 26px 0;
+    margin: 0 0 24px 0;
     letter-spacing: -0.01em;
     font-family: inherit;
   }
 
-  /* Body copy: 2 lines matching Figma */
   .s1-copy {
-    font-size: 16.5px;
+    font-size: 22px; /* Increased for readability */
     font-weight: 500;
-    line-height: 1.45;
+    line-height: 1.5;
     color: #12403d;
-    max-width: 420px;
-    margin: 0 0 32px 0;
+    max-width: 460px;
+    margin: 0 0 36px 0;
   }
 
-  /* "Get Started!" Action Button — exact Figma pill styling */
   .s1-btn-start {
-    min-height: 44px;
-    height: 44px;
-    min-width: 140px;
+    min-height: 56px;
+    height: 56px;
+    min-width: 170px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background-color: #fff9e6;
-    color: #12403d;
-    border: 1.8px solid #d4b84b;
+    background-color: #fdfce8; /* Light cream */
+    color: #12403d; /* Dark teal text */
+    border: 2px solid #12403d; /* Dark teal border, matching Figma */
     font-weight: 700;
-    font-size: 15.5px;
-    padding: 0 26px;
+    font-size: 20px;
+    padding: 0 36px;
     box-shadow: 0 2px 4px rgba(18, 64, 61, 0.1);
     transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
     cursor: pointer;
@@ -159,7 +150,7 @@ const SLIDE1_COMPONENT_CSS = `
     font-family: inherit;
   }
   .s1-btn-start:hover:not(:disabled) {
-    background-color: #faecc0;
+    background-color: #f2f0cc;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(18, 64, 61, 0.16);
   }
@@ -177,13 +168,12 @@ const SLIDE1_COMPONENT_CSS = `
     box-shadow: none;
   }
 
-  /* Right column: Nurse Anna full illustration (properly sized, NEVER clipped) */
   .s1-nurse-col {
     position: absolute;
-    right: 48px;
-    top: 26px;
-    bottom: 80px;
-    width: 230px;
+    right: 20px;
+    top: 20px;
+    bottom: 60px;
+    width: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,7 +182,7 @@ const SLIDE1_COMPONENT_CSS = `
   }
 
   .s1-nurse-img {
-    max-height: 330px;
+    max-height: 400px;
     max-width: 100%;
     width: auto;
     height: auto;
@@ -200,22 +190,21 @@ const SLIDE1_COMPONENT_CSS = `
     filter: drop-shadow(0 4px 10px rgba(18, 64, 61, 0.12));
   }
 
-  /* Desktop audio controls — anchored in the stage bottom-right */
   .s1-audio-desktop {
     position: absolute;
-    right: 48px;
-    bottom: 24px;
+    right: 32px;
+    bottom: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
     z-index: 30;
-    color: #144e57;
+    color: #12403d;
   }
   .s1-audio-desktop button {
     background: transparent !important;
     border: none !important;
     cursor: pointer !important;
-    color: #144e57 !important;
+    color: #12403d !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -238,15 +227,15 @@ const SLIDE1_COMPONENT_CSS = `
       overflow-y: auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
-      height: 100% !important;
-      min-height: clamp(560px, calc(100dvh - 120px), 720px) !important;
-      padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+      height: 100dvh !important;
+      min-height: 100% !important;
+      padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px)) 20px !important;
       background-color: #fcfdf3 !important;
     }
     .s1-root:not(.is-desktop) .s1-stage {
       position: relative !important;
       width: 100% !important;
-      max-width: 380px !important;
+      max-width: 440px !important;
       height: auto !important;
       min-height: 100% !important;
       transform: none !important;
@@ -254,7 +243,7 @@ const SLIDE1_COMPONENT_CSS = `
       flex-direction: column !important;
       justify-content: center !important;
       align-items: center !important;
-      gap: 8px !important;
+      gap: 12px !important;
       padding: 6px 0 !important;
     }
     .s1-root:not(.is-desktop) .s1-left-col {
@@ -262,18 +251,18 @@ const SLIDE1_COMPONENT_CSS = `
     }
     .s1-root:not(.is-desktop) .s1-title {
       order: 1 !important;
-      font-size: clamp(34px, 9.5vw, 44px) !important;
+      font-size: clamp(48px, 13vw, 64px) !important;
       line-height: 1 !important;
-      margin: 0 0 2px 0 !important;
+      margin: 0 0 4px 0 !important;
       text-align: center !important;
       white-space: nowrap !important;
     }
     .s1-root:not(.is-desktop) .s1-subtitle {
       order: 2 !important;
-      font-size: clamp(14px, 4vw, 16px) !important;
+      font-size: clamp(18px, 4.5vw, 22px) !important;
       text-align: center !important;
       white-space: normal !important;
-      margin: 0 0 6px 0 !important;
+      margin: 0 0 8px 0 !important;
       max-width: 360px !important;
     }
     .s1-root:not(.is-desktop) .s1-nurse-col {
@@ -283,19 +272,19 @@ const SLIDE1_COMPONENT_CSS = `
       bottom: auto !important;
       width: 100% !important;
       order: 3 !important;
-      margin: 4px auto 8px auto !important;
+      margin: 8px auto 12px auto !important;
       padding: 0 !important;
     }
     .s1-root:not(.is-desktop) .s1-nurse-img {
-      max-height: clamp(140px, 22vh, 185px) !important;
+      max-height: clamp(160px, 25vh, 220px) !important;
     }
     .s1-root:not(.is-desktop) .s1-copy {
       order: 4 !important;
-      font-size: clamp(13.5px, 3.6vw, 15px) !important;
-      line-height: 1.4 !important;
+      font-size: clamp(16px, 4.2vw, 18px) !important;
+      line-height: 1.5 !important;
       text-align: center !important;
-      margin: 0 0 6px 0 !important;
-      max-width: 330px !important;
+      margin: 0 0 16px 0 !important;
+      max-width: 360px !important;
     }
     .s1-root:not(.is-desktop) .s1-left-col .s1-btn-start {
       display: none !important;
@@ -311,7 +300,7 @@ const SLIDE1_COMPONENT_CSS = `
       justify-content: center !important;
       width: 100% !important;
       max-width: 340px !important;
-      gap: 10px !important;
+      gap: 16px !important;
       margin: 0 auto !important;
       flex-shrink: 0 !important;
     }
@@ -320,12 +309,12 @@ const SLIDE1_COMPONENT_CSS = `
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      color: #144e57 !important;
+      color: #12403d !important;
     }
     .s1-root:not(.is-desktop) .s1-mobile-nav .s1-btn-start {
-      min-width: 200px !important;
-      height: 48px !important;
-      font-size: 16px !important;
+      min-width: 220px !important;
+      height: 52px !important;
+      font-size: 18px !important;
       font-weight: 700 !important;
     }
   }
@@ -335,15 +324,15 @@ const SLIDE1_COMPONENT_CSS = `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: 100% !important;
-    min-height: clamp(560px, calc(100dvh - 120px), 720px) !important;
-    padding: 12px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    height: 100dvh !important;
+    min-height: 100% !important;
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px)) 20px !important;
     background-color: #fcfdf3 !important;
   }
   .s1-root.is-mobile .s1-stage {
     position: relative !important;
     width: 100% !important;
-    max-width: 380px !important;
+    max-width: 440px !important;
     height: auto !important;
     min-height: 100% !important;
     transform: none !important;
@@ -351,7 +340,7 @@ const SLIDE1_COMPONENT_CSS = `
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 12px !important;
     padding: 6px 0 !important;
   }
   .s1-root.is-mobile .s1-left-col {
@@ -359,18 +348,18 @@ const SLIDE1_COMPONENT_CSS = `
   }
   .s1-root.is-mobile .s1-title {
     order: 1 !important;
-    font-size: clamp(34px, 9.5vw, 44px) !important;
+    font-size: clamp(48px, 13vw, 64px) !important;
     line-height: 1 !important;
-    margin: 0 0 2px 0 !important;
+    margin: 0 0 4px 0 !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
   .s1-root.is-mobile .s1-subtitle {
     order: 2 !important;
-    font-size: clamp(14px, 4vw, 16px) !important;
+    font-size: clamp(18px, 4.5vw, 22px) !important;
     text-align: center !important;
     white-space: normal !important;
-    margin: 0 0 6px 0 !important;
+    margin: 0 0 8px 0 !important;
     max-width: 360px !important;
   }
   .s1-root.is-mobile .s1-nurse-col {
@@ -380,19 +369,19 @@ const SLIDE1_COMPONENT_CSS = `
     bottom: auto !important;
     width: 100% !important;
     order: 3 !important;
-    margin: 4px auto 8px auto !important;
+    margin: 8px auto 12px auto !important;
     padding: 0 !important;
   }
   .s1-root.is-mobile .s1-nurse-img {
-    max-height: clamp(140px, 22vh, 185px) !important;
+    max-height: clamp(160px, 25vh, 220px) !important;
   }
   .s1-root.is-mobile .s1-copy {
     order: 4 !important;
-    font-size: clamp(13.5px, 3.6vw, 15px) !important;
-    line-height: 1.4 !important;
+    font-size: clamp(16px, 4.2vw, 18px) !important;
+    line-height: 1.5 !important;
     text-align: center !important;
-    margin: 0 0 6px 0 !important;
-    max-width: 330px !important;
+    margin: 0 0 16px 0 !important;
+    max-width: 360px !important;
   }
   .s1-root.is-mobile .s1-left-col .s1-btn-start {
     display: none !important;
@@ -408,7 +397,7 @@ const SLIDE1_COMPONENT_CSS = `
     justify-content: center !important;
     width: 100% !important;
     max-width: 340px !important;
-    gap: 10px !important;
+    gap: 16px !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
   }
@@ -417,12 +406,12 @@ const SLIDE1_COMPONENT_CSS = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: #144e57 !important;
+    color: #12403d !important;
   }
   .s1-root.is-mobile .s1-mobile-nav .s1-btn-start {
-    min-width: 200px !important;
-    height: 48px !important;
-    font-size: 16px !important;
+    min-width: 220px !important;
+    height: 52px !important;
+    font-size: 18px !important;
     font-weight: 700 !important;
   }
 
@@ -459,7 +448,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
 
-  // WCAG 2.4.3 Focus Order: Move reading focus to heading on mount
   useEffect(() => {
     if (autoFocusHeading) {
       headingRef.current?.focus({ preventScroll: true });
@@ -478,10 +466,11 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       }
       const { clientWidth: w, clientHeight: h } = el;
       if (!w || !h) return;
-      // Allow 16px safety margins
-      const safeW = Math.max(0, w - 16);
-      const safeH = Math.max(0, h - 16);
-      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H, 1));
+      const safeW = Math.max(0, w - 32);
+      const safeH = Math.max(0, h - 32);
+      
+      // Scales up perfectly on large screens (No cap)
+      setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
     update();
@@ -506,7 +495,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
       ? "¡Hola! Soy la enfermera Anna. Hablemos sobre las alergias a la penicilina en los niños."
       : "Hi! I'm nurse Anna. Let's talk about penicillin allergies in kids.");
 
-  // Clean trailing "Get started." / "¡Comenzar!" from the displayed text so it matches Figma
   const mainCopy = rawCopy.replace(/\s*(Get started\.?|¡Comenzar!?)\s*$/i, "").trim();
 
   const effectiveAudioSrc =
@@ -530,7 +518,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
   const variantClass =
     variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
 
-  // Figma multi-stop gradient background on desktop
   const desktopGradient = `
     radial-gradient(circle at 12% 16%, #a1aef2 0%, rgba(161, 174, 242, 0) 55%),
     radial-gradient(circle at 10% 70%, #8be6eb 0%, rgba(139, 230, 235, 0) 50%),
@@ -564,9 +551,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
     >
       <style dangerouslySetInnerHTML={{ __html: SLIDE1_COMPONENT_CSS }} />
 
-      {/* Scaled design stage — locked aspect ratio & exact vector layout on desktop */}
       <div className="s1-stage" style={{ transform: `scale(${scale})` }}>
-        {/* Left column: Heading, Subtitle, Copy, and CTA Button */}
         <div className="s1-left-col">
           <h1
             id="slide1-primary-heading"
@@ -581,7 +566,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
           <p className="s1-copy">{mainCopy}</p>
 
-          {/* Desktop "Get Started!" Action Button */}
           <button
             type="button"
             onClick={handleStart}
@@ -593,7 +577,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
           </button>
         </div>
 
-        {/* Right column: Nurse Anna (properly sized to fit comfortably with no clipping) */}
         <div className="s1-nurse-col">
           <img
             src="/images/nurse-anna-s1.png"
@@ -607,7 +590,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
           />
         </div>
 
-        {/* Desktop Audio narration & CC controls — perfectly anchored at bottom-right */}
         <footer
           className="s1-audio-desktop"
           role="toolbar"
@@ -626,7 +608,6 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
           />
         </footer>
 
-        {/* Mobile Toolbar: Audio controls on top, Get Started button below */}
         <div className="s1-mobile-nav z-30">
           <div className="s1-audio-wrapper">
             <AudioPlayer
@@ -654,3 +635,5 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 });
 
 export default Slide1IntroScreen;
+
+
