@@ -672,7 +672,7 @@ export function Slide8MilestoneScreen({
         {/* 2. Nurse Anna on Right holding bottle */}
         <div className="s8-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s7.png"
+            src="/images/nurse-anna-s7.png?v=3"
             alt=""
             className="s8-nurse-img"
             draggable={false}

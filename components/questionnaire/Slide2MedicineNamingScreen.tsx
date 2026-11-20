@@ -666,7 +666,7 @@ export function Slide2MedicineNamingScreen({
         <div className="s2-middle-row">
           <div className="s2-nurse-wrap" aria-hidden="true">
             <img
-              src="/images/nurse-anna-s2.png"
+              src="/images/nurse-anna-s2.png?v=3"
               alt=""
               className="s2-nurse-img"
               draggable={false}

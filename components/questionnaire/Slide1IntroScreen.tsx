@@ -579,7 +579,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
         <div className="s1-nurse-col">
           <img
-            src="/images/nurse-anna-s1.png"
+            src="/images/nurse-anna-s1.png?v=3"
             alt={
               isSpanish
                 ? "Ilustración de la enfermera Anna sonriendo"

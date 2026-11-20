@@ -211,10 +211,10 @@ const SLIDE4_CSS = `
   /* ---- 1. Nurse Anna standing on Left gesturing toward bubble ---- */
   .s4-nurse {
     position: absolute;
-    left: 51px;
-    top: 179px;
-    width: 141px;
-    height: 281px;
+    left: 104px;
+    top: 172px;
+    width: 140px;
+    height: 284px;
     pointer-events: none;
     z-index: 5;
     display: flex;
@@ -600,7 +600,7 @@ export function Slide4AllergyBarrierScreen({
         {/* 1. Nurse Anna standing on Left gesturing toward bubble */}
         <div className="s4-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s4.png"
+            src="/images/nurse-anna-s4.png?v=3"
             alt=""
             className="s4-nurse-img"
             draggable={false}

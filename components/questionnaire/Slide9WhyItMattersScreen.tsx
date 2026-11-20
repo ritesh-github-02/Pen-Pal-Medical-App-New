@@ -641,7 +641,7 @@ export function Slide9WhyItMattersScreen({
         {/* 2. Nurse Anna — left side gesturing toward text */}
         <div className="s9-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s2.png"
+            src="/images/nurse-anna-s2.png?v=3"
             alt=""
             className="s9-nurse-img"
             draggable={false}

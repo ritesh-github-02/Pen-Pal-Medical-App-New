@@ -47,7 +47,6 @@ const SLIDE11_CSS = `
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #fafdf3;
   border-radius: 24px;
   padding: 2.5rem 3rem 5rem 3rem; /* Adjusted padding for base stage */
   overflow: hidden;

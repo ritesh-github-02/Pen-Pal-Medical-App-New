@@ -670,7 +670,7 @@ export function Slide10TestingOverviewScreen({
         {/* 3. Nurse Anna — right side */}
         <div className="s10-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s9.png"
+            src="/images/nurse-anna.png?v=3"
             alt=""
             className="s10-nurse-img"
             draggable={false}

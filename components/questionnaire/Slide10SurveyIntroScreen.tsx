@@ -593,7 +593,7 @@ export function Slide10SurveyIntroScreen({
         {/* 1. Nurse Anna on Left gesturing right toward bubble */}
         <div className="s10b-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s2.png"
+            src="/images/nurse-anna-s2.png?v=3"
             alt=""
             className="s10b-nurse-img"
             draggable={false}

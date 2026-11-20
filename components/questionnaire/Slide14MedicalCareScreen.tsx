@@ -258,8 +258,8 @@ const SLIDE14_CSS = `
     position: absolute;
     left: 576px;
     top: 134px;
-    width: 106px;
-    height: 274px;
+    width: 169px;
+    height: 271px;
     pointer-events: none;
     z-index: 6;
     display: flex;
@@ -757,7 +757,7 @@ export function Slide14MedicalCareScreen({
         </div>
 
         <div className="s14-nurse" aria-hidden="true">
-          <img src="/images/nurse-anna-s14.png" alt="" className="s14-nurse-img" draggable={false} />
+          <img src="/images/nurse-anna-s14.png?v=5" alt="" className="s14-nurse-img" draggable={false} />
         </div>
 
         {showCaptions && (

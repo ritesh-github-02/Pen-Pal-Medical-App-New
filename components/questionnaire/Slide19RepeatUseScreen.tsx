@@ -771,7 +771,7 @@ export function Slide19RepeatUseScreen({
         {/* 3. Nurse Anna (Right, Pointing Left) */}
         <div className="s19-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s16.png"
+            src="/images/nurse-anna-s16.png?v=6"
             alt=""
             draggable={false}
           />

@@ -121,7 +121,7 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s16-nurse {
     position: static !important;
-    width: 82px !important;
+    width: 90px !important;
     height: 210px !important;
     margin: 0 auto !important;
   }
@@ -294,9 +294,9 @@ const SLIDE16_CSS = `
   /* ---- 3. Nurse Anna (Right, Hands Clasped) ---- */
   .s16-nurse {
     position: absolute;
-    left: 562px;
+    left: 560px;
     top: 128px;
-    width: 106px;
+    width: 120px;
     height: 282px;
     z-index: 6;
     user-select: none;
@@ -843,7 +843,7 @@ export function Slide16ResolutionScreen({
         {/* 3. Nurse Anna (Right, Hands Clasped) */}
         <div className="s16-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s15.png"
+            src="/images/nurse-anna-s15.png?v=6"
             alt=""
             draggable={false}
           />

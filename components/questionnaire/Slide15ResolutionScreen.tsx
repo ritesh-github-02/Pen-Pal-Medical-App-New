@@ -1355,7 +1355,7 @@ export function Slide15ResolutionScreen({
         {/* Nurse Anna on the right (Strictly Decorative Slide 2+) */}
         <div className="s15-nurse-wrap" aria-hidden="true">
           <img
-            src="/images/nurse-anna.png"
+            src="/images/nurse-anna-s15.png?v=6"
             alt=""
             draggable={false}
             className="s15-nurse-img"
