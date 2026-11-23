@@ -173,7 +173,7 @@ const SLIDE1_COMPONENT_CSS = `
     right: 20px;
     top: 20px;
     bottom: 60px;
-    width: 250px;
+    width: 165px;
     display: flex;
     align-items: center;
     justify-content: center;
