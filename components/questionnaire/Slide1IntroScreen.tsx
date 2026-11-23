@@ -94,20 +94,19 @@ const SLIDE1_COMPONENT_CSS = `
     z-index: 10;
   }
 
-  .s1-title {
-    font-size: 76px; /* Massive, bold Figma title */
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    white-space: nowrap !important;
-    margin: 0 0 12px 0;
-    padding: 0;
-    color: #facc15; /* Exact Figma Yellow */
-    font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
-    -webkit-text-stroke: 2px #12403d; /* Thicker stroke */
-    paint-order: stroke fill;
-    text-shadow: 0 4px 0 #12403d, 0 5px 4px rgba(18, 64, 61, 0.3); /* Harder drop shadow */
-  }
+.s1-title {
+  font-size: 76px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap !important;
+  margin: 0 0 12px 0;
+  padding: 0;
+  color: #1b444d;
+  font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  -webkit-text-stroke: 4px #fcff49ff; /* Updated border color and thickness */
+  paint-order: stroke fill;
+}
 
   .s1-subtitle {
     font-size: 26px; /* Increased from 19px */
@@ -130,14 +129,14 @@ const SLIDE1_COMPONENT_CSS = `
   }
 
   .s1-btn-start {
-    min-height: 56px;
-    height: 56px;
+    min-height: 46px;
+    height: 46px;
     min-width: 170px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background-color: #fdfce8; /* Light cream */
+    background-color: #fdff9d; /* Light cream */
     color: #12403d; /* Dark teal text */
     border: 2px solid #12403d; /* Dark teal border, matching Figma */
     font-weight: 700;
@@ -579,7 +578,7 @@ export const Slide1IntroScreen = memo(function Slide1IntroScreen({
 
         <div className="s1-nurse-col">
           <img
-            src="/images/nurse-anna-s1.png?v=3"
+            src="/images/Slide1New.png"
             alt={
               isSpanish
                 ? "Ilustración de la enfermera Anna sonriendo"

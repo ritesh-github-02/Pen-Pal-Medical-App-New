@@ -305,13 +305,14 @@ export default function AudioPlayer({
 
   // Unified, exact identical size for CC and Play icons across ALL slides
   const isCompact = size === 'small' || size === 'compact';
-  const ccSizeClass = isCompact
-    ? 'w-[30px] h-[26px] sm:w-[33px] sm:h-[29px]'
-    : 'w-[36px] h-[30px] sm:w-[40px] sm:h-[34px]';
+// Increased sizes:
+const ccSizeClass = isCompact
+  ? 'w-[38px] h-[34px] sm:w-[42px] sm:h-[38px]'
+  : 'w-[46px] h-[40px] sm:w-[52px] sm:h-[44px]';
 
-  const playSizeClass = isCompact
-    ? 'w-[40px] h-[26px] sm:w-[44px] sm:h-[29px]'
-    : 'w-[46px] h-[30px] sm:w-[52px] sm:h-[34px]';
+const playSizeClass = isCompact
+  ? 'w-[50px] h-[34px] sm:w-[56px] sm:h-[38px]'
+  : 'w-[58px] h-[40px] sm:w-[66px] sm:h-[44px]';
 
   return (
     <div
