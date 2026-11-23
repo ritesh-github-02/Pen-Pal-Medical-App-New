@@ -303,9 +303,9 @@ const SLIDE3_CSS = `
   .s3-nurse {
     position: absolute;
     left: 564px;
-    top: 177px;
-    width: 142px;
-    height: 274px;
+    top: 162px;
+    width: 147px;
+    height: 271px;
     z-index: 10;
     pointer-events: none;
     display: flex;
@@ -702,7 +702,7 @@ export function Slide3EfficacyScreen({
         {/* 3. Nurse Anna */}
         <div className="s3-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna.png"
+            src="/images/Slide3New.png"
             alt=""
             className="s3-nurse-img"
             draggable={false}
