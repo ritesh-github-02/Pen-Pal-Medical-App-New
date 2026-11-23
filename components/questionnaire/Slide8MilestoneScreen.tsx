@@ -261,10 +261,10 @@ const SLIDE8_CSS = `
   /* ---- 2. Nurse Anna holding bottle on Right ---- */
   .s8-nurse {
     position: absolute;
-    left: 542px;
-    top: 161px;
-    width: 136px;
-    height: 273px;
+    left: 562px;
+    top: 157px;
+    width: 144px;
+    height: 279px;
     pointer-events: none;
     z-index: 5;
     display: flex;
@@ -672,7 +672,7 @@ export function Slide8MilestoneScreen({
         {/* 2. Nurse Anna on Right holding bottle */}
         <div className="s8-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s7.png?v=3"
+            src="/images/Slide7New.png?v=3"
             alt=""
             className="s8-nurse-img"
             draggable={false}

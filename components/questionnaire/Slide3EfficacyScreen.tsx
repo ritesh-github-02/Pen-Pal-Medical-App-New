@@ -365,9 +365,9 @@ const SLIDE3_CSS = `
   .s3-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
   .s3-btn-nav:active:not(:disabled) { transform: translateY(1px); }
   .s3-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-  .s3-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s3-btn-back { background-color: #c6dce0; color: #142724; border-color: #2a798a; }
   .s3-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
-  .s3-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s3-btn-next { background-color: #f9fa9a; color: #142724; border-color: #2a798a; }
   .s3-btn-next:hover:not(:disabled) { background-color: #f2f380; }
 
   /* Audio controls — bottom-right */

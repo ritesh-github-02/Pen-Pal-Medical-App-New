@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import AudioPlayer from "./AudioPlayer";
-import SlideNavigationButtons from "./SlideNavigationButtons";
 import { resolveMedicineToken } from "@/lib/token-engine";
 
 export interface Slide6MythTruthScreenProps {
@@ -175,6 +173,43 @@ const mobileLayout = (scope: string) => `
     align-items: center !important;
     justify-content: center !important;
   }
+  ${scope} .s6-bottom-bar {
+    position: static !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin-top: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    z-index: 10 !important;
+  }
+  ${scope} .s6-audio-controls {
+    position: static !important;
+    order: 1 !important;
+    margin: 0 auto !important;
+  }
+  ${scope} .s6-nav-center {
+    position: static !important;
+    order: 2 !important;
+    transform: none !important;
+    width: 100% !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
+  }
+  ${scope} .s6-btn-nav {
+    flex: 1 1 0% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  ${scope} .s6-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
+  }
   ${scope} .s6-audio {
     order: 2 !important;
     position: static !important;
@@ -218,12 +253,13 @@ const mobileLayout = (scope: string) => `
     gap: clamp(0.5rem, 2.5vw, 1rem) !important;
   }
   ${scope} .slide-nav-btn {
-    min-width: 128px !important;
-    min-height: 48px !important;
-    height: 48px !important;
-    padding: 0 32px !important;
+    min-width: 65px !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 20px !important;
     white-space: nowrap !important;
     flex: 0 1 auto !important;
+    font-size: 15px !important;
   }
   @media (max-width: 22em) {
     ${scope} {
@@ -260,9 +296,9 @@ const mobileLayout = (scope: string) => `
       gap: 0.375rem !important;
     }
     ${scope} .slide-nav-btn {
-      min-width: 112px !important;
-      height: 44px !important;
-      min-height: 44px !important;
+      min-width: 80px !important;
+      height: 36px !important;
+      min-height: 36px !important;
       padding: 0 16px !important;
       font-size: 14px !important;
     }
@@ -319,10 +355,10 @@ const SLIDE6_CSS = `
   flex-direction: column;
   width: ${STAGE_W}px;
   height: ${STAGE_H}px;
-  padding: 30px 36px 60px;
+  padding: 24px 36px 74px;
   overflow: hidden;
-  border-radius: 24px; /* Added border radius */
-  transform-origin: center center; /* Added for scaling */
+  border-radius: 24px;
+  transform-origin: center center;
 }
 
 /* 1. Question heading (AAA contrast: #232323 on #fafdf3 ≈ 15.8:1) */
@@ -348,7 +384,7 @@ const SLIDE6_CSS = `
 .s6-cards {
   display: flex;
   flex-direction: column;
-  gap: 14px; /* Increased gap */
+  gap: 11px;
   min-height: 0;
   overflow-y: auto;
 }
@@ -356,13 +392,13 @@ const SLIDE6_CSS = `
 .s6-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  min-height: 58px; /* Increased height */
-  padding: 16px 20px; /* Increased padding */
-  border: 1.5px solid #d9a97f;
+  min-height: 50px;
+  padding: 12px 18px;
+  border: 1.5px solid #c9b800;
   border-radius: 14px;
-  background-color: #f1c9a9;
+  background-color: #fef9c3;
   color: #232323;
   font-family: inherit;
   text-align: left;
@@ -375,8 +411,8 @@ const SLIDE6_CSS = `
 }
 
 .s6-card:hover {
-  background-color: #f6d3b8;
-  border-color: #c89163;
+  background-color: #fef08a;
+  border-color: #b8a200;
   transform: translateY(-1px);
 }
 
@@ -401,17 +437,7 @@ const SLIDE6_CSS = `
 }
 
 .s6-card-tag {
-  flex-shrink: 0;
-  padding: 6px 12px; /* Increased padding */
-  border-radius: 9999px;
-  background-color: #7a4526;
-  color: #ffffff;
-  font-size: 13px; /* INCREASED from 11px */
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  display: none;
 }
 
 .s6-card-tag--truth {
@@ -429,38 +455,120 @@ const SLIDE6_CSS = `
 }
 
 .s6-card-icon {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  color: #143833;
-  opacity: 0.75;
+  display: none;
 }
 
-/* 3. Audio controls — bottom-right on desktop */
-.s6-audio {
-  position: absolute;
-  right: 22px;
-  bottom: clamp(16px, 3vh, 22px);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  z-index: 30;
+
+.s6-card-prefix {
+  font-weight: 800;
+  font-size: inherit;
+  margin-right: 0;
 }
 
-/* 4. Navigation controls — centered bottom on desktop */
-.s6-nav {
-  position: absolute;
-  bottom: clamp(16px, 3vh, 24px);
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 25;
-  pointer-events: auto;
-}
+  /* ---- 4. Bottom Bar (matches Slides 2, 3, 4, 5, 8 pixel-for-pixel) ---- */
+  .s6-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 0 24px;
+  }
+
+  .s6-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 54px;
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+  .s6-btn-nav {
+    border-radius: 9999px;
+    font-weight: 600;
+    border: 1.6px solid #3c7c87;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    min-width: 74px;
+    font-size: 15px;
+    padding: 0 20px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+    font-family: inherit;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .s6-btn-nav:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12); }
+  .s6-btn-nav:active:not(:disabled) { transform: translateY(1px); }
+  .s6-btn-nav:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+  .s6-btn-back { background-color: #c6dce0; color: #142724; border-color: #3c7c87; }
+  .s6-btn-back:hover:not(:disabled) { background-color: #b2cfd5; }
+  .s6-btn-next { background-color: #f9fa9a; color: #142724; border-color: #3c7c87; }
+  .s6-btn-next:hover:not(:disabled) { background-color: #f2f380; }
+
+  /* Audio controls — bottom-right */
+  .s6-audio-controls {
+    position: absolute;
+    right: 52px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2b7a85;
+  }
+  .s6-audio-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #2b7a85;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+    transition: transform 0.12s ease, opacity 0.15s ease;
+    font-family: inherit;
+  }
+  .s6-audio-btn:hover { transform: scale(1.08); opacity: 0.85; }
+
+  /* Closed Captions Panel */
+  .s6-captions-panel {
+    position: absolute;
+    bottom: 66px;
+    left: 52px;
+    right: 52px;
+    background: #143833;
+    color: #fff;
+    border: 1.5px solid #bddfd8;
+    border-radius: 12px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    z-index: 30;
+  }
+  .s6-captions-tag {
+    background: #fdee8e;
+    color: #1a2624;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .s6-captions-text { font-size: 13.5px; line-height: 1.4; margin: 0; font-weight: 500; color: #fff; }
 
 @media (max-width: 767px) {
   ${mobileLayout(".s6-root:not(.is-desktop)")}
@@ -496,13 +604,29 @@ export function Slide6MythTruthScreen({
 }: Slide6MythTruthScreenProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [scale, setScale] = useState(1);
   const [ownRevealed, setOwnRevealed] = useState<number[]>([]);
   const [announcement, setAnnouncement] = useState("");
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const isEs = (locale ?? "").startsWith("es") || isSpanish;
   const activeLocale = isEs ? "es" : "en";
   const medName = medicationName?.trim();
+
+  // Mobile detection
+  useEffect(() => {
+    const check = () => {
+      if (variant === "mobile") setIsMobile(true);
+      else if (variant === "desktop") setIsMobile(false);
+      else setIsMobile(window.innerWidth < 768);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [variant]);
 
   // Controlled by the parent when `revealedCards` is supplied; self-managed otherwise.
   const revealed = revealedCards ?? ownRevealed;
@@ -542,40 +666,6 @@ export function Slide6MythTruthScreen({
     return () => window.removeEventListener("resize", update);
   }, [variant]);
 
-  const toggleCard = useCallback(
-    (item: MythTruthItem) => {
-      const isOpen = revealed.includes(item.id);
-      const updated = isOpen
-        ? revealed.filter((id) => id !== item.id)
-        : [...revealed, item.id];
-
-      if (!revealedCards) setOwnRevealed(updated);
-      onRevealedChange?.(updated);
-
-      if (isOpen) {
-        setAnnouncement(
-          isEs ? `Mito ${item.id} restaurado.` : `Myth ${item.id} restored.`
-        );
-        return;
-      }
-
-      const truth = text(isEs ? item.truthEs : item.truthEn);
-      const allRevealed = MYTHS.every((myth) => updated.includes(myth.id));
-      const suffix = allRevealed
-        ? isEs
-          ? " Todos los mitos han sido revelados. Ya puede continuar."
-          : " All myths are revealed. You can continue."
-        : isEs
-          ? ` Quedan ${MYTHS.length - updated.length} mitos por revelar.`
-          : ` ${MYTHS.length - updated.length} myths left to reveal.`;
-
-      setAnnouncement(
-        `${isEs ? `Verdad revelada para el mito ${item.id}` : `Truth revealed for myth ${item.id}`}: truth.{suffix}`
-      );
-    },
-    [revealed, revealedCards, onRevealedChange, isEs, text]
-  );
-
   const title = isEs ? TITLE_ES : TITLE_EN;
   const allRevealed = MYTHS.every((item) => revealed.includes(item.id));
 
@@ -590,6 +680,94 @@ export function Slide6MythTruthScreen({
     (isEs
       ? "/audio/exported/screen3_5_knowledge_test_es.mp3"
       : "/audio/exported/screen3_5_knowledge_test_en.mp3");
+
+  // Sync HTML5 audio events & cleanup
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
+
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setAnnouncement(
+      willPlay
+        ? isEs ? "Reproduciendo narración de audio" : "Audio narration playing"
+        : isEs ? "Narración de audio pausada" : "Audio narration paused"
+    );
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(plainTranscript);
+            utt.lang = isEs ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(plainTranscript);
+        utt.lang = isEs ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+    }
+  };
+
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setAnnouncement(
+      next
+        ? isEs ? "Subtítulos mostrados" : "Closed captions displayed"
+        : isEs ? "Subtítulos ocultados" : "Closed captions hidden"
+    );
+  };
+
+  const toggleCard = useCallback(
+    (item: MythTruthItem) => {
+      const isOpen = revealed.includes(item.id);
+      const next = isOpen ? revealed.filter((id) => id !== item.id) : [...revealed, item.id];
+      if (onRevealedChange) {
+        onRevealedChange(next);
+      } else {
+        setOwnRevealed(next);
+      }
+      setAnnouncement(
+        `${isEs ? `Verdad revelada para el mito ${item.id}` : `Truth revealed for myth ${item.id}`}`
+      );
+    },
+    [revealed, onRevealedChange, isEs]
+  );
 
   const variantClass =
     variant === "mobile" ? " is-mobile" : variant === "desktop" ? " is-desktop" : "";
@@ -610,7 +788,16 @@ export function Slide6MythTruthScreen({
         {announcement}
       </div>
 
-      <div className="s6-stage" style={{ transform: `scale(${scale})` }}>
+      {/* Hidden HTML5 Audio */}
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s6-sr-only"
+        aria-hidden="true"
+      />
+
+      <div className="s6-stage" style={!isMobile ? { transform: `scale(${scale})` } : undefined}>
         <h1 id="s6-heading" ref={headingRef} tabIndex={-1} className="s6-heading">
           {title}
         </h1>
@@ -622,8 +809,17 @@ export function Slide6MythTruthScreen({
         >
           {MYTHS.map((item) => {
             const isOpen = revealed.includes(item.id);
-            const statement = text(isEs ? (isOpen ? item.truthEs : item.mythEs) : isOpen ? item.truthEn : item.mythEn);
+            // Resolve medication token replacements
+            const resolvedMyth = resolveMedicineToken(isEs ? item.mythEs : item.mythEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
+            const resolvedTruth = resolveMedicineToken(isEs ? item.truthEs : item.truthEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
+            // Strip only the leading label prefix so we can render it bold inline
+            const mythBody = resolvedMyth.replace(/^(myth|mito)\s*\d+\s*[-–—:]\s*/i, "");
+            const truthBody = resolvedTruth.replace(/^(truth|verdad)\s*[-–—:]\s*/i, "");
+            const statement = isOpen ? truthBody : mythBody;
             const typeLabel = isEs ? (isOpen ? "Verdad" : `Mito ${item.id}`) : isOpen ? "Truth" : `Myth ${item.id}`;
+            const inlinePrefix = isOpen
+              ? (isEs ? "Verdad – " : "Truth – ")
+              : (isEs ? `Mito ${item.id} – ` : `Myth ${item.id} – `);
 
             return (
               <button
@@ -649,7 +845,7 @@ export function Slide6MythTruthScreen({
                   {typeLabel}
                 </span>
 
-                <span className="s6-card-text">{statement}</span>
+                <span className="s6-card-text"><strong className="s6-card-prefix">{inlinePrefix}</strong>{statement}</span>
 
                 <span className="s6-card-icon" aria-hidden="true">
                   {isOpen ? (
@@ -668,36 +864,171 @@ export function Slide6MythTruthScreen({
             );
           })}
         </div>
-      </div>
 
-      <div className="s6-audio">
-        <AudioPlayer
-          audioSrc={effectiveAudioSrc}
-          stepId={stepId}
-          locale={activeLocale}
-          transcriptText={plainTranscript}
-          size="large"
-        />
-      </div>
+        {/* Closed Captions Panel */}
+        {showCaptions && (
+          <div
+            className="s6-captions-panel"
+            role="region"
+            aria-label={isEs ? "Subtítulos de narración" : "Closed captions"}
+          >
+            <span className="s6-captions-tag" aria-hidden="true">CC</span>
+            <p className="s6-captions-text">{plainTranscript}</p>
+          </div>
+        )}
 
-      <p className="s6-sr-only">
-        {allRevealed
-          ? isEs
-            ? "Todos los mitos han sido revelados."
-            : "All myths are revealed."
-          : isEs
-            ? "El botón Siguiente se activa cuando se revelan los cuatro mitos."
-            : "The Next button is enabled once all four myths are revealed."}
-      </p>
+        {/* 4. Bottom bar */}
+        <footer
+          className="s6-bottom-bar"
+          role="toolbar"
+          aria-label={isEs ? "Controles de navegación y audio" : "Slide navigation and media controls"}
+        >
+          <nav className="s6-nav-center" aria-label={isEs ? "Navegación de diapositiva" : "Slide pagination"}>
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={loading}
+              className="s6-btn-nav s6-btn-back"
+              aria-label={isEs ? "Ir a la diapositiva anterior" : "Go to previous slide"}
+            >
+              {isEs ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={loading}
+              className="s6-btn-nav s6-btn-next"
+              aria-label={isEs ? "Ir a la siguiente diapositiva" : "Go to next slide"}
+            >
+              {loading ? "..." : isEs ? "Siguiente" : "Next"}
+            </button>
+          </nav>
 
-      <div className="s6-nav">
-        <SlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isEs}
-          loading={loading}
-          nextDisabled={!allRevealed}
-        />
+          <div className="s6-audio-controls">
+            <button
+              type="button"
+              className="s6-audio-btn"
+              onClick={toggleCaptions}
+              aria-pressed={showCaptions}
+              aria-label={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+              title={
+                showCaptions
+                  ? isEs ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isEs ? "Mostrar subtítulos" : "Show closed captions"
+              }
+            >
+              <svg
+                width="44"
+                height="40"
+                viewBox="0 0 40 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text
+                  x="20"
+                  y="15.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"}
+                  fontSize="13"
+                  fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                  letterSpacing="0.3px"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="s6-audio-btn"
+              onClick={toggleAudio}
+              aria-pressed={audioPlaying}
+              aria-label={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+              title={
+                audioPlaying
+                  ? isEs ? "Pausar narración de audio" : "Pause audio narration"
+                  : isEs ? "Reproducir narración de audio" : "Play audio narration"
+              }
+            >
+              {audioPlaying ? (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <text
+                    x="14.8"
+                    y="17.2"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="currentColor"
+                    fontSize="8"
+                    fontWeight="700"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    letterSpacing="0.1px"
+                  >
+                    play
+                  </text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );

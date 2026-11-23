@@ -211,7 +211,7 @@ const SLIDE4_CSS = `
   /* ---- 1. Nurse Anna standing on Left gesturing toward bubble ---- */
   .s4-nurse {
     position: absolute;
-    left: 104px;
+    left: 51px;
     top: 172px;
     width: 140px;
     height: 284px;

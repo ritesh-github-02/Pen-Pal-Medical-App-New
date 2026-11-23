@@ -305,14 +305,13 @@ export default function AudioPlayer({
 
   // Unified, exact identical size for CC and Play icons across ALL slides
   const isCompact = size === 'small' || size === 'compact';
-// Increased sizes:
-const ccSizeClass = isCompact
-  ? 'w-[38px] h-[34px] sm:w-[42px] sm:h-[38px]'
-  : 'w-[46px] h-[40px] sm:w-[52px] sm:h-[44px]';
+  const ccSizeClass = isCompact
+    ? 'w-[38px] h-[34px] sm:w-[42px] sm:h-[38px]'
+    : 'w-[46px] h-[40px] sm:w-[52px] sm:h-[44px]';
 
-const playSizeClass = isCompact
-  ? 'w-[50px] h-[34px] sm:w-[56px] sm:h-[38px]'
-  : 'w-[58px] h-[40px] sm:w-[66px] sm:h-[44px]';
+  const playSizeClass = isCompact
+    ? 'w-[50px] h-[34px] sm:w-[56px] sm:h-[38px]'
+    : 'w-[58px] h-[40px] sm:w-[66px] sm:h-[44px]';
 
   return (
     <div
@@ -354,8 +353,9 @@ const playSizeClass = isCompact
                 ? 'Close captions'
                 : 'Open captions'
           }
-          className={`audio-cc-btn group relative inline-flex items-center justify-center p-0.5 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${showTranscript ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
-            }`}
+          className={`audio-cc-btn group relative inline-flex items-center justify-center p-0.5 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2a798a] active:scale-90 ${
+            showTranscript ? 'text-[#1e5c69]' : 'text-[#2a798a] hover:text-[#1e5c69]'
+          }`}
         >
           {/* Custom CC Speech Bubble SVG perfectly aligned with Play button */}
           <svg
@@ -402,7 +402,7 @@ const playSizeClass = isCompact
           >
             <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 gap-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="w-2 h-2 rounded-full bg-[#236f7a] shrink-0" aria-hidden="true"></span>
+                <span className="w-2 h-2 rounded-full bg-[#2a798a] shrink-0" aria-hidden="true"></span>
                 <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider truncate">
                   {locale === 'es' ? 'Transcripción de Audio' : 'Audio Transcript'}
                 </span>
@@ -454,8 +454,9 @@ const playSizeClass = isCompact
               ? 'Reproducir audio'
               : 'Play audio'
         }
-        className={`audio-play-btn group relative inline-flex items-center justify-center p-0.5 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#13616d] active:scale-90 ${isPlaying ? 'text-[#0c4a54]' : 'text-[#13616d] hover:text-[#0c4a54]'
-          }`}
+        className={`audio-play-btn group relative inline-flex items-center justify-center p-0.5 rounded-xl transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2a798a] active:scale-90 ${
+          isPlaying ? 'text-[#1e5c69]' : 'text-[#2a798a] hover:text-[#1e5c69]'
+        }`}
       >
         <svg
           className={`${playSizeClass} transition-transform duration-150 group-hover:scale-105`}

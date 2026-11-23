@@ -235,10 +235,10 @@ const SLIDE5_CSS = `
   /* ---- 3. Nurse Anna holding pink bottle — right side ---- */
   .s5-nurse {
     position: absolute;
-    left: 490px;
-    top: 114px;
-    width: 181px;
-    height: 324px;
+    left: 546px;
+    top: 104px;
+    width: 127px;
+    height: 309px;
     pointer-events: none;
     z-index: 5;
     display: flex;
