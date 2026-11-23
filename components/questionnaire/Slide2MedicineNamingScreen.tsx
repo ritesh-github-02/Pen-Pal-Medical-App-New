@@ -203,12 +203,12 @@ const CSS = `
     position: absolute;
     top: 26px;
     left: 52px;
-    width: 496px;
-    background-color: #feff9f;
+    width: 461px;
+    background-color: #fdff9d;
     border: 2px solid #2b7a85;
     border-radius: 22px;
     box-shadow: 0 3px 6px rgba(35, 111, 122, 0.2);
-    padding: 14px 24px;
+    padding: 10px 14px;
     box-sizing: border-box;
     z-index: 10;
   }
@@ -231,7 +231,7 @@ const CSS = `
     position: absolute;
     left: 88px;
     top: 144px;
-    width: 125px;
+    width: 146px;
     height: 274px;
     pointer-events: none;
     display: flex;
@@ -666,7 +666,7 @@ export function Slide2MedicineNamingScreen({
         <div className="s2-middle-row">
           <div className="s2-nurse-wrap" aria-hidden="true">
             <img
-              src="/images/nurse-anna-s2.png?v=3"
+              src="/images/Slide2New.png?v=3"
               alt=""
               className="s2-nurse-img"
               draggable={false}
@@ -675,7 +675,7 @@ export function Slide2MedicineNamingScreen({
 
           <div className="s2-bottle-wrap">
             <img
-              src="/images/amoxicillin-bottle.png"
+              src="/images/bottle.png"
               alt={isEs ? "Frasco de medicina rosa" : "Pink medicine bottle"}
               className="s2-bottle-img"
               draggable={false}
