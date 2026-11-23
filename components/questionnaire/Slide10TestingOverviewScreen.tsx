@@ -223,13 +223,13 @@ const SLIDE10_CSS = `
     position: absolute;
     left: 60px;
     top: 48px;
-    min-width: 495px;
-    height: 58px;
+    min-width: 430;
+    height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0 28px;
-    background-color: #feff9f;
+    background-color: #fdff9d;
     border: 2px solid #2b7a85;
     border-radius: 9999px;
     box-shadow: 0 3px 6px rgba(35, 111, 122, 0.22);
@@ -251,7 +251,7 @@ const SLIDE10_CSS = `
   .s10-left {
     position: absolute;
     left: 60px;
-    top: 136px;
+    top: 121px;
     width: 494px;
     display: flex;
     flex-direction: column;
@@ -259,7 +259,7 @@ const SLIDE10_CSS = `
   }
   .s10-intro {
     margin: 0 0 20px 0;
-    font-size: 19.5px;
+    font-size: 20px;
     line-height: 1.4;
     font-weight: 500;
     letter-spacing: -0.01em;
@@ -268,7 +268,7 @@ const SLIDE10_CSS = `
   }
   .s10-subheading {
     margin: 0 0 6px 0;
-    font-size: 19.5px;
+    font-size: 20px;
     line-height: 1.38;
     font-weight: 500;
     letter-spacing: -0.01em;
@@ -289,7 +289,7 @@ const SLIDE10_CSS = `
     gap: 12px;
     margin: 0;
     color: #1d2423;
-    font-size: 18.5px;
+    font-size: 20px;
     font-weight: 500;
     line-height: 1.4;
     letter-spacing: -0.01em;
@@ -307,10 +307,10 @@ const SLIDE10_CSS = `
   /* ---- 3. Nurse Anna — right side gesturing toward bullets ---- */
   .s10-nurse {
     position: absolute;
-    left: 568px;
-    top: 162px;
-    width: 142px;
-    height: 278px;
+    left: 570px;
+    top: 96px;
+    width: 158px;
+    height: 307px;
     pointer-events: none;
     z-index: 5;
     display: flex;
@@ -670,7 +670,7 @@ export function Slide10TestingOverviewScreen({
         {/* 3. Nurse Anna — right side */}
         <div className="s10-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna.png?v=3"
+            src="/images/Slide9New.png?v=3"
             alt=""
             className="s10-nurse-img"
             draggable={false}

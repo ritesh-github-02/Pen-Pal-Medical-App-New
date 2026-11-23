@@ -18,8 +18,8 @@ export interface Slide6MythTruthScreenProps {
   transcriptText?: string;
 }
 
-/** Fixed design stage, scaled to fit the tablet frame (same convention as the other slides). */
-const STAGE_W = 750;
+/** Fixed design stage, scaled to fit the tablet frame (matches reference tablet aspect 827x577 = 1.433). */
+const STAGE_W = 760;
 const STAGE_H = 530;
 
 interface MythTruthItem {
@@ -176,14 +176,13 @@ const mobileLayout = (scope: string) => `
   ${scope} .s6-bottom-bar {
     position: static !important;
     height: auto !important;
-    padding: 0 !important;
-    margin-top: auto !important;
-    display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
+    flex-shrink: 0 !important;
     width: 100% !important;
     max-width: 360px !important;
-    z-index: 10 !important;
   }
   ${scope} .s6-audio-controls {
     position: static !important;
@@ -320,12 +319,12 @@ const SLIDE6_CSS = `
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 100dvh; /* Updated to fill screen */
+  height: 100%;
   min-height: 0;
+  background-color: transparent;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
-  background-color: transparent; /* Updated for background rect */
-  color: #232323;
-  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #1d2423;
 }
 
 .s6-sr-only {
@@ -347,29 +346,38 @@ const SLIDE6_CSS = `
   outline-offset: 3px !important;
 }
 
-/* Bottom padding keeps the slide content clear of the shared navigation row. */
+/* ---- Scale-locked desktop stage (matches Slide 5 pixel-for-pixel) ---- */
 .s6-stage {
   position: relative;
-  display: flex;
-  flex: none;
-  flex-direction: column;
   width: ${STAGE_W}px;
   height: ${STAGE_H}px;
-  padding: 24px 36px 74px;
-  overflow: hidden;
-  border-radius: 24px;
+  flex: none;
   transform-origin: center center;
+  background-color: transparent;
+  overflow: hidden;
 }
 
-/* 1. Question heading (AAA contrast: #232323 on #fafdf3 ≈ 15.8:1) */
+/* Content wrapper keeps heading and cards perfectly clear of bottom bar */
+.s6-content-wrap {
+  position: absolute;
+  left: 52px;
+  right: 52px;
+  top: 36px;
+  bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+/* 1. Question heading (AAA contrast: #1d2423 on #fafdf3 ≈ 15.8:1) */
 .s6-heading {
   flex: none;
-  margin: 0 0 20px; /* Slightly more margin */
-  padding: 0;
-  color: #232323;
-  font-size: 24px; /* INCREASED from 21px */
-  font-weight: 700;
-  line-height: 1.3;
+  margin: 0 0 16px;
+  padding: 0px 7px;
+  color: #1d2423;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
   letter-spacing: -0.015em;
   outline: none;
 }
@@ -384,9 +392,10 @@ const SLIDE6_CSS = `
 .s6-cards {
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 10px;
+  width: 100%;
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .s6-card {
@@ -394,12 +403,12 @@ const SLIDE6_CSS = `
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 50px;
-  padding: 12px 18px;
-  border: 1.5px solid #c9b800;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 1.5px solid #fdff9d;
   border-radius: 14px;
-  background-color: #fef9c3;
-  color: #232323;
+  background-color: #fdff9d;
+  color: #1d2423;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -411,8 +420,8 @@ const SLIDE6_CSS = `
 }
 
 .s6-card:hover {
-  background-color: #fef08a;
-  border-color: #b8a200;
+  background-color: #fdff9d;
+  border-color: #fdff9d;
   transform: translateY(-1px);
 }
 
@@ -427,13 +436,14 @@ const SLIDE6_CSS = `
 
 /* Revealed truth (AAA contrast: #232323 on #bce3dc ≈ 12.6:1) */
 .s6-card--revealed {
-  background-color: #bce3dc;
-  border-color: #8ab8b0;
+  background-color: #2a798a;
+  border-color: #2a798a;
+  color:white;
 }
 
 .s6-card--revealed:hover {
-  background-color: #c9ebe5;
-  border-color: #79a9a0;
+  background-color: #2a798a;
+  border-color: #2a798a;
 }
 
 .s6-card-tag {
@@ -459,11 +469,7 @@ const SLIDE6_CSS = `
 }
 
 
-.s6-card-prefix {
-  font-weight: 800;
-  font-size: inherit;
-  margin-right: 0;
-}
+
 
   /* ---- 4. Bottom Bar (matches Slides 2, 3, 4, 5, 8 pixel-for-pixel) ---- */
   .s6-bottom-bar {
@@ -642,28 +648,31 @@ export function Slide6MythTruthScreen({
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Fit the fixed stage into the available frame without distorting it.
+  // Scale-locked stage — proportionally fills desktop tablet frame (matches Slide 5)
   useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
     const update = () => {
       if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
         setScale(1);
         return;
       }
-      
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      
-      // Leave room for the header and margins
-      const safeW = Math.max(0, w - 64); 
-      const safeH = Math.max(0, h - 160); 
-      
-      // Removed the ", 1" cap so it scales up to fill the screen
+      const { clientWidth: w, clientHeight: h } = el;
+      if (!w || !h) return;
+      const safeW = Math.max(0, w - 8);
+      const safeH = Math.max(0, h - 8);
       setScale(Math.min(safeW / STAGE_W, safeH / STAGE_H));
     };
 
     update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, [variant]);
 
   const title = isEs ? TITLE_ES : TITLE_EN;
@@ -798,71 +807,73 @@ export function Slide6MythTruthScreen({
       />
 
       <div className="s6-stage" style={!isMobile ? { transform: `scale(${scale})` } : undefined}>
-        <h1 id="s6-heading" ref={headingRef} tabIndex={-1} className="s6-heading">
-          {title}
-        </h1>
+        <div className="s6-content-wrap">
+          <h1 id="s6-heading" ref={headingRef} tabIndex={-1} className="s6-heading">
+            {title}
+          </h1>
 
-        <div
-          className="s6-cards"
-          role="group"
-          aria-label={isEs ? "Mitos para revelar" : "Myths to reveal"}
-        >
-          {MYTHS.map((item) => {
-            const isOpen = revealed.includes(item.id);
-            // Resolve medication token replacements
-            const resolvedMyth = resolveMedicineToken(isEs ? item.mythEs : item.mythEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
-            const resolvedTruth = resolveMedicineToken(isEs ? item.truthEs : item.truthEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
-            // Strip only the leading label prefix so we can render it bold inline
-            const mythBody = resolvedMyth.replace(/^(myth|mito)\s*\d+\s*[-–—:]\s*/i, "");
-            const truthBody = resolvedTruth.replace(/^(truth|verdad)\s*[-–—:]\s*/i, "");
-            const statement = isOpen ? truthBody : mythBody;
-            const typeLabel = isEs ? (isOpen ? "Verdad" : `Mito ${item.id}`) : isOpen ? "Truth" : `Myth ${item.id}`;
-            const inlinePrefix = isOpen
-              ? (isEs ? "Verdad – " : "Truth – ")
-              : (isEs ? `Mito ${item.id} – ` : `Myth ${item.id} – `);
+          <div
+            className="s6-cards"
+            role="group"
+            aria-label={isEs ? "Mitos para revelar" : "Myths to reveal"}
+          >
+            {MYTHS.map((item) => {
+              const isOpen = revealed.includes(item.id);
+              // Resolve medication token replacements
+              const resolvedMyth = resolveMedicineToken(isEs ? item.mythEs : item.mythEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
+              const resolvedTruth = resolveMedicineToken(isEs ? item.truthEs : item.truthEn, medName || (isEs ? "la amoxicilina" : "amoxicillin"), isEs);
+              // Strip only the leading label prefix so we can render it bold inline
+              const mythBody = resolvedMyth.replace(/^(myth|mito)\s*\d+\s*[-–—:]\s*/i, "");
+              const truthBody = resolvedTruth.replace(/^(truth|verdad)\s*[-–—:]\s*/i, "");
+              const statement = isOpen ? truthBody : mythBody;
+              const typeLabel = isEs ? (isOpen ? "Verdad" : `Mito ${item.id}`) : isOpen ? "Truth" : `Myth ${item.id}`;
+              const inlinePrefix = isOpen
+                ? (isEs ? "Verdad – " : "Truth – ")
+                : (isEs ? `Mito ${item.id} – ` : `Myth ${item.id} – `);
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={`s6-card${isOpen ? " s6-card--revealed" : ""}`}
-                aria-expanded={isOpen}
-                aria-label={`${typeLabel}. ${statement} ${
-                  isOpen
-                    ? isEs
-                      ? "Haga clic para volver a mostrar el mito."
-                      : "Click to show the myth again."
-                    : isEs
-                      ? "Haga clic para revelar la verdad."
-                      : "Click to reveal the truth."
-                }`}
-                onClick={() => toggleCard(item)}
-              >
-                <span
-                  className={`s6-card-tag${isOpen ? " s6-card-tag--truth" : ""}`}
-                  aria-hidden="true"
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`s6-card${isOpen ? " s6-card--revealed" : ""}`}
+                  aria-expanded={isOpen}
+                  aria-label={`${typeLabel}. ${statement} ${
+                    isOpen
+                      ? isEs
+                        ? "Haga clic para volver a mostrar el mito."
+                        : "Click to show the myth again."
+                      : isEs
+                        ? "Haga clic para revelar la verdad."
+                        : "Click to reveal the truth."
+                  }`}
+                  onClick={() => toggleCard(item)}
                 >
-                  {typeLabel}
-                </span>
+                  <span
+                    className={`s6-card-tag${isOpen ? " s6-card-tag--truth" : ""}`}
+                    aria-hidden="true"
+                  >
+                    {typeLabel}
+                  </span>
 
-                <span className="s6-card-text"><strong className="s6-card-prefix">{inlinePrefix}</strong>{statement}</span>
+                  <span className="s6-card-text"><span className="s6-card-prefix">{inlinePrefix}</span>{statement}</span>
 
-                <span className="s6-card-icon" aria-hidden="true">
-                  {isOpen ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="3" />
-                    </svg>
-                  )}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="s6-card-icon" aria-hidden="true">
+                    {isOpen ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="3" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Closed Captions Panel */}
@@ -877,7 +888,7 @@ export function Slide6MythTruthScreen({
           </div>
         )}
 
-        {/* 4. Bottom bar */}
+        {/* 4. Bottom Navigation & Audio Controls */}
         <footer
           className="s6-bottom-bar"
           role="toolbar"

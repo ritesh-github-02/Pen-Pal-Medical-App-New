@@ -2,10 +2,8 @@
 
 
 import React, { useState, useRef, useEffect } from "react";
-import AudioPlayer from "./AudioPlayer";
 import { NurseAnna } from "./NurseAnna";
 import { resolveMedicineToken } from "@/lib/token-engine";
-import SlideNavigationButtons from "./SlideNavigationButtons";
 
 
 const STAGE_W = 896;
@@ -61,6 +59,8 @@ const SLIDE11_CSS = `
   margin: 0 auto;
   padding: 0;
   flex-shrink: 0;
+  padding-right: 180px;
+
 }
 .s11-heading {
   font-size: 24px; /* INCREASED from 1.25rem */
@@ -254,28 +254,160 @@ const SLIDE11_CSS = `
 }
 
 
-/* Audio and Nav */
-.s11-audio {
+.s11-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+
+/* ---- Bottom Bar (matches Slides 5 & 6 pixel-for-pixel) ---- */
+.s11-bottom-bar {
   position: absolute;
-  right: 3rem;
-  bottom: 1.5rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 74px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+  z-index: 20;
+  padding: 0 24px;
+  pointer-events: none;
+}
+
+
+.s11-nav-center {
+  display: flex;
+  align-items: center;
+  gap: 54px;
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+
+.s11-btn-nav {
+  border-radius: 9999px;
+  font-weight: 600;
+  border: 1.6px solid #3c7c87;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  min-width: 74px;
+  font-size: 15px;
+  padding: 0 20px;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+  font-family: inherit;
+  user-select: none;
+  touch-action: manipulation;
+}
+.s11-btn-nav:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+.s11-btn-nav:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.s11-btn-nav:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.s11-btn-back {
+  background-color: #c6dce0;
+  color: #142724;
+  border-color: #3c7c87;
+}
+.s11-btn-back:hover:not(:disabled) {
+  background-color: #b2cfd5;
+}
+.s11-btn-next {
+  background-color: #f9fa9a;
+  color: #142724;
+  border-color: #3c7c87;
+}
+.s11-btn-next:hover:not(:disabled) {
+  background-color: #f2f380;
+}
+
+
+/* Audio controls — bottom-right */
+.s11-audio-controls {
+  position: absolute;
+  right: 52px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2b7a85;
+  pointer-events: auto;
+}
+.s11-audio-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #2b7a85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 8px;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+  font-family: inherit;
+}
+.s11-audio-btn:hover {
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+
+/* Closed Captions Panel */
+.s11-captions-panel {
+  position: absolute;
+  bottom: 66px;
+  left: 52px;
+  right: 52px;
+  background: #143833;
+  color: #fff;
+  border: 1.5px solid #bddfd8;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   z-index: 30;
 }
-.s11-root .slide-nav {
-  position: absolute !important;
-  bottom: 1.5rem !important;
-  left: 0 !important;
-  right: 0 !important;
-  margin: 0 auto !important;
-  display: flex !important;
-  justify-content: center !important;
-  pointer-events: none !important;
+.s11-captions-tag {
+  background: #fdee8e;
+  color: #1a2624;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
 }
-.s11-root .slide-nav button {
-  pointer-events: auto !important;
+.s11-captions-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: 500;
+  color: #fff;
 }
 
 
@@ -364,16 +496,50 @@ const SLIDE11_CSS = `
   }
 
 
-  .s11-audio {
+  .s11-bottom-bar {
     position: static !important;
-    margin: 1rem auto !important;
-    justify-content: center !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    pointer-events: auto !important;
   }
 
 
-  .s11-root .slide-nav {
+  .s11-audio-controls {
     position: static !important;
-    margin-top: 0.5rem !important;
+    order: 1 !important;
+    margin: 0 auto !important;
+  }
+
+
+  .s11-nav-center {
+    position: static !important;
+    order: 2 !important;
+    transform: none !important;
+    width: 100% !important;
+    gap: 14px !important;
+    justify-content: space-between !important;
+  }
+
+
+  .s11-btn-nav {
+    flex: 1 1 0% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+
+
+  .s11-captions-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    bottom: auto !important;
   }
 }
 `;
@@ -460,6 +626,10 @@ export function Slide11SymptomsScreen({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState("");
 
   const effectiveAudioSrc =
     audioSrc ||
@@ -467,25 +637,20 @@ export function Slide11SymptomsScreen({
       ? "/audio/exported/screen6_1_symptoms_es.mp3"
       : "/audio/exported/screen6_1_symptoms_en.mp3");
 
-
   const effectiveTranscript =
     transcriptText ||
     (isSpanish
       ? "Seleccione lo que sucedió cuando se le dijo que su hijo era alérgico a la penicilina."
       : "Select what happened when your child was said to be allergic to penicillin.");
 
-
   const swellingTriggerRef = useRef<HTMLElement | null>(null);
   const swellingFirstBtnRef = useRef<HTMLButtonElement | null>(null);
-
 
   const [symptoms, setSymptoms] = useState<string[]>(selectedSymptoms);
   const [otherText, setOtherText] = useState<string>(symptomsOther);
 
-
   const [rashModalOpen, setRashModalOpen] = useState(false);
   const [activeRashDetails, setActiveRashDetails] = useState<string[]>(rashDetails);
-
 
   const [swellingModalOpen, setSwellingModalOpen] = useState(false);
   const [activeSwellingDetails, setActiveSwellingDetails] = useState<string[]>(swellingDetails);
@@ -493,6 +658,90 @@ export function Slide11SymptomsScreen({
     const found = (swellingDetails || []).find((d) => d.startsWith("Other:"));
     return found ? found.replace(/^Other:\s*/, "") : "";
   });
+
+  // Escape dismisses captions (WCAG 1.4.13)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showCaptions) {
+        setShowCaptions(false);
+        setLiveAnnouncement(isSpanish ? "Subtítulos ocultados" : "Closed captions dismissed");
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showCaptions, isSpanish]);
+
+  // Sync audio element events & clean up on unmount / step change
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => setAudioPlaying(true);
+    const onPause = () => setAudioPlaying(false);
+    const onEnded = () => setAudioPlaying(false);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
+    el.addEventListener("ended", onEnded);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
+      el.removeEventListener("ended", onEnded);
+      el.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [effectiveAudioSrc, stepId]);
+
+  const toggleAudio = () => {
+    const el = audioRef.current;
+    const willPlay = !audioPlaying;
+    setLiveAnnouncement(
+      willPlay
+        ? isSpanish ? "Reproduciendo narración de audio" : "Audio narration playing"
+        : isSpanish ? "Narración de audio pausada" : "Audio narration paused"
+    );
+    if (willPlay) {
+      if (el && el.src && !el.src.endsWith(".undefined")) {
+        el.play().catch(() => {
+          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+            utt.lang = isSpanish ? "es-US" : "en-US";
+            utt.rate = 0.95;
+            utt.onstart = () => setAudioPlaying(true);
+            utt.onend = () => setAudioPlaying(false);
+            utt.onerror = () => setAudioPlaying(false);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utt);
+          }
+        });
+      } else if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        const utt = new SpeechSynthesisUtterance(effectiveTranscript);
+        utt.lang = isSpanish ? "es-US" : "en-US";
+        utt.rate = 0.95;
+        utt.onstart = () => setAudioPlaying(true);
+        utt.onend = () => setAudioPlaying(false);
+        utt.onerror = () => setAudioPlaying(false);
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+      }
+    } else {
+      el?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlaying(false);
+    }
+  };
+
+  const toggleCaptions = () => {
+    const next = !showCaptions;
+    setShowCaptions(next);
+    setLiveAnnouncement(
+      next
+        ? isSpanish ? "Subtítulos mostrados" : "Closed captions displayed"
+        : isSpanish ? "Subtítulos ocultados" : "Closed captions hidden"
+    );
+  };
 
 
   // Scaling Logic
@@ -723,8 +972,23 @@ export function Slide11SymptomsScreen({
 
   return (
     <div className="s11-wrapper" ref={wrapperRef}>
+      <style dangerouslySetInnerHTML={{ __html: SLIDE11_CSS }} />
+
+      {/* Screen Reader Live Region */}
+      <div className="s11-sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveAnnouncement}
+      </div>
+
+      {/* Hidden HTML5 Audio */}
+      <audio
+        ref={audioRef}
+        src={effectiveAudioSrc}
+        preload="metadata"
+        className="s11-sr-only"
+        aria-hidden="true"
+      />
+
       <div id="slide-content" className="s11-root" style={{ transform: `scale(${scale})` }}>
-        <style dangerouslySetInnerHTML={{ __html: SLIDE11_CSS }} />
 
 
         <div className="s11-top-section">
@@ -783,24 +1047,170 @@ export function Slide11SymptomsScreen({
         </div>
 
 
-        <div className="s11-audio">
-          <AudioPlayer
-            audioSrc={effectiveAudioSrc}
-            stepId={stepId || "screen6_1_symptoms"}
-            locale={locale || (isSpanish ? "es" : "en")}
-            transcriptText={effectiveTranscript}
-          />
-        </div>
+        {/* Closed Captions Panel */}
+        {showCaptions && (
+          <div
+            className="s11-captions-panel"
+            role="region"
+            aria-label={isSpanish ? "Subtítulos de narración" : "Closed captions"}
+          >
+            <span className="s11-captions-tag" aria-hidden="true">CC</span>
+            <p className="s11-captions-text">{effectiveTranscript}</p>
+          </div>
+        )}
 
+        {/* Bottom Navigation & Audio Controls */}
+        <footer
+          className="s11-bottom-bar"
+          role="toolbar"
+          aria-label={isSpanish ? "Controles de navegación y audio" : "Slide navigation and media controls"}
+        >
+          <nav className="s11-nav-center" aria-label={isSpanish ? "Navegación de diapositiva" : "Slide pagination"}>
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={loading}
+              className="s11-btn-nav s11-btn-back"
+              aria-label={isSpanish ? "Ir a la diapositiva anterior" : "Go to previous slide"}
+            >
+              {isSpanish ? "Atrás" : "Back"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={!isNextEnabled || loading}
+              className="s11-btn-nav s11-btn-next"
+              aria-label={isSpanish ? "Ir a la siguiente diapositiva" : "Go to next slide"}
+            >
+              {loading ? "..." : isSpanish ? "Siguiente" : "Next"}
+            </button>
+          </nav>
 
-        <SlideNavigationButtons
-          onBack={onBack}
-          onNext={onNext}
-          isSpanish={isSpanish}
-          loading={loading}
-          nextDisabled={!isNextEnabled || loading}
-          variant="flow"
-        />
+          <div className="s11-audio-controls">
+            <button
+              type="button"
+              className="s11-audio-btn"
+              onClick={toggleCaptions}
+              aria-pressed={showCaptions}
+              aria-label={
+                showCaptions
+                  ? isSpanish ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isSpanish ? "Mostrar subtítulos" : "Show closed captions"
+              }
+              title={
+                showCaptions
+                  ? isSpanish ? "Ocultar subtítulos" : "Hide closed captions"
+                  : isSpanish ? "Mostrar subtítulos" : "Show closed captions"
+              }
+            >
+              <svg
+                width="44"
+                height="40"
+                viewBox="0 0 40 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M 8.5 5.5 C 5.5 5.5 4 7.2 4 11 V 20 C 4 23.8 5.5 25.5 8.5 25.5 H 12 C 13 25.5 14 26.3 14.7 27.5 L 16.5 30.5 C 17.3 31.7 18.7 31.7 19.5 30.5 L 21.3 27.5 C 22 26.3 23 25.5 24 25.5 H 31.5 C 34.5 25.5 36 23.8 36 20 V 11 C 36 7.2 34.5 5.5 31.5 5.5 Z"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill={showCaptions ? "currentColor" : "none"}
+                />
+                <text
+                  x="20"
+                  y="15.5"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill={showCaptions ? "#ffffff" : "currentColor"}
+                  fontSize="13"
+                  fontWeight="700"
+                  fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                  letterSpacing="0.3px"
+                >
+                  CC
+                </text>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="s11-audio-btn"
+              onClick={toggleAudio}
+              aria-pressed={audioPlaying}
+              aria-label={
+                audioPlaying
+                  ? isSpanish ? "Pausar narración de audio" : "Pause audio narration"
+                  : isSpanish ? "Reproducir narración de audio" : "Play audio narration"
+              }
+              title={
+                audioPlaying
+                  ? isSpanish ? "Pausar narración de audio" : "Pause audio narration"
+                  : isSpanish ? "Reproducir narración de audio" : "Play audio narration"
+              }
+            >
+              {audioPlaying ? (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <line x1="11.5" y1="13" x2="11.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <line x1="16.5" y1="13" x2="16.5" y2="23" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg
+                  width="54"
+                  height="40"
+                  viewBox="0 0 50 36"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M 4.5 8.5 C 4.5 5.5 6.8 4.2 9.5 5.8 L 28 16.2 C 29.8 17.2 29.8 18.8 28 19.8 L 9.5 30.2 C 6.8 31.8 4.5 30.5 4.5 27.5 Z"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <text
+                    x="14.8"
+                    y="17.2"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="currentColor"
+                    fontSize="8"
+                    fontWeight="700"
+                    fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                    letterSpacing="0.1px"
+                  >
+                    play
+                  </text>
+                  <path d="M 33 11 C 37 13.5 37 22.5 33 25" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                  <path d="M 38.5 6.5 C 44.5 10.5 44.5 25.5 38.5 29.5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </footer>
       </div>
 
 

@@ -228,9 +228,9 @@ const SLIDE13_CSS = `
   .s13-nurse {
     position: absolute;
     left: 564px;
-    top: 134px;
-    width: 136px;
-    height: 266px;
+    top: 103px;
+    width: 152px;
+    height: 302px;x
     pointer-events: none;
     z-index: 6;
     display: flex;
@@ -614,7 +614,7 @@ export function Slide13OnsetScreen({
         </div>
 
         <div className="s13-nurse" aria-hidden="true">
-          <img src="/images/nurse-anna.png" alt="" className="s13-nurse-img" draggable={false} />
+          <img src="/images/Slide13New.png" alt="" className="s13-nurse-img" draggable={false} />
         </div>
 
         {showCaptions && (

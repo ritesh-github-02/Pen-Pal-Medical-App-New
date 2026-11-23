@@ -37,7 +37,7 @@ export const NurseAnna: React.FC<NurseAnnaProps> = ({
     >
       {/* Official Nurse Anna PNG Artwork with optimized subpixel contrast rendering */}
       <img
-        src="/images/nurse-anna.png"
+        src="/images/Slide11New.png"
         alt={isDecorative ? "" : altText}
         role={isDecorative ? "presentation" : "img"}
         aria-hidden={isDecorative ? "true" : undefined}

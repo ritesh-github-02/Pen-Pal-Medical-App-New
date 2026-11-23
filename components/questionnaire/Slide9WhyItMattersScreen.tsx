@@ -219,13 +219,13 @@ const SLIDE9_CSS = `
     position: absolute;
     left: 68px;
     top: 46px;
-    min-width: 296px;
-    height: 58px;
+    min-width: 275px;
+    height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0 26px;
-    background-color: #feff9f;
+    background-color: #fdff9d;
     border: 2px solid #2b7a85;
     border-radius: 9999px;
     box-shadow: 0 3px 6px rgba(35, 111, 122, 0.22);
