@@ -104,7 +104,7 @@ const SLIDE1_COMPONENT_CSS = `
   padding: 0;
   color: #1b444d;
   font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
-  -webkit-text-stroke: 4px #fcff49ff; /* Updated border color and thickness */
+  -webkit-text-stroke: 4px #f2da1b; /* Updated border color and thickness */
   paint-order: stroke fill;
 }
 
