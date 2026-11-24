@@ -84,67 +84,71 @@ const stripPrefix = (text: string) =>
  */
 const mobileLayout = (scope: string) => `
   ${scope} {
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    min-height: 0 !important;
-    flex: 1 1 auto !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: stretch !important;
-    padding: clamp(0.75rem, 3vw, 1.25rem) clamp(0.75rem, 3.5vw, 1.25rem) calc(clamp(0.75rem, 3vw, 1.25rem) + env(safe-area-inset-bottom, 0px)) clamp(0.75rem, 3.5vw, 1.25rem) !important;
-    gap: clamp(0.625rem, 2vw, 1rem) !important;
-    box-sizing: border-box !important;
+    align-items: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background-color: #fcfdf3;
   }
   ${scope} .s6-stage {
-    order: 1 !important;
-    position: relative !important;
+    position: static !important;
     width: 100% !important;
     max-width: none !important;
     height: auto !important;
-    flex: 1 0 auto !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    transform: none !important;
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     justify-content: flex-start !important;
-    align-items: stretch !important;
-    transform: none !important;
-    gap: clamp(0.625rem, 2vw, 1rem) !important;
+    padding: 14px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    gap: 12px !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
+    background-color: transparent !important;
+  }
+  ${scope} .s6-content-wrap {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
     overflow: visible !important;
   }
   ${scope} .s6-heading {
     width: 100% !important;
-    font-size: clamp(1.1875rem, 3vw + 0.5rem, 1.375rem) !important;
-    line-height: 1.35 !important;
-    margin: 0 0 clamp(0.25rem, 1vw, 0.5rem) 0 !important;
+    font-size: 16.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.38 !important;
+    margin: 0 0 12px 0 !important;
+    padding: 0 2px !important;
     text-align: left !important;
-    text-wrap: balance !important;
     flex: 0 0 auto !important;
   }
   ${scope} .s6-cards {
-    gap: clamp(0.5rem, 1.5vw + 0.2rem, 0.75rem) !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    gap: 10px !important;
     width: 100% !important;
+    flex: 0 0 auto !important;
     overflow: visible !important;
   }
   ${scope} .s6-card {
-    flex: 1 0 auto !important;
-    min-height: 3.5rem !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 48px !important;
     max-height: none !important;
     height: auto !important;
-    padding: clamp(0.625rem, 2vw + 0.25rem, 0.875rem) clamp(0.75rem, 2.5vw, 1rem) !important;
-    gap: clamp(0.5rem, 2vw, 0.75rem) !important;
-    border-radius: 0.75rem !important;
+    padding: 11px 14px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
     box-sizing: border-box !important;
     align-items: center !important;
   }
@@ -154,43 +158,39 @@ const mobileLayout = (scope: string) => `
   ${scope} .s6-card:active {
     transform: translateY(0) !important;
   }
-  ${scope} .s6-card-tag {
-    font-size: clamp(0.8125rem, 0.6vw + 0.7rem, 0.875rem) !important;
-    padding: 0.25rem 0.625rem !important;
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
-  }
   ${scope} .s6-card-text {
-    font-size: clamp(1rem, 1.2vw + 0.75rem, 1.125rem) !important;
-    line-height: 1.35 !important;
+    font-size: 15px !important;
+    line-height: 1.38 !important;
     overflow-wrap: break-word !important;
     word-break: normal !important;
     flex: 1 1 auto !important;
   }
-  ${scope} .s6-card-icon {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
   ${scope} .s6-bottom-bar {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
     gap: 8px !important;
     padding: 4px 0 0 0 !important;
     flex-shrink: 0 !important;
-    width: 100% !important;
+    margin-top: auto !important;  width: 100% !important;
     max-width: 360px !important;
+    margin: 0 auto !important;
   }
   ${scope} .s6-audio-controls {
     position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     order: 1 !important;
     margin: 0 auto !important;
   }
   ${scope} .s6-nav-center {
     position: static !important;
+    left: auto !important;
+    bottom: auto !important;
     order: 2 !important;
     transform: none !important;
     width: 100% !important;
@@ -205,102 +205,12 @@ const mobileLayout = (scope: string) => `
   }
   ${scope} .s6-captions-panel {
     position: static !important;
-    width: 100% !important;
-    max-width: 360px !important;
-    bottom: auto !important;
-  }
-  ${scope} .s6-audio {
-    order: 2 !important;
-    position: static !important;
+    left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0.25rem auto 0 auto !important;
     width: 100% !important;
-    z-index: 25 !important;
-    flex: 0 0 auto !important;
-  }
-  ${scope} .s6-audio [role="toolbar"] {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-  }
-  ${scope} .slide-nav,
-  ${scope} .s6-nav {
-    order: 3 !important;
-    position: static !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0.25rem auto 0 auto !important;
-    width: 100% !important;
-    flex: 0 0 auto !important;
-    z-index: 25 !important;
-  }
-  ${scope} .slide-nav-container {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    max-width: 360px !important;
     margin: 0 auto !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    gap: clamp(0.5rem, 2.5vw, 1rem) !important;
-  }
-  ${scope} .slide-nav-btn {
-    min-width: 65px !important;
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 0 20px !important;
-    white-space: nowrap !important;
-    flex: 0 1 auto !important;
-    font-size: 15px !important;
-  }
-  @media (max-width: 22em) {
-    ${scope} {
-      padding: 0.625rem 0.5rem calc(0.625rem + env(safe-area-inset-bottom, 0px)) 0.5rem !important;
-      gap: 0.5rem !important;
-    }
-    ${scope} .s6-stage {
-      gap: 0.5rem !important;
-    }
-    ${scope} .s6-heading {
-      font-size: 1.0625rem !important;
-      margin: 0 0 0.25rem 0 !important;
-    }
-    ${scope} .s6-cards {
-      gap: 0.375rem !important;
-    }
-    ${scope} .s6-card {
-      min-height: 3rem !important;
-      height: auto !important;
-      flex: 1 0 auto !important;
-      padding: 0.5rem 0.5rem !important;
-      gap: 0.375rem !important;
-      border-radius: 0.5rem !important;
-    }
-    ${scope} .s6-card-tag {
-      padding: 0.2rem 0.4rem !important;
-      font-size: 0.75rem !important;
-    }
-    ${scope} .s6-card-text {
-      font-size: 0.9375rem !important;
-      line-height: 1.3 !important;
-    }
-    ${scope} .slide-nav-container {
-      gap: 0.375rem !important;
-    }
-    ${scope} .slide-nav-btn {
-      min-width: 80px !important;
-      height: 36px !important;
-      min-height: 36px !important;
-      padding: 0 16px !important;
-      font-size: 14px !important;
-    }
   }
 `;
 

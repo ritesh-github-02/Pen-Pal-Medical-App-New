@@ -104,6 +104,13 @@ const SLIDE11_CSS = `
 
 
 /* Rows of symptom chips */
+.s11-chips-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+}
+
 .s11-chip-row {
   display: flex;
   align-items: center;
@@ -417,79 +424,101 @@ const SLIDE11_CSS = `
 @media (max-width: 767px) {
   .s11-wrapper {
     position: relative !important;
-    height: auto !important;
-    min-height: 100dvh !important;
-    overflow: visible !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    background-color: #fcfdf3 !important;
   }
- 
+
   .s11-root {
+    position: static !important;
     width: 100% !important;
     height: auto !important;
     max-height: none !important;
-    min-height: 100dvh !important;
+    min-height: 100% !important;
     border-radius: 0 !important;
     transform: none !important;
-    overflow-y: auto !important;
-    padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px !important;
-    justify-content: flex-start !important;
-    gap: 1.25rem !important;
+    overflow: visible !important;
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background-color: transparent !important;
   }
 
   .s11-top-section {
-    max-width: 100% !important;
-    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    padding: 0 2px !important;
+    margin: 0 auto !important;
   }
 
   .s11-heading {
-    font-size: 19px !important;
+    font-size: 16.5px !important;
     line-height: 1.35 !important;
     text-align: left !important;
   }
 
   .s11-middle {
     flex-direction: column !important;
-    gap: 1.25rem !important;
+    gap: 10px !important;
     width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
     align-items: center !important;
   }
 
   .s11-card {
-    padding: 1rem 0.9rem !important;
-    gap: 0.75rem !important;
+    padding: 13px 12px !important;
+    gap: 10px !important;
     border-radius: 16px !important;
     max-width: 100% !important;
     width: 100% !important;
   }
 
-  .s11-chip-row {
-    gap: 0.5rem !important;
+  .s11-chips-group {
+    display: flex !important;
+    flex-direction: row !important;
     flex-wrap: wrap !important;
-    justify-content: flex-start !important;
+    gap: 7px !important;
+    width: 100% !important;
+    align-items: center !important;
+  }
+
+  .s11-chip-row {
+    display: contents !important;
   }
 
   .s11-chip {
-    padding: 0.45rem 0.75rem !important;
+    padding: 7px 11px !important;
     font-size: 13.5px !important;
+    line-height: 1.25 !important;
     white-space: normal !important;
     flex-shrink: 1 !important;
     text-align: center !important;
+    max-width: 100% !important;
   }
 
   .s11-row-bottom {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.75rem !important;
-    margin-top: 0.25rem !important;
+    gap: 8px !important;
+    margin-top: 2px !important;
   }
 
   .s11-other-wrap {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.4rem !important;
+    gap: 5px !important;
   }
 
   .s11-other-label {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
   }
 
   .s11-other-input {
@@ -498,17 +527,20 @@ const SLIDE11_CSS = `
   }
 
   .s11-nurse {
-    width: 110px !important;
+    width: 80px !important;
     margin: 0 auto !important;
   }
 
   .s11-bottom-bar {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 0 0 0 !important;
+    gap: 8px !important;
+    padding: 4px 0 0 0 !important;
     flex-shrink: 0 !important;
     width: 100% !important;
     max-width: 360px !important;
@@ -518,9 +550,11 @@ const SLIDE11_CSS = `
 
   .s11-audio-controls {
     position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     order: 1 !important;
     margin: 0 auto !important;
-    gap: 8px !important;
+    gap: 10px !important;
   }
 
   .s11-audio-btn {
@@ -530,12 +564,14 @@ const SLIDE11_CSS = `
   }
 
   .s11-audio-btn svg {
-    width: 44px !important;
-    height: 38px !important;
+    width: 40px !important;
+    height: 34px !important;
   }
 
   .s11-nav-center {
     position: static !important;
+    left: auto !important;
+    bottom: auto !important;
     order: 2 !important;
     transform: none !important;
     width: 100% !important;
@@ -552,9 +588,11 @@ const SLIDE11_CSS = `
 
   .s11-captions-panel {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     width: 100% !important;
     max-width: 360px !important;
-    bottom: auto !important;
     margin: 0 auto !important;
     padding: 8px 12px !important;
     font-size: 13.5px !important;
@@ -1018,10 +1056,12 @@ export function Slide11SymptomsScreen({
 
         <div className="s11-middle">
           <div className="s11-card" role="group" aria-label={titleText}>
-            <div className="s11-chip-row">{ROW_1.map(renderChip)}</div>
-            <div className="s11-chip-row">{ROW_2.map(renderChip)}</div>
-            <div className="s11-chip-row">{ROW_3.map(renderChip)}</div>
-            <div className="s11-chip-row">{ROW_4.map(renderChip)}</div>
+            <div className="s11-chips-group">
+              <div className="s11-chip-row">{ROW_1.map(renderChip)}</div>
+              <div className="s11-chip-row">{ROW_2.map(renderChip)}</div>
+              <div className="s11-chip-row">{ROW_3.map(renderChip)}</div>
+              <div className="s11-chip-row">{ROW_4.map(renderChip)}</div>
+            </div>
 
 
             <div className="s11-row-bottom">
@@ -1244,7 +1284,7 @@ export function Slide11SymptomsScreen({
           }}
         >
           <div
-            className="relative bg-[#fffef2] rounded-[28px] p-8 md:p-10 max-w-[620px] w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200"
+            className="relative bg-[#fffef2] rounded-[22px] sm:rounded-[28px] p-7 sm:p-10 md:p-12 max-w-[760px] max-h-[90dvh] overflow-y-auto w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 sm:gap-6 animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* <button
@@ -1259,13 +1299,13 @@ export function Slide11SymptomsScreen({
               ✕
             </button> */}
 
-             <div className="flex flex-wrap gap-3.5">
+             <div className="flex flex-wrap gap-5">
                 {["Hives", "Blisters", "Red, fine or bumpy rash"].map(opt => (
                   <button
                     key={opt}
                     ref={opt === "Hives" ? rashFirstBtnRef : null}
                     onClick={() => toggleRashDetail(opt)}
-                    className={`px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                    className={`px-7 py-4 rounded-xl border-[2px] font-bold text-[17px] transition-all ${
                       activeRashDetails.includes(opt)
                         ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                         : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1275,12 +1315,12 @@ export function Slide11SymptomsScreen({
                   </button>
                 ))}
              </div>
-             <div className="flex flex-wrap gap-3.5">
+             <div className="flex flex-wrap gap-5">
                 {["Flushing", "Pus-filled pimples"].map(opt => (
                   <button
                     key={opt}
                     onClick={() => toggleRashDetail(opt)}
-                    className={`px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                    className={`px-7 py-4 rounded-xl border-[2px] font-bold text-[17px] transition-all ${
                       activeRashDetails.includes(opt)
                         ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                         : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1290,10 +1330,10 @@ export function Slide11SymptomsScreen({
                   </button>
                 ))}
              </div>
-             <div className="flex flex-wrap gap-3.5 mt-1">
+             <div className="flex flex-wrap gap-5 mt-2">
                <button
                  onClick={() => toggleRashDetail("Unsure")}
-                 className={`px-6 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                 className={`px-8 py-4 rounded-xl border-[2px] font-bold text-[17px] transition-all ${
                    activeRashDetails.includes("Unsure")
                      ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                      : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1318,7 +1358,7 @@ export function Slide11SymptomsScreen({
           }}
         >
           <div
-            className="relative bg-[#fffef2] rounded-[28px] p-8 md:p-10 max-w-[620px] w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200"
+            className="relative bg-[#fffef2] rounded-[22px] sm:rounded-[28px] p-7 sm:p-10 md:p-12 max-w-[760px] max-h-[90dvh] overflow-y-auto w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 sm:gap-6 animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* <button
@@ -1333,13 +1373,13 @@ export function Slide11SymptomsScreen({
               ✕
             </button> */}
 
-             <div className="flex gap-3.5">
+             <div className="flex flex-wrap gap-5">
                 {["Face swelling", "Throat swelling"].map(opt => (
                   <button
                     key={opt}
                     ref={opt === "Face swelling" ? swellingFirstBtnRef : null}
                     onClick={() => toggleSwellingDetail(opt)}
-                    className={`flex-1 px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                    className={`flex-1 min-w-[140px] px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl border-[2px] font-bold text-sm sm:text-[15.5px] transition-all ${
                       activeSwellingDetails.includes(opt)
                         ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                         : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1349,12 +1389,12 @@ export function Slide11SymptomsScreen({
                   </button>
                 ))}
              </div>
-             <div className="flex gap-3.5">
+             <div className="flex flex-wrap gap-5">
                 {["Lip swelling", "Tongue swelling"].map(opt => (
                   <button
                     key={opt}
                     onClick={() => toggleSwellingDetail(opt)}
-                    className={`flex-1 px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                    className={`flex-1 min-w-[140px] px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl border-[2px] font-bold text-sm sm:text-[15.5px] transition-all ${
                       activeSwellingDetails.includes(opt)
                         ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                         : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1364,10 +1404,10 @@ export function Slide11SymptomsScreen({
                   </button>
                 ))}
              </div>
-             <div className="flex gap-3.5">
+             <div className="flex flex-wrap gap-5">
                <button
                  onClick={() => toggleSwellingDetail("Unsure")}
-                 className={`px-6 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                 className={`px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl border-[2px] font-bold text-sm sm:text-[15.5px] transition-all ${
                    activeSwellingDetails.includes("Unsure")
                      ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
                      : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
@@ -1376,15 +1416,15 @@ export function Slide11SymptomsScreen({
                   {isSpanish ? "No estoy seguro/No lo sé" : "Unsure/I don't know"}
                </button>
              </div>           
-             <div className="flex items-center gap-3.5 mt-2">
-               <label className="text-[15.5px] font-bold text-[#142724] whitespace-nowrap">
+             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5 mt-2">
+               <label className="text-sm sm:text-[15.5px] font-bold text-[#142724] whitespace-nowrap">
                  {isSpanish ? "Otro: Describa" : "Other: Please describe"}
                </label>
                <input
                  type="text"
                  value={swellingOtherText}
                  onChange={(e) => handleSwellingOtherChange(e.target.value)}
-                 className="flex-1 bg-transparent border-b-2 border-[#142724] outline-none text-base font-medium px-2 py-1.5 focus:border-[#0b1f1c]"
+                 className="w-full sm:flex-1 bg-transparent border-b-2 border-[#142724] outline-none text-base font-medium px-2 py-1.5 focus:border-[#0b1f1c]"
                />
              </div>
           </div>

@@ -68,6 +68,8 @@ const mobileLayoutCSS = (scope: string) => `
   ${scope} {
     align-items: flex-start;
     overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     background-color: #fcfdf3;
   }
   ${scope} .s17b-stage {
@@ -81,7 +83,7 @@ const mobileLayoutCSS = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    padding: 14px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
     gap: 12px !important;
     box-sizing: border-box !important;
     overflow: visible !important;
@@ -89,13 +91,16 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s17b-banner {
     position: static !important;
+    left: auto !important;
+    top: auto !important;
     transform: none !important;
     width: 100% !important;
     max-width: 360px !important;
     min-height: auto !important;
     padding: 10px 18px !important;
     margin: 0 auto !important;
-    border-radius: 20px !important;
+    border-radius: 16px !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s17b-banner-title {
     font-size: 16.5px !important;
@@ -107,17 +112,20 @@ const mobileLayoutCSS = (scope: string) => `
     max-width: 360px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px !important;
-    margin: 4px auto !important;
+    gap: 12px !important;
+    margin: 0 auto !important;
+    flex: 0 0 auto !important;
   }
   ${scope} .s17b-options-col {
     position: static !important;
+    left: auto !important;
+    top: auto !important;
     width: 100% !important;
-    gap: 12px !important;
+    gap: 8px !important;
   }
   ${scope} .s17b-option-row {
-    padding: 8px 10px !important;
-    background-color: rgba(255, 255, 255, 0.7) !important;
+    padding: 8px 12px !important;
+    background-color: rgba(255, 255, 255, 0.72) !important;
     border-radius: 10px !important;
   }
   ${scope} .s17b-option-label {
@@ -125,42 +133,66 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s17b-right-col {
     position: static !important;
+    left: auto !important;
+    top: auto !important;
     width: 100% !important;
+    height: auto !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 12px !important;
-    margin-top: 4px !important;
+    gap: 6px !important;
+    margin-top: 2px !important;
   }
   ${scope} .s17b-bubble-container {
-    position: static !important;
-    width: 180px !important;
-    height: 110px !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 175px !important;
+    height: 112px !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s17b-bubble-text {
-    font-size: 14px !important;
-    padding: 8px 12px 18px 10px !important;
+    position: absolute !important;
+    inset: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    color: #142724 !important;
+    text-align: center !important;
+    padding: 6px 16px 20px 10px !important;
   }
   ${scope} .s17b-nurse-wrap {
     position: static !important;
-    width: 95px !important;
-    height: 180px !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 92px !important;
+    height: 172px !important;
+    flex-shrink: 0 !important;
   }
   ${scope} .s17b-bottom-bar {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
     gap: 8px !important;
-    padding: 6px 0 0 0 !important;
+    padding: 4px 0 0 0 !important;
     width: 100% !important;
     max-width: 360px !important;
+    margin: 0 auto !important;
+    flex-shrink: 0 !important;
   }
-  ${scope} .s17b-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
-  ${scope} .s17b-nav-center { position: static !important; order: 2 !important; transform: none !important; width: 100% !important; gap: 14px !important; justify-content: space-between !important; }
+  ${scope} .s17b-audio-controls { position: static !important; right: auto !important; bottom: auto !important; order: 1 !important; margin: 0 auto !important; }
+  ${scope} .s17b-nav-center { position: static !important; left: auto !important; bottom: auto !important; order: 2 !important; transform: none !important; width: 100% !important; gap: 14px !important; justify-content: space-between !important; }
   ${scope} .s17b-btn-nav { flex: 1 1 0% !important; height: 44px !important; min-height: 44px !important; font-size: 16px !important; }
-  ${scope} .s17b-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
+  ${scope} .s17b-captions-panel { position: static !important; left: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; max-width: 360px !important; margin: 0 auto !important; }
 `;
 
 const SLIDE17B_CSS = `
@@ -494,6 +526,10 @@ export function Slide17bLikelihoodScreen({
     const el = rootRef.current;
     if (!el) return;
     const update = () => {
+      if (variant === "mobile" || (variant !== "desktop" && window.innerWidth < 768)) {
+        setScale(1);
+        return;
+      }
       const w = el.clientWidth;
       const h = el.clientHeight;
       if (w > 0 && h > 0) {
@@ -508,7 +544,7 @@ export function Slide17bLikelihoodScreen({
     }
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, []);
+  }, [variant]);
 
   useEffect(() => {
     const timer = setTimeout(() => headingRef.current?.focus(), 50);
