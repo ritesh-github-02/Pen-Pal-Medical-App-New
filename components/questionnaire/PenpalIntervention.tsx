@@ -679,7 +679,7 @@ export default function PenpalIntervention() {
         <div className="w-full flex-1 min-h-0 flex items-center justify-center relative print:block print:w-full print:m-0 print:p-0">
           {/* Outer Slide Frame: Clean presentation card with consistent light background and no black border */}
           <div 
-            className="tablet-mockup-frame relative bg-[#f4f8ec] p-0 rounded-2xl md:rounded-[2rem] border-0 shadow-md md:shadow-lg flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block overflow-hidden"
+            className="tablet-mockup-frame relative bg-[#f4f8ec] p-0 rounded-2xl md:rounded-[2rem] border-0 shadow-md md:shadow-lg flex flex-col mx-auto w-full print:bg-transparent print:p-0 print:m-0 print:border-none print:rounded-none print:shadow-none print:aspect-auto print:max-h-none print:h-auto print:w-full print:block print:overflow-visible overflow-hidden"
           >
             {/* Slide Inner Screen with Clean Unified Background */}
             <div 

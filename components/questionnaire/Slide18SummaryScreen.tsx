@@ -381,100 +381,208 @@ const SLIDE18_CSS = `
   }
 
   /* ---- Clinical Print Layout ---- */
+  /* ---- Clinical Print Layout ---- */
   @media print {
     @page {
       size: portrait;
-      margin: 12mm 15mm;
+      margin: 10mm 14mm;
     }
     .s18-bottom-bar,
     .s18-captions-panel,
     .no-print {
       display: none !important;
     }
-    .s18-root {
+    .s18-root,
+    .s18-root.is-mobile,
+    .s18-root.is-auto,
+    .s18-root.is-desktop,
+    .s18-root:not(.is-desktop) {
       position: static !important;
       display: block !important;
       width: 100% !important;
+      max-width: 100% !important;
       height: auto !important;
+      min-height: 0 !important;
       background: #ffffff !important;
       overflow: visible !important;
+      transform: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
-    .s18-stage {
+    .s18-stage,
+    .s18-root.is-mobile .s18-stage,
+    .s18-root.is-auto .s18-stage,
+    .s18-root.is-desktop .s18-stage,
+    .s18-root:not(.is-desktop) .s18-stage {
       position: static !important;
       width: 100% !important;
+      max-width: 100% !important;
       height: auto !important;
+      min-height: 0 !important;
       transform: none !important;
       overflow: visible !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: transparent !important;
     }
-    .s18-capture-surface {
+    .s18-capture-surface,
+    .s18-root.is-mobile .s18-capture-surface,
+    .s18-root.is-auto .s18-capture-surface,
+    .s18-root.is-desktop .s18-capture-surface,
+    .s18-root:not(.is-desktop) .s18-capture-surface {
       position: static !important;
       display: block !important;
       width: 100% !important;
+      max-width: 100% !important;
       height: auto !important;
+      min-height: 0 !important;
       padding: 0 !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
     }
-    .s18-print-header {
+    .s18-print-header,
+    .s18-root.is-mobile .s18-print-header,
+    .s18-root.is-auto .s18-print-header,
+    .s18-root:not(.is-desktop) .s18-print-header {
       display: flex !important;
+      flex-direction: row !important;
       justify-content: space-between !important;
-      align-items: flex-end !important;
+      align-items: flex-start !important;
+      gap: 24px !important;
       border-bottom: 2px solid #142724 !important;
       padding-bottom: 8px !important;
       margin-bottom: 14px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
-    .s18-print-brand {
+    .s18-print-brand,
+    .s18-root.is-mobile .s18-print-brand,
+    .s18-root.is-auto .s18-print-brand,
+    .s18-root:not(.is-desktop) .s18-print-brand {
       display: flex !important;
       flex-direction: column !important;
-      gap: 2px !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      gap: 3px !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      max-width: 58% !important;
     }
     .s18-print-logo {
+      display: block !important;
       font-size: 18pt !important;
       font-weight: 900 !important;
       color: #142724 !important;
-      line-height: 1 !important;
+      line-height: 1.1 !important;
+      letter-spacing: -0.02em !important;
     }
     .s18-print-tagline {
+      display: block !important;
       font-size: 8.5pt !important;
       font-weight: 600 !important;
       color: #3b5a54 !important;
+      line-height: 1.35 !important;
+      white-space: normal !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      text-align: left !important;
     }
-    .s18-print-meta {
+    .s18-print-meta,
+    .s18-root.is-mobile .s18-print-meta,
+    .s18-root.is-auto .s18-print-meta,
+    .s18-root:not(.is-desktop) .s18-print-meta {
       display: flex !important;
       flex-direction: column !important;
       align-items: flex-end !important;
-      gap: 2px !important;
+      text-align: right !important;
+      gap: 3px !important;
+      flex: 0 0 auto !important;
+      min-width: 0 !important;
+      max-width: 40% !important;
     }
     .s18-print-doc-type {
+      display: block !important;
       font-size: 8.5pt !important;
       font-weight: 700 !important;
       color: #142724 !important;
+      line-height: 1.35 !important;
+      text-align: right !important;
+      white-space: normal !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
     }
     .s18-print-date {
+      display: block !important;
       font-size: 8pt !important;
       color: #557871 !important;
+      text-align: right !important;
+      white-space: nowrap !important;
     }
-    .s18-badge {
+    .s18-badge,
+    .s18-root.is-mobile .s18-badge,
+    .s18-root.is-auto .s18-badge,
+    .s18-root:not(.is-desktop) .s18-badge {
       position: static !important;
       display: inline-flex !important;
+      max-width: 100% !important;
+      min-width: auto !important;
+      height: auto !important;
       background-color: #feff9f !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
       border: 2px solid #2b7a85 !important;
+      border-radius: 9999px !important;
+      padding: 6px 20px !important;
       box-shadow: none !important;
-      margin-bottom: 14px !important;
+      margin-bottom: 12px !important;
     }
-    .s18-steps-list {
+    .s18-badge-title {
+      font-size: 13.5pt !important;
+      font-weight: 700 !important;
+      color: #1d2423 !important;
+      line-height: 1.2 !important;
+    }
+    .s18-steps-list,
+    .s18-root.is-mobile .s18-steps-list,
+    .s18-root.is-auto .s18-steps-list,
+    .s18-root:not(.is-desktop) .s18-steps-list {
       position: static !important;
       width: 100% !important;
-      margin-bottom: 14px !important;
-      gap: 6px !important;
+      max-width: 100% !important;
+      margin: 0 0 14px 0 !important;
+      padding: 0 !important;
+      gap: 5px !important;
     }
-    .s18-table-container {
+    .s18-step-line {
+      font-size: 10pt !important;
+      line-height: 1.4 !important;
+      color: #1d2423 !important;
+      margin: 0 !important;
+    }
+    .s18-quote-line {
+      font-size: 9.5pt !important;
+      line-height: 1.35 !important;
+      color: #1d2423 !important;
+      margin: 0 !important;
+    }
+    .s18-table-container,
+    .s18-root.is-mobile .s18-table-container,
+    .s18-root.is-auto .s18-table-container,
+    .s18-root:not(.is-desktop) .s18-table-container {
       position: static !important;
       width: 100% !important;
+      max-width: 100% !important;
       max-height: none !important;
       overflow: visible !important;
-      margin-bottom: 14px !important;
+      margin: 0 0 14px 0 !important;
+      padding: 0 !important;
       page-break-inside: avoid !important;
+    }
+    .s18-table {
+      width: 100% !important;
+      table-layout: fixed !important;
+      border-collapse: collapse !important;
     }
     .s18-table tbody tr:nth-child(odd) .s18-table-label {
       background-color: #c9dedd !important;
@@ -486,12 +594,30 @@ const SLIDE18_CSS = `
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
-    .s18-print-footer {
+    .s18-table-label {
+      width: 38% !important;
+      font-size: 8.5pt !important;
+      padding: 6px 10px !important;
+      line-height: 1.35 !important;
+    }
+    .s18-table-value {
+      width: 62% !important;
+      font-size: 8.5pt !important;
+      padding: 6px 10px !important;
+      line-height: 1.35 !important;
+    }
+    .s18-print-footer,
+    .s18-root.is-mobile .s18-print-footer,
+    .s18-root.is-auto .s18-print-footer,
+    .s18-root:not(.is-desktop) .s18-print-footer {
       display: flex !important;
       justify-content: space-between !important;
       align-items: center !important;
+      width: 100% !important;
+      max-width: 100% !important;
       border-top: 1px solid #90b3ab !important;
       padding-top: 8px !important;
+      margin-top: 12px !important;
       font-size: 8.5pt !important;
       color: #3b5a54 !important;
     }
