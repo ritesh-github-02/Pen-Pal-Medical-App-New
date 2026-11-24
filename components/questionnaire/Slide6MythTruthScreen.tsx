@@ -101,7 +101,7 @@ const mobileLayout = (scope: string) => `
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
     padding: 14px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
     gap: 12px !important;
     box-sizing: border-box !important;
@@ -119,7 +119,7 @@ const mobileLayout = (scope: string) => `
     margin: 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    flex: 1 1 auto !important;
+    flex: 0 0 auto !important;
     overflow: visible !important;
   }
   ${scope} .s6-heading {
@@ -176,7 +176,7 @@ const mobileLayout = (scope: string) => `
     gap: 8px !important;
     padding: 4px 0 0 0 !important;
     flex-shrink: 0 !important;
-    margin-top: auto !important;  width: 100% !important;
+    width: 100% !important;
     max-width: 360px !important;
     margin: 0 auto !important;
   }
