@@ -201,7 +201,7 @@ const SLIDE21_CSS = `
     list-style: disc;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
   }
   .s21-bullet::marker {
     color: #1d2423;
