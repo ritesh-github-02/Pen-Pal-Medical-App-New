@@ -59,8 +59,10 @@ const COPY = {
 // ============================================================================
 const mobileLayoutCSS = (scope: string) => `
   ${scope} {
-    align-items: flex-start;
-    overflow-y: auto;
+    flex: 0 0 auto !important;
+    height: auto !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
     background-color: #fcfdf3;
   }
   ${scope} .s9-stage {
