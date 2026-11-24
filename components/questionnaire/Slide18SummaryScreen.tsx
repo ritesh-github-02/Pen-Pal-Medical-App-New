@@ -110,6 +110,7 @@ const mobileLayoutCSS = (scope: string) => `
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
+    transform: none !important;
     width: 100% !important;
     display: flex !important;
     flex-wrap: wrap !important;
@@ -335,13 +336,13 @@ const SLIDE18_CSS = `
   }
   .s18-actions-center {
     position: absolute;
-    left: 48px;
-    right: 162px;
+    left: 50%;
     bottom: 20px;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: 18px;
   }
   .s18-btn-action {
     height: 38px;
