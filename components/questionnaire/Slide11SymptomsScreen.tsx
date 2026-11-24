@@ -267,18 +267,18 @@ const SLIDE11_CSS = `
 }
 
 
-/* ---- Bottom Bar (matches Slides 5 & 6 pixel-for-pixel) ---- */
+/* ---- Bottom Bar (scaled 1.18× to compensate for 896×620 vs 760×530 stage) ---- */
 .s11-bottom-bar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 74px;
+  height: 87px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 20;
-  padding: 0 24px;
+  padding: 0 28px;
   pointer-events: none;
 }
 
@@ -286,10 +286,10 @@ const SLIDE11_CSS = `
 .s11-nav-center {
   display: flex;
   align-items: center;
-  gap: 54px;
+  gap: 64px;
   position: absolute;
   left: 50%;
-  bottom: 20px;
+  bottom: 24px;
   transform: translateX(-50%);
   pointer-events: auto;
 }
@@ -298,15 +298,15 @@ const SLIDE11_CSS = `
 .s11-btn-nav {
   border-radius: 9999px;
   font-weight: 600;
-  border: 1.6px solid #3c7c87;
+  border: 1.9px solid #3c7c87;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 38px;
-  min-width: 74px;
-  font-size: 15px;
-  padding: 0 20px;
+  height: 45px;
+  min-width: 87px;
+  font-size: 17.7px;
+  padding: 0 24px;
   transition: transform 0.1s ease, background-color 0.15s ease;
   font-family: inherit;
   user-select: none;
@@ -342,14 +342,14 @@ const SLIDE11_CSS = `
 }
 
 
-/* Audio controls — bottom-right */
+/* Audio controls — bottom-right (scaled 1.18×) */
 .s11-audio-controls {
   position: absolute;
-  right: 52px;
-  bottom: 18px;
+  right: 61px;
+  bottom: 21px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #2b7a85;
   pointer-events: auto;
 }
@@ -361,10 +361,10 @@ const SLIDE11_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
-  min-width: 40px;
-  min-height: 40px;
-  border-radius: 8px;
+  padding: 5px;
+  min-width: 47px;
+  min-height: 47px;
+  border-radius: 9px;
   transition: transform 0.12s ease, opacity 0.15s ease;
   font-family: inherit;
 }
@@ -374,36 +374,36 @@ const SLIDE11_CSS = `
 }
 
 
-/* Closed Captions Panel */
+/* Closed Captions Panel (scaled 1.18×) */
 .s11-captions-panel {
   position: absolute;
-  bottom: 66px;
-  left: 52px;
-  right: 52px;
+  bottom: 78px;
+  left: 61px;
+  right: 61px;
   background: #143833;
   color: #fff;
-  border: 1.5px solid #bddfd8;
-  border-radius: 12px;
-  padding: 8px 14px;
+  border: 1.8px solid #bddfd8;
+  border-radius: 14px;
+  padding: 9px 17px;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   z-index: 30;
 }
 .s11-captions-tag {
   background: #fdee8e;
   color: #1a2624;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 7px;
+  border-radius: 5px;
   flex-shrink: 0;
   letter-spacing: 0.05em;
 }
 .s11-captions-text {
-  font-size: 13.5px;
+  font-size: 16px;
   line-height: 1.4;
   margin: 0;
   font-weight: 500;
@@ -1104,8 +1104,8 @@ export function Slide11SymptomsScreen({
               }
             >
               <svg
-                width="44"
-                height="40"
+                width="52"
+                height="47"
                 viewBox="0 0 40 36"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
