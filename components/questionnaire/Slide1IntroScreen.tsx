@@ -138,7 +138,7 @@ const SLIDE1_COMPONENT_CSS = `
     border-radius: 9999px;
     background-color: #fdff9d; /* Light cream */
     color: #12403d; /* Dark teal text */
-    border: 2px solid #12403d; /* Dark teal border, matching Figma */
+    border: 2px solid #2a798a; /* Dark teal border, matching Figma */
     font-weight: 700;
     font-size: 20px;
     padding: 0 36px;
