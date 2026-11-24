@@ -78,9 +78,12 @@ const mobileLayoutCSS = (scope: string) => `
     max-width: 360px !important;
     margin: 0 auto !important;
   }
-  ${scope} .s21-heading,
+  ${scope} .s21-heading{
+  font-size: 18px !important;
+    line-height: 1.4 !important;
+  }
   ${scope} .s21-bullet {
-    font-size: 15px !important;
+    font-size: 16px !important;
     line-height: 1.4 !important;
   }
   ${scope} .s21-figure {

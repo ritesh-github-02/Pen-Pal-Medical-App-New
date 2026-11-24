@@ -103,7 +103,7 @@ const mobileLayoutCSS = (scope: string) => `
     position: static !important;
     width: 100% !important;
     max-width: 360px !important;
-    font-size: 17.5px !important;
+    font-size: 18px !important;
     line-height: 1.35 !important;
     text-align: center !important;
     margin: 0 auto !important;

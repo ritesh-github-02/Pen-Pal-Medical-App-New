@@ -101,7 +101,7 @@ const mobileLayoutCSS = (scope: string) => `
     width: 80% !important;
   }
   ${scope} .s10b-bubble-text {
-    font-size: clamp(15px, 4.2vw, 17.5px) !important;
+    font-size: clamp(15px, 4.2vw, 18px) !important;
     line-height: 1.42 !important;
     text-align: center !important;
   }

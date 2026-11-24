@@ -102,23 +102,24 @@ const mobileLayoutCSS = (scope: string) => `
     max-width: 360px !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
+    gap: 10px;
   }
   ${scope} .s10-intro {
-    font-size: 15px !important;
+    font-size: 18px !important;
     line-height: 1.4 !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 0px !important;
   }
   ${scope} .s10-subheading {
-    font-size: 15px !important;
+    font-size: 18px !important;
     line-height: 1.38 !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 11px !important;
   }
   ${scope} .s10-bullets {
     padding-left: 8px !important;
     gap: 6px !important;
   }
   ${scope} .s10-bullet-item {
-    font-size: 14.5px !important;
+    font-size: 16px !important;
     line-height: 1.38 !important;
   }
   ${scope} .s10-nurse {

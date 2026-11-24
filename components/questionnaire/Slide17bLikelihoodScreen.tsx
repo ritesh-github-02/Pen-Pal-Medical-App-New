@@ -121,7 +121,7 @@ const mobileLayoutCSS = (scope: string) => `
     left: auto !important;
     top: auto !important;
     width: 100% !important;
-    gap: 8px !important;
+    gap: 0px !important;
   }
   ${scope} .s17b-option-row {
     padding: 8px 12px !important;
