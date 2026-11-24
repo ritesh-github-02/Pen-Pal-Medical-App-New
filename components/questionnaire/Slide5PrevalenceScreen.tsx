@@ -209,7 +209,7 @@ const SLIDE5_CSS = `
     position: absolute;
     left: 76px;
     top: 170px;
-    width: 392px;
+    width: 409px;
     margin: 0;
     padding: 0;
     z-index: 5;
@@ -217,7 +217,7 @@ const SLIDE5_CSS = `
   .s5-heading {
     margin: 0;
     padding: 0;
-    font-size: 20.5px;
+    font-size: 22.5px;
     line-height: 1.48;
     font-weight: 500;
     color: #1d2423;
