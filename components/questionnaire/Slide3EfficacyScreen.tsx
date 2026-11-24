@@ -99,7 +99,7 @@ const mobileLayoutCSS = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    padding: 14px 10px calc(10px + env(safe-area-inset-bottom, 0px)) 10px !important;
     gap: 14px !important;
     box-sizing: border-box !important;
     overflow: visible !important;
@@ -107,13 +107,16 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s3-left-col {
     position: static !important;
+    left: auto !important;
+    top: auto !important;
     width: 100% !important;
     max-width: 360px !important;
     margin: 0 auto !important;
+    padding: 0 6px !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s3-heading {
-    font-size: 18px !important;
+    font-size: 17.5px !important;
     line-height: 1.4 !important;
     text-align: left !important;
   }
@@ -122,20 +125,30 @@ const mobileLayoutCSS = (scope: string) => `
     left: auto !important;
     top: auto !important;
     width: 100% !important;
-    max-width: 350px !important;
+    max-width: 374px !important;
     aspect-ratio: 490 / 175 !important;
     height: auto !important;
     margin: 0 auto !important;
+    padding: 0 !important;
+    container-type: inline-size !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s3-bubble-text-wrap {
-    top: 48% !important;
-    left: 46.5% !important;
-    width: 78% !important;
+    position: absolute !important;
+    top: 48.5% !important;
+    left: 46.7% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 68% !important;
+    z-index: 2 !important;
   }
   ${scope} .s3-bubble-text {
-    font-size: clamp(12.5px, 3.4vw, 14.5px) !important;
-    line-height: 1.38 !important;
+    font-size: clamp(13.5px, 4.3cqw, 16px) !important;
+    line-height: 1.2 !important;
+    text-wrap: balance !important;
+  }
+  ${scope} .s3-bubble-text--long {
+    font-size: clamp(11.5px, 3.6cqw, 13.8px) !important;
+    line-height: 1.2 !important;
   }
   ${scope} .s3-nurse {
     position: relative !important;
@@ -148,6 +161,9 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s3-bottom-bar {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -159,11 +175,15 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s3-audio-controls {
     position: static !important;
+    right: auto !important;
+    bottom: auto !important;
     order: 1 !important;
     margin: 0 auto !important;
   }
   ${scope} .s3-nav-center {
     position: static !important;
+    left: auto !important;
+    bottom: auto !important;
     order: 2 !important;
     transform: none !important;
     width: 100% !important;
@@ -178,6 +198,8 @@ const mobileLayoutCSS = (scope: string) => `
   }
   ${scope} .s3-captions-panel {
     position: static !important;
+    left: auto !important;
+    right: auto !important;
     width: 100% !important;
     max-width: 360px !important;
     bottom: auto !important;
@@ -695,7 +717,11 @@ export function Slide3EfficacyScreen({
           </svg>
 
           <div className="s3-bubble-text-wrap">
-            <blockquote className="s3-bubble-text">{bubbleText}</blockquote>
+            <blockquote
+              className={`s3-bubble-text${bubbleText.length > 115 ? " s3-bubble-text--long" : ""}`}
+            >
+              {bubbleText}
+            </blockquote>
           </div>
         </figure>
 
