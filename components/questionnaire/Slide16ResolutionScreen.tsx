@@ -87,7 +87,7 @@ const mobileLayoutCSS = (scope: string) => `
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    padding: 14px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px !important;
     gap: 14px !important;
     box-sizing: border-box !important;
     overflow: visible !important;
@@ -96,7 +96,7 @@ const mobileLayoutCSS = (scope: string) => `
   ${scope} .s16-heading {
     position: static !important;
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 380px !important;
     font-size: 18px !important;
     line-height: 1.35 !important;
     text-align: center !important;
@@ -105,19 +105,28 @@ const mobileLayoutCSS = (scope: string) => `
   ${scope} .s16-card {
     position: static !important;
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 380px !important;
     min-height: auto !important;
-    padding: 16px 14px !important;
+    padding: 14px 10px !important;
     margin: 0 auto !important;
   }
   ${scope} .s16-options-row {
-    flex-direction: column !important;
-    gap: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px 6px !important;
+    width: 100% !important;
   }
   ${scope} .s16-option-btn {
-    width: 100% !important;
-    min-height: 44px !important;
-    white-space: normal !important;
+    width: auto !important;
+    flex: 0 1 auto !important;
+    min-height: 36px !important;
+    padding: 6px 8px !important;
+    font-size: clamp(11px, 3vw, 13.5px) !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
   }
   ${scope} .s16-nurse {
     position: static !important;
@@ -220,15 +229,16 @@ const SLIDE16_CSS = `
 
   .s16-options-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 10px 12px;
     width: 100%;
   }
 
   .s16-option-btn {
     min-height: 36px;
-    padding: 7px 14px;
+    padding: 7px 12px;
     border-radius: 6px;
     background-color: #ffffff;
     border: 1.3px solid #2b7a85;
