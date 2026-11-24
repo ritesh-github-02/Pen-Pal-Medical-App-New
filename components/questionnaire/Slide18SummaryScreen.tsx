@@ -55,7 +55,7 @@ const mobileLayoutCSS = (scope: string) => `
     align-items: center !important;
     justify-content: space-between !important;
     padding: 14px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px !important;
-    gap: 12px !important;
+    gap: 18px !important;
     box-sizing: border-box !important;
   }
   ${scope} .s18-badge {
