@@ -37,7 +37,8 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_5_reaction_detail', slideNumber: 20, title: 'Subsequent Reaction History (Modal 20)', type: 'Question' },
   { id: 'slide21_what_now', slideNumber: 21, title: 'Next Steps & Doctor Discussion', type: 'Education' },
   { id: 'screen7_summary', slideNumber: 22, title: 'Action Steps & Clinical Summary', type: 'Summary' },
-  { id: 'screen_end', slideNumber: 23, title: 'Non-Participant End Screen', type: 'Exit' },
+  { id: 'slide17b_likelihood', slideNumber: 23, title: 'Allergy Testing Discussion Likelihood', type: 'Question' },
+  { id: 'screen_end', slideNumber: 24, title: 'Non-Participant End Screen', type: 'Exit' },
   { id: 'control_baseline_page', slideNumber: 1, title: 'Educational Handout Website (Control Arm)', type: 'Handout' },
 ];
 

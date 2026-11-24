@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { generateAssessmentPDF } from "@/lib/generate-pdf";
 import { formatAssessmentData } from "@/lib/format-assessment";
 import { toPng } from "html-to-image";
-import { submitAnswer, completeQuestionnaire } from "./actions";
+import { submitAnswer } from "./actions";
 
 // ============================================================================
 // Constants (matches reference tablet aspect 827x577 = 1.433)
@@ -103,8 +103,10 @@ const mobileLayoutCSS = (scope: string) => `
     max-width: 360px !important;
   }
   ${scope} .s18-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
-  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; bottom: auto !important; width: 100% !important; gap: 12px !important; justify-content: center !important; }
-  ${scope} .s18-btn-action { flex: 1 1 0% !important; height: 42px !important; min-height: 42px !important; font-size: 14px !important; padding: 0 12px !important; }
+  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  ${scope} .s18-btn-action { width: 100% !important; height: 42px !important; min-height: 42px !important; font-size: 13.5px !important; padding: 0 10px !important; }
+  ${scope} .s18-btn-back { order: 3 !important; }
+  ${scope} .s18-btn-next { order: 4 !important; }
   ${scope} .s18-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
 `;
 
@@ -307,16 +309,18 @@ const SLIDE18_CSS = `
   }
   .s18-actions-center {
     position: absolute;
-    left: 238px;
+    left: 48px;
+    right: 162px;
     bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 58px;
+    justify-content: center;
+    gap: 16px;
   }
   .s18-btn-action {
     height: 38px;
-    min-width: 96px;
-    padding: 0 22px;
+    min-width: 74px;
+    padding: 0 18px;
     border-radius: 9999px;
     font-family: inherit;
     font-size: 14.5px;
@@ -334,6 +338,12 @@ const SLIDE18_CSS = `
   }
   .s18-btn-action:hover:not(:disabled) {
     background-color: #b4d1d6;
+  }
+  .s18-btn-next {
+    background-color: #f9fa9a;
+  }
+  .s18-btn-next:hover:not(:disabled) {
+    background-color: #f5f77a;
   }
   .s18-btn-action:active:not(:disabled) {
     transform: scale(0.97);
@@ -632,7 +642,9 @@ export function Slide18SummaryScreen({
   answers,
   activeToken,
   participantId,
+  onBack,
   onPrint,
+  onNext,
   audioSrc,
   stepId = "screen7_summary",
   locale,
@@ -775,9 +787,8 @@ export function Slide18SummaryScreen({
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
 
-      // Persist completion status in the background
+      // Persist summary view/save status in the background
       submitAnswer("screen7_summary", "completed", 0).catch(() => {});
-      completeQuestionnaire().catch(() => {});
     } catch (err) {
       console.error("Failed to capture PNG screenshot:", err);
       generateAssessmentPDF({
@@ -936,9 +947,23 @@ export function Slide18SummaryScreen({
             </div>
           )}
 
-          {/* 4. Bottom Bar: Print + Save as Picture + CC / Play */}
+          {/* 4. Bottom Bar: Back + Print + Save as Picture + Next + CC / Play */}
           <div className="s18-bottom-bar no-print">
             <div className="s18-actions-center">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopAudio();
+                    onBack();
+                  }}
+                  className="s18-btn-action s18-btn-back"
+                  aria-label={isSpanish ? "Atrás" : "Back"}
+                >
+                  {isSpanish ? "Atrás" : "Back"}
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={onPrint || (() => window.print())}
@@ -968,6 +993,20 @@ export function Slide18SummaryScreen({
                     : isSpanish ? "Guardar como imagen" : "Save as Picture"}
                 </span>
               </button>
+
+              {onNext && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopAudio();
+                    onNext();
+                  }}
+                  className="s18-btn-action s18-btn-next"
+                  aria-label={isSpanish ? "Siguiente" : "Next"}
+                >
+                  {isSpanish ? "Siguiente" : "Next"}
+                </button>
+              )}
             </div>
 
             <div className="s18-audio-controls">

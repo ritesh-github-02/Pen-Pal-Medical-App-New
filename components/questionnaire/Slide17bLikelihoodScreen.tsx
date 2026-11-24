@@ -599,6 +599,7 @@ export function Slide17bLikelihoodScreen({
   };
 
   const isLoading = loading || navProps?.loading || false;
+  const isNextEnabled = !!localSelected && !isLoading;
 
   const variantClass =
     variant === "mobile"
@@ -735,7 +736,6 @@ export function Slide17bLikelihoodScreen({
             <div className="s17b-nurse-wrap">
               <img
                 src="/images/Slide18.png"
-                srcSet="/images/nurse-anna-waving.png 1x, /images/nurse-anna-waving-2x.png 2x"
                 alt=""
                 className="s17b-nurse-img"
                 draggable={false}
@@ -770,7 +770,8 @@ export function Slide17bLikelihoodScreen({
             <button
               type="button"
               onClick={handleNext}
-              disabled={isLoading}
+              disabled={!isNextEnabled}
+              aria-disabled={!isNextEnabled}
               className="s17b-btn-nav s17b-btn-next"
               aria-label={isSpanish ? "Siguiente" : "Next"}
             >

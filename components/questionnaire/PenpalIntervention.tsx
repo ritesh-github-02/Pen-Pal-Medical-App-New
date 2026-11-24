@@ -546,8 +546,9 @@ export default function PenpalIntervention() {
   const handleBack = () => {
     if (loading) return;
     if (showSummary) {
-      setShowSummary(false);               
-      const prevIdx = questionnaireConfig.length - 2;
+      setShowSummary(false);
+      const summaryIdx = questionnaireConfig.findIndex((s) => s.type === "summary");
+      const prevIdx = summaryIdx > 0 ? summaryIdx - 1 : 0;
       setCurrentStepIndex(prevIdx);
       if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
@@ -656,8 +657,11 @@ export default function PenpalIntervention() {
             <span className="font-black text-xs sm:text-sm tracking-tight text-[#236f7a] font-display shrink-0 whitespace-nowrap">PEN-PAL</span>
             <span className="text-slate-300 text-xs shrink-0" aria-hidden="true">|</span>
             {(() => {
+              const summaryIdx = questionnaireConfig.findIndex((s) => s.type === "summary");
               const activeCount = questionnaireConfig.filter((s) => !s.isTerminal && s.id !== "screen_end").length + 1;
-              const displayStep = showSummary ? activeCount : Math.min(currentStepIndex + 1, activeCount);
+              const displayStep = showSummary
+                ? (summaryIdx !== -1 ? summaryIdx + 1 : activeCount - 1)
+                : Math.min(currentStepIndex + 1, activeCount);
               return (
                 <span 
                   className="text-[10.5px] sm:text-[11px] font-bold text-slate-700 shrink-0 whitespace-nowrap"
@@ -723,7 +727,23 @@ export default function PenpalIntervention() {
                     setShowSuccess(true);
                   }}
                   onNext={() => {
-                    setShowSuccess(true);
+                    if (answers["slide17b_likelihood"]) {
+                      setShowSuccess(true);
+                      return;
+                    }
+                    const likelihoodIdx = questionnaireConfig.findIndex((s) => s.id === "slide17b_likelihood");
+                    if (likelihoodIdx !== -1) {
+                      setShowSummary(false);
+                      setCurrentStepIndex(likelihoodIdx);
+                      if (typeof window !== "undefined") {
+                        const searchParams = new URLSearchParams(window.location.search);
+                        searchParams.set("step", String(likelihoodIdx));
+                        searchParams.delete("report");
+                        window.history.replaceState(null, "", `${window.location.pathname}?${searchParams.toString()}`);
+                      }
+                    } else {
+                      setShowSuccess(true);
+                    }
                   }}
                 />
               ) : (
@@ -1214,24 +1234,8 @@ export default function PenpalIntervention() {
                           ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
                           : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
                       }
-                      onNavigateToSuccess={async () => {
-                        try {
-                          await submitAnswer("screen7_summary", "completed", 0);
-                          await completeQuestionnaire();
-                        } catch (e) {
-                          console.warn("Complete sync warning:", e);
-                        }
-                        setShowSuccess(true);
-                      }}
-                      onNext={async () => {
-                        try {
-                          await submitAnswer("screen7_summary", "completed", 0);
-                          await completeQuestionnaire();
-                        } catch (e) {
-                          console.warn("Complete sync warning:", e);
-                        }
-                        setShowSuccess(true);
-                      }}
+                      onNavigateToSuccess={() => handleNext("completed")}
+                      onNext={() => handleNext("completed")}
                     />
                   ) : currentStep.type === "single_choice" ? (
                     <SurveySingleChoice

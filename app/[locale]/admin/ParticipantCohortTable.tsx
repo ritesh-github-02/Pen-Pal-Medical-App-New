@@ -80,6 +80,7 @@ const STUDY_SLIDES_CONFIG = [
   { id: 'screen6_5_yetagain', slideNumber: 19, title: 'Subsequent Penicillin Exposure', subtitle: 'Re-exposure history since reaction', type: 'Question' },
   { id: 'slide21_what_now', slideNumber: 21, title: 'Next Steps & Doctor Discussion', subtitle: 'What Now Transition Guidance', type: 'Education' },
   { id: 'screen7_summary', slideNumber: 22, title: 'Action Steps & Clinical Summary', subtitle: 'Printable report & Doctor Talking Points', type: 'Summary' },
+  { id: 'slide17b_likelihood', slideNumber: 23, title: 'Allergy Testing Discussion Likelihood', subtitle: 'Post-report likelihood survey', type: 'Question' },
 ];
 
 // Educational Handout Sections (Control Arm)

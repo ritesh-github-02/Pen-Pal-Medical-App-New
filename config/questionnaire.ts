@@ -270,19 +270,6 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     audioEn: '/audio/exported/slide21_what_now_en.mp3',
     audioEs: '/audio/exported/slide21_what_now_es.mp3',
     required: true,
-    nextStepId: 'slide17b_likelihood'
-  },
-  // Slide 17b: Likelihood of speaking to child's doctor about allergy testing
-  {
-    id: 'slide17b_likelihood',
-    type: 'single_choice',
-    titleEn: "How likely are you to speak to your child's doctor about [name] allergy testing?",
-    titleEs: "¿Qué tan probable es que hable con el médico de su hijo sobre la prueba de alergia a [name]?",
-    descriptionEn: "Extremely likely, Likely, Unsure, Unlikely, Extremely unlikely. Thank you for completing PEN-PAL.",
-    descriptionEs: "Extremadamente probable, Probable, Inseguro, Poco probable, Extremadamente improbable. Gracias por completar PEN-PAL.",
-    audioEn: '/audio/exported/slide17b_likelihood_en.mp3',
-    audioEs: '/audio/exported/slide17b_likelihood_es.mp3',
-    required: true,
     nextStepId: 'screen7_summary'
   },
   // Slide 22: Summary Table & PDF Export
@@ -295,6 +282,19 @@ export const questionnaireConfig: QuestionnaireStep[] = [
     descriptionEs: "1. Hable con el médico de su hijo sobre la alergia en su próxima visita. 2. Comparta fotos de la reacción de su hijo con el médico. 3. Entregue la siguiente tabla al médico de su hijo.",
     audioEn: '/audio/exported/screen7_summary_en.mp3',
     audioEs: '/audio/exported/screen7_summary_es.mp3',
+    required: true,
+    nextStepId: 'slide17b_likelihood'
+  },
+  // Final Survey Slide: Likelihood of speaking to child's doctor about allergy testing
+  {
+    id: 'slide17b_likelihood',
+    type: 'single_choice',
+    titleEn: "How likely are you to speak to your child's doctor about [name] allergy testing?",
+    titleEs: "¿Qué tan probable es que hable con el médico de su hijo sobre la prueba de alergia a [name]?",
+    descriptionEn: "Extremely likely, Likely, Unsure, Unlikely, Extremely unlikely. Thank you for completing PEN-PAL.",
+    descriptionEs: "Extremadamente probable, Probable, Inseguro, Poco probable, Extremadamente improbable. Gracias por completar PEN-PAL.",
+    audioEn: '/audio/exported/slide17b_likelihood_en.mp3',
+    audioEs: '/audio/exported/slide17b_likelihood_es.mp3',
     required: true,
     isTerminal: true
   },

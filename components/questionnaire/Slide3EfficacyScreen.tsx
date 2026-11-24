@@ -113,7 +113,7 @@ const mobileLayoutCSS = (scope: string) => `
     flex-shrink: 0 !important;
   }
   ${scope} .s3-heading {
-    font-size: 16.5px !important;
+    font-size: 18px !important;
     line-height: 1.4 !important;
     text-align: left !important;
   }
