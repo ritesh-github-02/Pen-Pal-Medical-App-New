@@ -727,10 +727,6 @@ export default function PenpalIntervention() {
                     setShowSuccess(true);
                   }}
                   onNext={() => {
-                    if (answers["slide17b_likelihood"]) {
-                      setShowSuccess(true);
-                      return;
-                    }
                     const likelihoodIdx = questionnaireConfig.findIndex((s) => s.id === "slide17b_likelihood");
                     if (likelihoodIdx !== -1) {
                       setShowSummary(false);

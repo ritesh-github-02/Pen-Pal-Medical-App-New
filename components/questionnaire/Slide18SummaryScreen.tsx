@@ -23,6 +23,7 @@ export interface Slide18SummaryScreenProps {
   onPrint?: () => void;
   onNavigateToSuccess?: () => void;
   onNext?: () => void;
+  onFinish?: () => void;
   audioSrc?: string;
   stepId?: string;
   locale?: string;
@@ -103,10 +104,9 @@ const mobileLayoutCSS = (scope: string) => `
     max-width: 360px !important;
   }
   ${scope} .s18-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
-  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-  ${scope} .s18-btn-action { width: 100% !important; height: 42px !important; min-height: 42px !important; font-size: 13.5px !important; padding: 0 10px !important; }
-  ${scope} .s18-btn-back { order: 3 !important; }
-  ${scope} .s18-btn-next { order: 4 !important; }
+  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; display: grid !important; grid-template-columns: minmax(96px, auto) 1fr !important; gap: 10px !important; }
+  ${scope} .s18-btn-action { width: 100% !important; height: 42px !important; min-height: 42px !important; font-size: 13.5px !important; padding: 0 12px !important; }
+  ${scope} .s18-btn-finish { grid-column: 1 / -1 !important; height: 44px !important; min-height: 44px !important; font-size: 16px !important; }
   ${scope} .s18-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
 `;
 
@@ -315,12 +315,12 @@ const SLIDE18_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 24px;
   }
   .s18-btn-action {
     height: 38px;
-    min-width: 74px;
-    padding: 0 18px;
+    min-width: 84px;
+    padding: 0 20px;
     border-radius: 9999px;
     font-family: inherit;
     font-size: 14.5px;
@@ -339,10 +339,11 @@ const SLIDE18_CSS = `
   .s18-btn-action:hover:not(:disabled) {
     background-color: #b4d1d6;
   }
-  .s18-btn-next {
+  .s18-btn-finish {
     background-color: #f9fa9a;
+    font-weight: 600;
   }
-  .s18-btn-next:hover:not(:disabled) {
+  .s18-btn-finish:hover:not(:disabled) {
     background-color: #f5f77a;
   }
   .s18-btn-action:active:not(:disabled) {
@@ -642,9 +643,9 @@ export function Slide18SummaryScreen({
   answers,
   activeToken,
   participantId,
-  onBack,
   onPrint,
   onNext,
+  onFinish,
   audioSrc,
   stepId = "screen7_summary",
   locale,
@@ -947,23 +948,9 @@ export function Slide18SummaryScreen({
             </div>
           )}
 
-          {/* 4. Bottom Bar: Back + Print + Save as Picture + Next + CC / Play */}
+          {/* 4. Bottom Bar: Print + Save as Picture + Finish + CC / Play */}
           <div className="s18-bottom-bar no-print">
             <div className="s18-actions-center">
-              {onBack && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    stopAudio();
-                    onBack();
-                  }}
-                  className="s18-btn-action s18-btn-back"
-                  aria-label={isSpanish ? "Atrás" : "Back"}
-                >
-                  {isSpanish ? "Atrás" : "Back"}
-                </button>
-              )}
-
               <button
                 type="button"
                 onClick={onPrint || (() => window.print())}
@@ -994,17 +981,18 @@ export function Slide18SummaryScreen({
                 </span>
               </button>
 
-              {onNext && (
+              {(onFinish || onNext) && (
                 <button
                   type="button"
                   onClick={() => {
                     stopAudio();
-                    onNext();
+                    (onFinish || onNext)?.();
                   }}
-                  className="s18-btn-action s18-btn-next"
-                  aria-label={isSpanish ? "Siguiente" : "Next"}
+                  className="s18-btn-action s18-btn-finish"
+                  aria-label={isSpanish ? "Finalizar e ir a la encuesta final" : "Finish and go to final survey"}
+                  title={isSpanish ? "Finalizar" : "Finish"}
                 >
-                  {isSpanish ? "Siguiente" : "Next"}
+                  {isSpanish ? "Finalizar" : "Finish"}
                 </button>
               )}
             </div>

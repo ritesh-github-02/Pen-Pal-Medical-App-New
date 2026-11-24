@@ -102,7 +102,7 @@ const mobileLayoutCSS = (scope: string) => `
     flex-shrink: 0 !important;
   }
   ${scope} .s9-intro {
-    font-size: 15.5px !important;
+    font-size: 18px !important;
     line-height: 1.42 !important;
     margin-bottom: 6px !important;
   }
@@ -111,7 +111,7 @@ const mobileLayoutCSS = (scope: string) => `
     gap: 6px !important;
   }
   ${scope} .s9-bullet {
-    font-size: 15px !important;
+    font-size: 16px !important;
     line-height: 1.38 !important;
   }
   ${scope} .s9-nurse {
