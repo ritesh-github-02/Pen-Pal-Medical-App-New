@@ -46,25 +46,23 @@ const SLIDE11_CSS = `
   justify-content: center;
   align-items: center;
   border-radius: 24px;
-  padding: 2.5rem 3rem 5rem 3rem; /* Adjusted padding for base stage */
+  padding: 1.75rem 2rem 5rem 2rem;
   overflow: hidden;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 
 /* Top Heading */
 .s11-top-section {
   width: 100%;
-  max-width: 100%;
+  max-width: 820px;
   margin: 0 auto;
   padding: 0;
   flex-shrink: 0;
-  padding-right: 180px;
-
 }
 .s11-heading {
-  font-size: 24px; /* INCREASED from 1.25rem */
-  line-height: 1.35;
+  font-size: 23px;
+  line-height: 1.32;
   font-weight: 700;
   color: #142724;
   letter-spacing: -0.015em;
@@ -84,7 +82,7 @@ const SLIDE11_CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 0;
   margin: 0 auto;
 }
@@ -94,14 +92,14 @@ const SLIDE11_CSS = `
 .s11-card {
   flex: 1 1 auto;
   width: 100%;
-  max-width: 700px;
+  max-width: 672px;
   background-color: #84aba0;
   border-radius: 20px;
-  padding: 1.5rem 1.5rem;
+  padding: 1.15rem 1.25rem;
   box-shadow: 0 4px 14px -3px rgba(20, 60, 55, 0.18);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 
@@ -109,8 +107,8 @@ const SLIDE11_CSS = `
 .s11-chip-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.8rem;
+  flex-wrap: nowrap;
+  gap: 0.65rem;
 }
 
 
@@ -119,10 +117,10 @@ const SLIDE11_CSS = `
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0.6rem 1.2rem; /* INCREASED */
+  padding: 0.52rem 0.9rem;
   background-color: #ffffff;
   color: #142724;
-  font-size: 16px; /* INCREASED from 0.88rem */
+  font-size: 14.5px;
   font-weight: 600;
   border-radius: 9px;
   box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.12);
@@ -131,6 +129,8 @@ const SLIDE11_CSS = `
   transition: all 0.15s ease;
   user-select: none;
   outline: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 
@@ -186,21 +186,21 @@ const SLIDE11_CSS = `
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  margin-top: 0.5rem;
+  gap: 1.25rem;
+  margin-top: 0.25rem;
 }
 
 
 .s11-other-wrap {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.75rem;
   flex: 1;
 }
 
 
 .s11-other-label {
-  font-size: 16px; /* INCREASED */
+  font-size: 15px;
   font-weight: 600;
   color: #142724;
   white-space: nowrap;
@@ -213,11 +213,11 @@ const SLIDE11_CSS = `
   border: 2px solid #ffd41d !important;
   border-radius: 8px;
   outline: none;
-  font-size: 16px; /* INCREASED */
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff !important;
   caret-color: #ffd41d;
-  padding: 8px 12px;
+  padding: 6px 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
@@ -240,7 +240,7 @@ const SLIDE11_CSS = `
 
 
 .s11-nurse {
-  width: 150px; /* Slightly larger for the bigger canvas */
+  width: 135px;
   height: auto;
 }
 
@@ -430,48 +430,57 @@ const SLIDE11_CSS = `
     border-radius: 0 !important;
     transform: none !important;
     overflow-y: auto !important;
-    padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    padding: 16px 16px calc(24px + env(safe-area-inset-bottom, 0px)) 16px !important;
     justify-content: flex-start !important;
-    gap: 1rem !important;
+    gap: 1.25rem !important;
   }
 
+  .s11-top-section {
+    max-width: 100% !important;
+    padding-right: 0 !important;
+  }
 
   .s11-heading {
-    font-size: 18px !important;
+    font-size: 19px !important;
+    line-height: 1.35 !important;
     text-align: left !important;
   }
 
-
   .s11-middle {
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 1.25rem !important;
+    width: 100% !important;
+    align-items: center !important;
   }
-
 
   .s11-card {
-    padding: 0.85rem 1rem !important;
-    gap: 0.6rem !important;
-    border-radius: 14px !important;
+    padding: 1rem 0.9rem !important;
+    gap: 0.75rem !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
-
 
   .s11-chip-row {
-    gap: 0.45rem !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
   }
-
 
   .s11-chip {
     padding: 0.45rem 0.75rem !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
+    white-space: normal !important;
+    flex-shrink: 1 !important;
+    text-align: center !important;
   }
-
 
   .s11-row-bottom {
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.8rem !important;
+    gap: 0.75rem !important;
+    margin-top: 0.25rem !important;
   }
-
 
   .s11-other-wrap {
     flex-direction: column !important;
@@ -479,43 +488,51 @@ const SLIDE11_CSS = `
     gap: 0.4rem !important;
   }
 
-
   .s11-other-label {
     font-size: 14px !important;
   }
 
-
   .s11-other-input {
     font-size: 14px !important;
-    padding: 8px !important;
+    padding: 8px 10px !important;
   }
-
 
   .s11-nurse {
-    width: 120px !important;
+    width: 110px !important;
+    margin: 0 auto !important;
   }
-
 
   .s11-bottom-bar {
     position: static !important;
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 8px !important;
-    padding: 4px 0 0 0 !important;
+    gap: 12px !important;
+    padding: 12px 0 0 0 !important;
     flex-shrink: 0 !important;
     width: 100% !important;
     max-width: 360px !important;
+    margin: 0 auto !important;
     pointer-events: auto !important;
   }
-
 
   .s11-audio-controls {
     position: static !important;
     order: 1 !important;
     margin: 0 auto !important;
+    gap: 8px !important;
   }
 
+  .s11-audio-btn {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    padding: 4px !important;
+  }
+
+  .s11-audio-btn svg {
+    width: 44px !important;
+    height: 38px !important;
+  }
 
   .s11-nav-center {
     position: static !important;
@@ -526,7 +543,6 @@ const SLIDE11_CSS = `
     justify-content: space-between !important;
   }
 
-
   .s11-btn-nav {
     flex: 1 1 0% !important;
     height: 44px !important;
@@ -534,12 +550,14 @@ const SLIDE11_CSS = `
     font-size: 16px !important;
   }
 
-
   .s11-captions-panel {
     position: static !important;
     width: 100% !important;
     max-width: 360px !important;
     bottom: auto !important;
+    margin: 0 auto !important;
+    padding: 8px 12px !important;
+    font-size: 13.5px !important;
   }
 }
 `;
@@ -1154,8 +1172,8 @@ export function Slide11SymptomsScreen({
             >
               {audioPlaying ? (
                 <svg
-                  width="54"
-                  height="40"
+                  width="64"
+                  height="47"
                   viewBox="0 0 50 36"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -1176,8 +1194,8 @@ export function Slide11SymptomsScreen({
                 </svg>
               ) : (
                 <svg
-                  width="54"
-                  height="40"
+                  width="64"
+                  height="47"
                   viewBox="0 0 50 36"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

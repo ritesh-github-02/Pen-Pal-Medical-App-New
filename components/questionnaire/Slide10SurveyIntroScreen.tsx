@@ -210,10 +210,10 @@ const SLIDE10_SURVEY_INTRO_CSS = `
   /* ---- 1. Nurse Anna on Left gesturing right toward bubble ---- */
   .s10b-nurse {
     position: absolute;
-    left: 88px;
-    top: 154px;
-    width: 142px;
-    height: 284px;
+    left: 40px;
+    top: 159px;
+    width: 198px;
+    height: 289px;
     pointer-events: none;
     z-index: 5;
     display: flex;
@@ -593,7 +593,7 @@ export function Slide10SurveyIntroScreen({
         {/* 1. Nurse Anna on Left gesturing right toward bubble */}
         <div className="s10b-nurse" aria-hidden="true">
           <img
-            src="/images/nurse-anna-s2.png?v=3"
+            src="/images/Slide10.png?v=3"
             alt=""
             className="s10b-nurse-img"
             draggable={false}
