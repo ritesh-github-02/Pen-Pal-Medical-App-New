@@ -98,15 +98,41 @@ const mobileLayoutCSS = (scope: string) => `
     height: auto !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 14px !important;
     padding: 6px 0 0 0 !important;
     width: 100% !important;
-    max-width: 360px !important;
+    max-width: 380px !important;
   }
   ${scope} .s18-audio-controls { position: static !important; order: 1 !important; margin: 0 auto !important; }
-  ${scope} .s18-actions-center { position: static !important; order: 2 !important; left: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; display: grid !important; grid-template-columns: minmax(96px, auto) 1fr !important; gap: 10px !important; }
-  ${scope} .s18-btn-action { width: 100% !important; height: 42px !important; min-height: 42px !important; font-size: 13.5px !important; padding: 0 12px !important; }
-  ${scope} .s18-btn-finish { grid-column: 1 / -1 !important; height: 44px !important; min-height: 44px !important; font-size: 16px !important; }
+  ${scope} .s18-actions-center {
+    position: static !important;
+    order: 2 !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  ${scope} .s18-btn-action {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 0 1 auto !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: clamp(12px, 3.2vw, 13.5px) !important;
+    padding: 0 13px !important;
+  }
+  ${scope} .s18-btn-finish {
+    grid-column: auto !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: clamp(12.5px, 3.4vw, 14px) !important;
+    padding: 0 16px !important;
+  }
   ${scope} .s18-captions-panel { position: static !important; width: 100% !important; max-width: 360px !important; bottom: auto !important; }
 `;
 
