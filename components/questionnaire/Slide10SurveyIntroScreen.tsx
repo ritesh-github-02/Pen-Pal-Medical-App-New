@@ -98,21 +98,25 @@ const mobileLayoutCSS = (scope: string) => `
   ${scope} .s10b-bubble-text-wrap {
     top: 42% !important;
     left: 50% !important;
-    width: 80% !important;
+    width: 78% !important;
   }
   ${scope} .s10b-bubble-text {
     font-size: clamp(15px, 4.2vw, 18px) !important;
-    line-height: 1.42 !important;
+    line-height: 1.4 !important;
     text-align: center !important;
+    text-wrap: balance !important;
+  }
+  ${scope} .s10b-bubble-line {
+    display: inline !important;
   }
   ${scope} .s10b-nurse {
     order: 2 !important;
     position: relative !important;
     left: auto !important;
     top: auto !important;
-    width: 112px !important;
-    height: 222px !important;
-    margin: -18px auto 0 12% !important;
+    width: 156px !important;
+    height: 234px !important;
+    margin: -16px auto 0 10% !important;
     flex-shrink: 0 !important;
   }
   ${scope} .s10b-bottom-bar {
@@ -664,14 +668,14 @@ export function Slide10SurveyIntroScreen({
             <h1 id="s10b-heading" ref={headingRef} tabIndex={-1} className="s10b-bubble-text">
               {isEs ? (
                 <>
-                  <span className="s10b-bubble-line">El siguiente conjunto de preguntas</span>
-                  <span className="s10b-bubble-line">puede ayudarlo a usted y al médico</span>
+                  <span className="s10b-bubble-line">El siguiente conjunto de preguntas</span>{" "}
+                  <span className="s10b-bubble-line">puede ayudarlo a usted y al médico</span>{" "}
                   <span className="s10b-bubble-line">a decidir qué es mejor para su hijo.</span>
                 </>
               ) : (
                 <>
-                  <span className="s10b-bubble-line">The next set of questions can help</span>
-                  <span className="s10b-bubble-line">you and the doctor see what&rsquo;s best</span>
+                  <span className="s10b-bubble-line">The next set of questions can help</span>{" "}
+                  <span className="s10b-bubble-line">you and the doctor see what&rsquo;s best</span>{" "}
                   <span className="s10b-bubble-line">for your child.</span>
                 </>
               )}

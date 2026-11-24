@@ -1093,14 +1093,14 @@ export function Slide11SymptomsScreen({
 
 
           <div className="s11-right">
-            <div className="s11-nurse">
+            {/* <div className="s11-nurse">
               <NurseAnna
                 size="md"
                 imgClassName="s11-nurse-img"
                 isDecorative={true}
                 locale={isSpanish ? "es" : "en"}
               />
-            </div>
+            </div> */}
           </div>
         </div>
 
