@@ -95,11 +95,11 @@ const SLIDE11_CSS = `
   max-width: 672px;
   background-color: #84aba0;
   border-radius: 20px;
-  padding: 1.15rem 1.25rem;
+  padding: 1.5rem;
   box-shadow: 0 4px 14px -3px rgba(20, 60, 55, 0.18);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 
@@ -120,7 +120,7 @@ const SLIDE11_CSS = `
   padding: 0.52rem 0.9rem;
   background-color: #ffffff;
   color: #142724;
-  font-size: 14.5px;
+  font-size: 17.5px;
   font-weight: 600;
   border-radius: 9px;
   box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.12);
@@ -1244,25 +1244,61 @@ export function Slide11SymptomsScreen({
           }}
         >
           <div
-            className="bg-[#fffef2] rounded-3xl p-6 md:p-8 max-w-[480px] w-full shadow-2xl border-[1.5px] border-[#142724] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200"
+            className="relative bg-[#fffef2] rounded-[28px] p-8 md:p-10 max-w-[620px] w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-             <div className="flex flex-wrap gap-3">
+            {/* <button
+              type="button"
+              onClick={() => {
+                setRashModalOpen(false);
+                modalTriggerRef.current?.focus();
+              }}
+              className="absolute top-4 right-5 text-xl font-bold text-[#142724]/60 hover:text-[#142724] p-1.5 rounded-full hover:bg-black/5 transition-colors"
+              aria-label={isSpanish ? "Cerrar" : "Close"}
+            >
+              ✕
+            </button> */}
+
+             <div className="flex flex-wrap gap-3.5">
                 {["Hives", "Blisters", "Red, fine or bumpy rash"].map(opt => (
-                  <button key={opt} ref={opt === "Hives" ? rashFirstBtnRef : null} onClick={() => toggleRashDetail(opt)} className={`px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeRashDetails.includes(opt) ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+                  <button
+                    key={opt}
+                    ref={opt === "Hives" ? rashFirstBtnRef : null}
+                    onClick={() => toggleRashDetail(opt)}
+                    className={`px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                      activeRashDetails.includes(opt)
+                        ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                        : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                    }`}
+                  >
                     {isSpanish ? (opt === "Hives" ? "Ronchas" : opt === "Blisters" ? "Ampollas" : "Sarpullido rojo") : opt}
                   </button>
                 ))}
              </div>
-             <div className="flex flex-wrap gap-3">
+             <div className="flex flex-wrap gap-3.5">
                 {["Flushing", "Pus-filled pimples"].map(opt => (
-                  <button key={opt} onClick={() => toggleRashDetail(opt)} className={`px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeRashDetails.includes(opt) ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+                  <button
+                    key={opt}
+                    onClick={() => toggleRashDetail(opt)}
+                    className={`px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                      activeRashDetails.includes(opt)
+                        ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                        : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                    }`}
+                  >
                     {isSpanish ? (opt === "Flushing" ? "Enrojecimiento" : "Granos con pus") : opt}
                   </button>
                 ))}
              </div>
-             <div className="flex flex-wrap gap-3 mt-2">
-               <button onClick={() => toggleRashDetail("Unsure")} className={`px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeRashDetails.includes("Unsure") ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+             <div className="flex flex-wrap gap-3.5 mt-1">
+               <button
+                 onClick={() => toggleRashDetail("Unsure")}
+                 className={`px-6 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                   activeRashDetails.includes("Unsure")
+                     ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                     : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                 }`}
+               >
                   {isSpanish ? "No estoy seguro" : "Unsure/I don't know"}
                </button>
              </div>
@@ -1282,37 +1318,73 @@ export function Slide11SymptomsScreen({
           }}
         >
           <div
-            className="bg-[#fffef2] rounded-3xl p-6 md:p-8 max-w-[440px] w-full shadow-2xl border border-[#e5ded0] flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200"
+            className="relative bg-[#fffef2] rounded-[28px] p-8 md:p-10 max-w-[620px] w-full shadow-2xl border-[2px] border-[#142724] flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-             <div className="flex gap-3">
+            {/* <button
+              type="button"
+              onClick={() => {
+                setSwellingModalOpen(false);
+                swellingTriggerRef.current?.focus();
+              }}
+              className="absolute top-4 right-5 text-xl font-bold text-[#142724]/60 hover:text-[#142724] p-1.5 rounded-full hover:bg-black/5 transition-colors"
+              aria-label={isSpanish ? "Cerrar" : "Close"}
+            >
+              ✕
+            </button> */}
+
+             <div className="flex gap-3.5">
                 {["Face swelling", "Throat swelling"].map(opt => (
-                  <button key={opt} ref={opt === "Face swelling" ? swellingFirstBtnRef : null} onClick={() => toggleSwellingDetail(opt)} className={`flex-1 px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeSwellingDetails.includes(opt) ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+                  <button
+                    key={opt}
+                    ref={opt === "Face swelling" ? swellingFirstBtnRef : null}
+                    onClick={() => toggleSwellingDetail(opt)}
+                    className={`flex-1 px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                      activeSwellingDetails.includes(opt)
+                        ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                        : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                    }`}
+                  >
                     {isSpanish ? (opt === "Face swelling" ? "Inflamación de la cara" : "Inflamación de la garganta") : opt}
                   </button>
                 ))}
              </div>
-             <div className="flex gap-3">
+             <div className="flex gap-3.5">
                 {["Lip swelling", "Tongue swelling"].map(opt => (
-                  <button key={opt} onClick={() => toggleSwellingDetail(opt)} className={`flex-1 px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeSwellingDetails.includes(opt) ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+                  <button
+                    key={opt}
+                    onClick={() => toggleSwellingDetail(opt)}
+                    className={`flex-1 px-5 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                      activeSwellingDetails.includes(opt)
+                        ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                        : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                    }`}
+                  >
                     {isSpanish ? (opt === "Lip swelling" ? "Inflamación de los labios" : "Inflamación de la lengua") : opt}
                   </button>
                 ))}
              </div>
-             <div className="flex gap-3">
-               <button onClick={() => toggleSwellingDetail("Unsure")} className={`px-4 py-2 rounded-lg border-[1.5px] font-semibold text-sm transition-all ${activeSwellingDetails.includes("Unsure") ? "bg-[#ffd41d] border-[#1c5249] shadow-inner" : "bg-white border-[#236f7a] hover:bg-[#f3f8f6]"}`}>
+             <div className="flex gap-3.5">
+               <button
+                 onClick={() => toggleSwellingDetail("Unsure")}
+                 className={`px-6 py-3.5 rounded-xl border-[2px] font-bold text-[15.5px] transition-all ${
+                   activeSwellingDetails.includes("Unsure")
+                     ? "bg-[#ffd41d] border-[#1c5249] shadow-inner"
+                     : "bg-white border-[#236f7a] hover:bg-[#f3f8f6] shadow-sm hover:translate-y-[-1px]"
+                 }`}
+               >
                   {isSpanish ? "No estoy seguro/No lo sé" : "Unsure/I don't know"}
                </button>
              </div>           
-             <div className="flex items-center gap-3 mt-2">
-               <label className="text-sm font-semibold text-[#142724] whitespace-nowrap">
+             <div className="flex items-center gap-3.5 mt-2">
+               <label className="text-[15.5px] font-bold text-[#142724] whitespace-nowrap">
                  {isSpanish ? "Otro: Describa" : "Other: Please describe"}
                </label>
                <input
                  type="text"
                  value={swellingOtherText}
                  onChange={(e) => handleSwellingOtherChange(e.target.value)}
-                 className="flex-1 bg-transparent border-b-2 border-[#142724] outline-none text-sm font-medium px-1 py-1 focus:border-[#0b1f1c]"
+                 className="flex-1 bg-transparent border-b-2 border-[#142724] outline-none text-base font-medium px-2 py-1.5 focus:border-[#0b1f1c]"
                />
              </div>
           </div>

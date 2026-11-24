@@ -34,6 +34,7 @@ import { Slide14MedicalCareScreen } from "./Slide14MedicalCareScreen";
 import { Slide16ResolutionScreen } from "./Slide16ResolutionScreen";
 import { Slide19RepeatUseScreen } from "./Slide19RepeatUseScreen";
 import { Slide21WhatNowScreen } from "./Slide21WhatNowScreen";
+import { Slide17bLikelihoodScreen } from "./Slide17bLikelihoodScreen";
 import { Slide18SummaryScreen } from "./Slide18SummaryScreen";
 import { SlideNavigationButtons } from "./SlideNavigationButtons";
 import esMessages from "@/messages/es.json";
@@ -1153,6 +1154,37 @@ export default function PenpalIntervention() {
                       isSpanish={locale === "es"}
                       medicationName={medicationName}
                       onNext={() => handleNext("acknowledged")}
+                      onBack={handleBack}
+                      loading={loading}
+                      audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}
+                      stepId={currentStep.id}
+                      locale={locale}
+                      transcriptText={
+                        (locale === "es"
+                          ? `${currentStep.titleEs || ""}${currentStep.descriptionEs ? ". " + currentStep.descriptionEs : ""}`
+                          : `${currentStep.titleEn || ""}${currentStep.descriptionEn ? ". " + currentStep.descriptionEn : ""}`
+                        ).replace(/\[name\]/gi, medicationName).trim()
+                      }
+                      navProps={baseProps}
+                    />
+                  ) : currentStep.id === "slide17b_likelihood" ? (
+                    <Slide17bLikelihoodScreen
+                      isSpanish={locale === "es"}
+                      medicationName={medicationName}
+                      selected={answers["slide17b_likelihood"] || answers["likelihood"]}
+                      onSelect={(val: string) => {
+                        setAnswers((prev) => {
+                          const updated = { ...prev, slide17b_likelihood: val, likelihood: val };
+                          try {
+                            localStorage.setItem("penpal_progress", JSON.stringify(updated));
+                          } catch {}
+                          return updated;
+                        });
+                        submitAnswer("slide17b_likelihood", val, 0).catch(() => {});
+                      }}
+                      onNext={(explicitAnswer?: string) =>
+                        handleNext(explicitAnswer || answers["slide17b_likelihood"] || answers["likelihood"])
+                      }
                       onBack={handleBack}
                       loading={loading}
                       audioSrc={locale === "es" ? currentStep.audioEs : currentStep.audioEn}

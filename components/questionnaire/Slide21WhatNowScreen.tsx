@@ -446,8 +446,8 @@ export function Slide21WhatNowScreen({
     variant === "mobile"
       ? " is-mobile"
       : variant === "desktop"
-      ? " is-desktop"
-      : "";
+        ? " is-desktop"
+        : "";
 
   return (
     <div id="slide-content" ref={rootRef} className={`s21-root${variantClass}`} data-step-id={stepId || "slide21_what_now"}>
@@ -499,7 +499,7 @@ export function Slide21WhatNowScreen({
         {/* 3. Doctor Consultation Illustration */}
         <figure className="s21-figure" aria-hidden="true">
           <img
-            src="/images/doctor-consultation-s17.png"
+            src="/images/Slide17.png"
             alt={
               isSpanish
                 ? "Madre e hija consultando con la pediatra sobre las pruebas de alergia"
