@@ -83,7 +83,7 @@ const mobileLayoutCSS = (scope: string) => `
     line-height: 1.4 !important;
   }
   ${scope} .s21-bullet {
-    font-size: 16px !important;
+    font-size: 18px !important;
     line-height: 1.4 !important;
   }
   ${scope} .s21-figure {
